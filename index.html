@@ -78,6 +78,8 @@ function InitMidi(){
           i++;
       }
       SelectPort(0);
+      if(!midiout)
+        alert("MIDI port is not found.");
       var inputIterator=midiaccess.inputs.values();
       for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
         console.log(ip.value);
@@ -108,8 +110,6 @@ function InitMidi(){
     },
     function(e){console.log(e);},
   );
-  if(!midiout)
-    alert("MIDI port is not found.");
 }
 function Init(){
   setTimeout(function(){
@@ -135,7 +135,8 @@ function StateChange(){
   midiout=null;
 }
 function SelectPort(){
-  midiout=midioutputs[document.getElementById("midiport").selectedIndex];
+  if(midioutputs.length>0)
+    midiout=midioutputs[document.getElementById("midiport").selectedIndex];
 }
 function SelectPatch(p){
   if(midiout)
