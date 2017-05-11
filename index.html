@@ -1,0 +1,279 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script>
+//
+// Zoom MS-50G Utility
+//
+// MIDI commands
+//  These commands are inferred by irresponsible experiment and not garanteed.
+//
+//  ProgramChange : [0xc0,pp]
+//     Select patch by MIDI Program Change pp=patch number (0-49)
+//  RequestCurrentProgram : [0xf0,0x52,0x00,0x58,0x33,0xf7]
+//     Request current bank&program. It returns [0xb0,0x00,0x00, 0xb0,0x20,0x00, 0xc0,pp] pp=program#(0-49) bank is always 0
+//  IdentityRequest : [0xf0,0x7e,0x00,0x06,0x01,0xf7]
+//     Identity Request (MIDI Universal System Exclusive). It return [0xf0,0x7e,0x00,0x06,0x02,0x52,0x58,0x00,0x00,0x00,0x33,0x2e,0x30,0x30,0xf7]
+//  TunerMode : [0xb0,0x4a,mm]
+//     Tuner Mode On/Off. MIDI Control Change CC#74. mm<64:off mm>=64:on
+//  EffectEnable : [0xf0,0x52,0x00,0x58,0x31,nn,0x00,mm,0x00,0xf7]
+//     Effect On/Off. It seems effective only for effect1-3.  nn=effect#(0-2) mm=0:off mm=1:on
+//  ParameterEditEnable : [0xf0,0x52,0x00,0x58,vv,0xf7]
+//     Parameter value edit enable. Needed before Parameter Edit command.  vv=0x50:Disable vv=0x51:Enable
+//  ParameterEdit : [0xf0,0x52,0x00,0x58,0x31,0x01,nn,vvLSB,vvMSB,0xf7]
+//     Parameter value edit. nn=param#+2 vv=value. value range is depends on each effect.
+//  WritePatch : [0xf0,0x52,0x00,0x58,0x28,effect1,effect2,...effect6,patch-name,0xf7] (146bytes)
+//     Write 146bytes patch-data to current program.
+//     It consist of [0xf8,0x52,0x00,0x58,0x28, effect1,effect2,...effect6, patch-name,0xf7]
+//  RequestPatch : [0xf0,0x52,0x00,0x58,0x29,0xf7]
+//     Requst patch-data of current program. it returns 146 bytes patch-data (same as WritePatch command)
+//
+//
+var midiaccess=null;
+var midioutputs=[];
+var midiout=null;
+var midirecv="";
+var patches;
+var patchindex=-1;
+var timer;
+
+function MakeStr(b){
+  var str="";
+  for(var j=0;j<b.length;++j)
+    str+=("00"+b[j].toString(16)).substr(-2);
+  return str;
+}
+function MakeName(b){
+  var name="";
+  for(var j=0;j<13;++j){
+    var c=b[132+j];
+    if(c)
+      name+=String.fromCharCode(c);
+  }
+  return name;
+}
+function MakeBin(s){
+  var bin=[];
+  for(var j=0;j<s.length;j+=2)
+    bin.push(parseInt(s.substr(j,2),16));
+  return bin;
+}
+function InitMidi(){
+  var i;
+  if(!navigator.requestMIDIAccess){
+    alert("This browser does not support Web MIDI API. Please use latest Chrome.");
+    return;
+  }
+  navigator.requestMIDIAccess({sysex:true}).then(
+    function(ma){
+      midiaccess=ma;
+      console.log(midiaccess)
+      var outputIterator=midiaccess.outputs.values();
+      i=0;
+      for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
+          midioutputs[i]=o.value;
+          document.getElementById("midiport").options[i]=new Option(o.value.name);
+          i++;
+      }
+      midiout=midioutputs[0];
+      var inputIterator=midiaccess.inputs.values();
+      for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
+        console.log(ip.value);
+        if(ip.value.name==="ZOOM MS Series"){
+          ip.value.addEventListener("midimessage",
+            function(ev){
+              midirecv=MakeStr(ev.data);
+              if(midirecv.substr(0,10)=="f052005828"){
+                var name=MakeName(ev.data);
+                if(patchindex>=0){
+                  patches[patchindex++]={name:name,data:ev.data};
+                  if(patchindex>49){
+                    SelectPatch(0);
+                    patchindex=-1;
+                  }
+                  else{
+                    midiout.send([0xc0,patchindex]);
+                    midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
+                  }
+                }
+                console.log("name:"+name)
+              }
+              console.log(midirecv);
+            }
+          );
+        }
+      }
+    },
+    function(e){console.log(e)},
+  );
+}
+function Init(){
+  setTimeout(function(){
+    Edit(1);
+    setTimeout(function(){
+      DumpPatches();
+      timer=setInterval(function(){
+        if(patchindex<0){
+          clearInterval(timer);
+          for(i=0;i<50;++i)
+            document.getElementById("patch").options[i]=new Option((i+1)+":"+patches[i].name);
+          document.getElementById("msg").innerHTML="Ready";
+        }
+        else{
+          document.getElementById("msg").innerHTML="Scanning("+patchindex+")...";
+        }
+      },200);
+    },200);
+  },200);
+}
+function SelectPort(){
+  midiout=midioutputs[document.getElementById("midiport").selectedIndex];
+}
+function SelectPatch(p){
+  midiout.send([0xc0,p]);
+}
+function SendPatch(p){
+  console.log(patches[p].data);
+  midiout.send(patches[p].data);
+}
+function DumpPatches(){
+  midiout.send([0xc0,0]);
+  patches=[];
+  patchindex=0;
+  midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
+}
+function Edit(p){
+  if(p)
+    midiout.send([0xf0,0x52,0x00,0x58,0x50,0xf7]);
+  else
+    midiout.send([0xf0,0x52,0x00,0x58,0x51,0xf7]);
+}
+function Save(){
+  var p=document.getElementById("patch").selectedIndex;
+  if(p<0)
+    return;
+  var n=patches[p].name;
+  var fname=n.replace(/\s+$/,"").replace(/ /g,"_");
+  var d=MakeStr(patches[p].data);
+  var blob=new Blob([d],{"type":"text/plain"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.target="_blank";
+  a.download=fname+".txt";
+  a.click();
+  console.log(n,d,fname);
+}
+function Load(){
+  var p=document.getElementById("patch").selectedIndex;
+  if(p<0)
+    return;
+    console.log("load");
+  var i=document.createElement("input");
+  i.type="file";
+  i.click();
+  i.addEventListener("change",function(ev){
+    var file=ev.target.files;
+    var reader=new FileReader();
+    reader.readAsText(file[0]);
+    reader.onload=function(ev){
+      console.log(reader.result);
+      patches[p].data=MakeBin(reader.result);
+      patches[p].name=MakeName(patches[p].data);
+      document.getElementById("patch").options[p].innerHTML=(p+1)+":" +patches[p].name;
+      SelectPatch(p);
+      SendPatch(p);
+    }
+  },false);
+}
+function Rename(){
+  var p=document.getElementById("patch").selectedIndex;
+  if(p<0)
+    return;
+  var el=document.getElementById("renamepane");
+  document.getElementById("newname").value=patches[document.getElementById("patch").selectedIndex].name;
+  if(el.style.display!="block"){
+    el.style.display="block";
+  }
+  else{
+    el.style.display="none";
+  }
+}
+function CancelRename(){
+  var el=document.getElementById("renamepane");
+  el.style.display="none";
+}
+function OkRename(){
+  var i;
+  var name=document.getElementById("newname").value;
+  var p=document.getElementById("patch").selectedIndex;
+  if(name.length>10)
+    name=name.substr(0,10);
+  patches[p].name=name;
+  patches[p].data[132]=name.charCodeAt(0);
+  for(i=1;i<=7;++i)
+    patches[p].data[133+i]=name.charCodeAt(i);
+  for(i=8;i<=9;++i)
+    patches[p].data[134+i]=name.charCodeAt(i);
+  document.getElementById("patch").options[p].innerHTML=(p+1)+":" +name;
+  SelectPatch(p);
+  SendPatch(p);
+  var el=document.getElementById("renamepane");
+  el.style.display="none";
+  SendPatch(p);
+}
+window.addEventListener("load",InitMidi);
+
+</script>
+<style>
+#rename {
+  display:none;
+}
+.patch{
+  background: #66f;
+  border:1px solid #225;
+  border-radius: 5px;
+  width:220px;
+  height:60px;
+}
+#renamepane{
+  background:#66f;
+  color:#fff;
+  border:1px solid #000;
+  padding: 8px;
+  display:none;
+}
+</style>
+</head>
+<body>
+  <a href="http://www.g200kg.com/"><img src="./g200kg160x80.png" style="float:left;margin:4px 11px"/></a>
+  <h1>Zoom MS-50G Utility</h1>
+  <hr style="clear:both"/>
+  <p> This is a patch utility for ZOOM MS-50G MultiStomp guitar pedal.
+  </p>
+  <p> This is still a very tentative version for the confirmation of MIDI related fucntion.</p>
+  <p> If you are interested in MS-50G MIDI related function, check GitHub repository<p>
+  <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
+  <ul>
+    <li>Connect PC/Mac to MS-50G via USB</li>
+    <li>Launch this page. You should use Chrome</li>
+    <li>Press accept if 'MIDI device' dialog is deplayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
+    <li>Select MidiPort to 'ZOOM MS Series'</li>
+    <li>Press 'Scan MS-50G'</li>
+    <li>After scan, select patch and 'Rename', 'SaveToFile' or 'LoadFromFile'.
+  </ul>
+  MidiPort : <select id="midiport" onchange="SelectPort()"></select><br/>
+  <button onclick="Init()">Scan MS-50G</button>
+  <br/>
+
+  <hr/>
+  Status : <span id="msg">Not Initialized</span><br/>
+  Patch : <select id="patch" onchange="SelectPatch(this.selectedIndex)"></select><br/>
+
+  <button onclick="Rename()">Rename</button> <button onclick="Save()">Save To File</button> <button onclick="Load()">Load From File</button>
+  <div id="renamepane">
+    New name : <input id="newname"/><br/><button onclick="CancelRename()">Cancel</button><button onclick="OkRename()">OK</button>
+  </div>
+  <br/>
+</body>
+</html>
