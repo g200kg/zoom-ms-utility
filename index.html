@@ -69,6 +69,7 @@ function InitMidi(){
     function(ma){
       midiaccess=ma;
       console.log(midiaccess)
+      midiaccess.onstatechange=StateChange;
       var outputIterator=midiaccess.outputs.values();
       i=0;
       for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
@@ -76,7 +77,7 @@ function InitMidi(){
           document.getElementById("midiport").options[i]=new Option(o.value.name);
           i++;
       }
-      midiout=midioutputs[0];
+      SelectPort(0);
       var inputIterator=midiaccess.inputs.values();
       for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
         console.log(ip.value);
@@ -97,7 +98,7 @@ function InitMidi(){
                     midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
                   }
                 }
-                console.log("name:"+name)
+                console.log("name:"+name);
               }
               console.log(midirecv);
             }
@@ -105,8 +106,10 @@ function InitMidi(){
         }
       }
     },
-    function(e){console.log(e)},
+    function(e){console.log(e);},
   );
+  if(!midiout)
+    alert("MIDI port is not found.");
 }
 function Init(){
   setTimeout(function(){
@@ -127,23 +130,32 @@ function Init(){
     },200);
   },200);
 }
+function StateChange(){
+  console.log("StateChange");
+  midiout=null;
+}
 function SelectPort(){
   midiout=midioutputs[document.getElementById("midiport").selectedIndex];
 }
 function SelectPatch(p){
-  midiout.send([0xc0,p]);
+  if(midiout)
+    midiout.send([0xc0,p]);
 }
 function SendPatch(p){
-  console.log(patches[p].data);
-  midiout.send(patches[p].data);
+  if(midiout)
+    midiout.send(patches[p].data);
 }
 function DumpPatches(){
+  if(!midiout)
+    return;
   midiout.send([0xc0,0]);
   patches=[];
   patchindex=0;
   midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
 }
 function Edit(p){
+  if(!midiout)
+    return;
   if(p)
     midiout.send([0xf0,0x52,0x00,0x58,0x50,0xf7]);
   else
@@ -256,7 +268,7 @@ window.addEventListener("load",InitMidi);
   <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
   <ul>
     <li>Connect PC/Mac to MS-50G via USB</li>
-    <li>Launch this page. You should use Chrome</li>
+    <li>Launch this page. You should use Latest Chrome</li>
     <li>Press accept if 'MIDI device' dialog is deplayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
     <li>Select MidiPort to 'ZOOM MS Series'</li>
     <li>Press 'Scan MS-50G'</li>
