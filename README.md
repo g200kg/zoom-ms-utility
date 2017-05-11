@@ -12,6 +12,6 @@ Usage :
 * Press 'Scan MS-50G'
 * After scan, select patch and 'Rename', 'SaveToFile' or 'LoadFromFile'.
 
-[Zoom MS Utility Page](https://g200kg.github.io/zoom-ms-utility/index.html)
+[Zoom MS Utility Page](https://g200kg.github.io/zoom-ms-utility/)
 
 If you are interested in MS-50G MIDI function, check the source-code of 'index.html'
