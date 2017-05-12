@@ -59,6 +59,9 @@ function MakeBin(s){
     bin.push(parseInt(s.substr(j,2),16));
   return bin;
 }
+function ScanPort(){
+
+}
 function InitMidi(){
   var i;
   if(!navigator.requestMIDIAccess){
@@ -68,7 +71,6 @@ function InitMidi(){
   navigator.requestMIDIAccess({sysex:true}).then(
     function(ma){
       midiaccess=ma;
-      console.log(midiaccess)
       midiaccess.onstatechange=StateChange;
       var outputIterator=midiaccess.outputs.values();
       i=0;
@@ -108,10 +110,14 @@ function InitMidi(){
         }
       }
     },
-    function(e){console.log(e);},
+    function(e){alert("requestMIDIAccess Error");},
   );
 }
 function Init(){
+  if(!midiout || midiout.name!="ZOOM MS Series"){
+    alert("ZOOM MS Series is not found.");
+    return;
+  }
   setTimeout(function(){
     Edit(1);
     setTimeout(function(){
@@ -298,7 +304,7 @@ button{
   <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
   <ul>
     <li>Connect PC/Mac to MS-50G via USB</li>
-    <li>Launch this page. You should use Latest Chrome</li>
+    <li>Launch this page. You should use Latest Chrome. In Windows, should start from all Chrome window are closed</li>
     <li>Press accept if 'MIDI device' dialog is deplayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
     <li>Select MidiPort to 'ZOOM MS Series'</li>
     <li>Press 'Scan MS-50G'</li>
