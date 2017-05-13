@@ -36,7 +36,10 @@ var midiout=null;
 var midirecv="";
 var patches;
 var patchindex=-1;
-var timer;
+var currentpatch=-1;
+var timer,timerprg;
+var dragtarget=null;
+var ready=false;
 
 function MakeStr(b){
   var str="";
@@ -59,10 +62,7 @@ function MakeBin(s){
     bin.push(parseInt(s.substr(j,2),16));
   return bin;
 }
-function ScanPort(){
-
-}
-function InitMidi(){
+function Init(){
   var i;
   if(!navigator.requestMIDIAccess){
     alert("This browser does not support Web MIDI API. Please use latest Chrome.");
@@ -70,31 +70,38 @@ function InitMidi(){
   }
   navigator.requestMIDIAccess({sysex:true}).then(
     function(ma){
+      var i=0,pt=0;
       midiaccess=ma;
       midiaccess.onstatechange=StateChange;
       var outputIterator=midiaccess.outputs.values();
-      i=0;
       for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
           midioutputs[i]=o.value;
-          document.getElementById("midiport").options[i]=new Option(o.value.name);
+          var op=new Option(o.value.name);
+          if(o.value.name=="ZOOM MS Series")
+            op.selected=true;
+          document.getElementById("midiport").options[i]=op;
           i++;
       }
-      SelectPort(0);
+      SelectPort();
       if(!midiout)
         alert("MIDI port is not found.");
       var inputIterator=midiaccess.inputs.values();
       for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
-        console.log(ip.value);
         if(ip.value.name==="ZOOM MS Series"){
           ip.value.addEventListener("midimessage",
             function(ev){
               midirecv=MakeStr(ev.data);
+              if(ev.data[0]==0xc0){
+                DispPatch(0);
+                currentpatch=ev.data[1];
+                DispPatch(1);
+              }
               if(midirecv.substr(0,10)=="f052005828"){
                 var name=MakeName(ev.data);
                 if(patchindex>=0){
                   patches[patchindex++]={name:name,data:ev.data};
                   if(patchindex>49){
-                    SelectPatch(0);
+                    SelectPatch(currentpatch);
                     patchindex=-1;
                   }
                   else{
@@ -104,7 +111,6 @@ function InitMidi(){
                 }
                 console.log("name:"+name);
               }
-              console.log(midirecv);
             }
           );
         }
@@ -112,12 +118,41 @@ function InitMidi(){
     },
     function(e){alert("requestMIDIAccess Error");},
   );
+  document.addEventListener("keydown",function(ev){
+    if(ready){
+      var p;
+      if(document.getElementById("renamepane").style.maxHeight=="500px")
+        return;
+      if(ev.keyCode>=48 && ev.keyCode<=57){
+        if((p=ev.keyCode-49)<0)
+          p=9;
+        SelectPatch(p);
+        ev.preventDefault();
+      }
+      if(ev.keyCode==37 || ev.keyCode==39){
+        p=currentpatch;
+        if(ev.keyCode==37){
+          if(--p<0)
+            p=49;
+        }
+        else{
+          if(++p>=50)
+            p=0;
+        }
+        SelectPatch(p);
+        ev.preventDefault();
+      }
+    }
+  });
 }
-function Init(){
+function Scan(){
   if(!midiout || midiout.name!="ZOOM MS Series"){
     alert("ZOOM MS Series is not found.");
     return;
   }
+  midiout.send([0xf0,0x52,0x00,0x58,0x33,0xf7]);
+  if(timerprg)
+    clearInterval(timerprg);
   setTimeout(function(){
     Edit(1);
     setTimeout(function(){
@@ -125,9 +160,61 @@ function Init(){
       timer=setInterval(function(){
         if(patchindex<0){
           clearInterval(timer);
-          for(i=0;i<50;++i)
-            document.getElementById("patch").options[i]=new Option((i+1)+":"+patches[i].name);
+          for(i=0;i<50;++i){
+            var cell=GetCell(i);
+            cell.innerHTML=(i+1)+":"+patches[i].name;
+            cell.id=i;
+            cell.onmousedown=function(ev){
+              document.getElementById("popupmenu").style.display="none";
+              SelectPatch(ev.target.id);
+              if(dragtarget){
+                dragtarget.style.background="#ccf";
+                dragtarget.style.color="#000";
+              }
+            };
+            cell.draggable=true;
+            cell.ondragstart=function(ev){
+              if(dragtarget){
+                dragtarget.style.background="#ccf";
+                dragtarget.style.color="#000";
+              }
+              ev.dataTransfer.setData("text",ev.target.id);
+            };
+            cell.ondragenter=function(ev){
+              if(ev.target.id!=currentpatch){
+                ev.target.style.background="#aaf";
+                ev.target.style.color="#000";
+                dragtarget=ev.target;
+              }
+            };
+            cell.ondragleave=function(ev){
+              ev.target.style.background="#ccf";
+              ev.target.style.color="#000";
+            };
+            cell.ondragover=function(ev){
+              ev.preventDefault();
+            };
+            cell.ondrop=function(ev){
+              var s=parseInt(event.dataTransfer.getData("text"));
+              var d=parseInt(ev.target.id);
+              if(s!=d)
+                PopupMenu(ev.target);
+              ev.preventDefault();
+            };
+            cell.ondragend=function(ev){
+              var e=document.getElementById("popupmenu");
+              if(e.style.display!="block")
+                dragtarget.style.background="#ccf";
+            };
+          }
           document.getElementById("msg").innerHTML="Ready";
+          document.getElementById("renamebtn").disabled=false;
+          document.getElementById("savebtn").disabled=false;
+          document.getElementById("loadbtn").disabled=false;
+          ready=true;
+          timerprg=setInterval(function(){
+            midiout.send([0xf0,0x52,0x00,0x58,0x33,0xf7]);
+          },150);
         }
         else{
           document.getElementById("msg").innerHTML="Scanning("+patchindex+")...";
@@ -139,15 +226,62 @@ function Init(){
 function StateChange(){
   console.log("StateChange");
 }
+function PopupMenu(tar){
+  tar.style.background="#aaf";
+  var rc=tar.getBoundingClientRect();
+  var e=document.getElementById("popupmenu");
+  e.style.display="block";
+  e.style.left=(rc.left+20)+"px";
+  e.style.top=(rc.top+20)+"px";
+}
+function PopupCancel(){
+  var e=document.getElementById("popupmenu");
+  e.style.display="none";
+  dragtarget.style.background="#ccf";
+  dragtarget.style.color="#000";
+}
+function PopupCopy(){
+  var e=document.getElementById("popupmenu");
+  e.style.display="none";
+  Copy(currentpatch,dragtarget.id);
+  SelectPatch(dragtarget.id);
+  SendPatch(dragtarget.id);
+}
+function GetCell(p){
+  if(p<0)
+    return null;
+  var t=document.getElementById("table");
+  return t.rows[p%10].cells[(p/10)|0];
+}
 function SelectPort(){
   if(midioutputs.length>0)
     midiout=midioutputs[document.getElementById("midiport").selectedIndex];
 }
 function SelectPatch(p){
+  p=parseInt(p);
+  if(p<0)
+    return;
+  DispPatch(0);
   if(midiout)
     midiout.send([0xc0,p]);
+  currentpatch=p;
+  DispPatch(1);
+}
+function DispPatch(f){
+  if(currentpatch<0)
+    return;
+  c=GetCell(currentpatch);
+  if(f){
+    c.style.background="#f00";
+    c.style.color="#fff";
+  }
+  else{
+    c.style.background="#ccf";
+    c.style.color="#004";
+  }
 }
 function SendPatch(p){
+  p=parseInt(p);
   if(midiout)
     midiout.send(patches[p].data);
 }
@@ -167,8 +301,21 @@ function Edit(p){
   else
     midiout.send([0xf0,0x52,0x00,0x58,0x51,0xf7]);
 }
+function Usage(){
+  var e=document.getElementById("usage");
+  if(e.style.maxHeight!="500px"){
+    e.style.maxHeight="500px";
+    e.style.border="1px solid #000";
+    e.style.padding="10px";
+  }
+  else{
+    e.style.maxHeight="0px";
+    e.style.border="0px solid #000";
+    e.style.padding="0px";
+  }
+}
 function Save(){
-  var p=document.getElementById("patch").selectedIndex;
+  var p=currentpatch;
   if(p<0)
     return;
   var n=patches[p].name;
@@ -183,10 +330,9 @@ function Save(){
   console.log(n,d,fname);
 }
 function Load(){
-  var p=document.getElementById("patch").selectedIndex;
+  var p=currentpatch;
   if(p<0)
     return;
-    console.log("load");
   var i=document.createElement("input");
   i.type="file";
   i.click();
@@ -198,33 +344,40 @@ function Load(){
       console.log(reader.result);
       patches[p].data=MakeBin(reader.result);
       patches[p].name=MakeName(patches[p].data);
-      document.getElementById("patch").options[p].innerHTML=(p+1)+":" +patches[p].name;
+      GetCell(p).innerHTML=(p+1)+":"+patches[p].name;
       SelectPatch(p);
       SendPatch(p);
     }
   },false);
 }
+function Copy(s,d){
+  s=parseInt(s); d=parseInt(d);
+  patches[d].data=patches[s].data.slice(0);
+  patches[d].name=MakeName(patches[d].data);
+  GetCell(d).innerHTML=(d+1)+":"+patches[d].name;
+}
 function Rename(){
-  var p=document.getElementById("patch").selectedIndex;
+  var p=currentpatch;
   if(p<0)
     return;
   var el=document.getElementById("renamepane");
-  document.getElementById("newname").value=patches[document.getElementById("patch").selectedIndex].name;
-  if(el.style.display!="block"){
-    el.style.display="block";
+  document.getElementById("newname").value=patches[currentpatch].name;
+  if(el.style.maxHeight!="500px"){
+    el.style.maxHeight="500px";
+    el.style.padding="10px";
   }
-  else{
-    el.style.display="none";
-  }
+  else
+    CancelRename();
 }
 function CancelRename(){
   var el=document.getElementById("renamepane");
-  el.style.display="none";
+  el.style.maxHeight="0px";
+  el.style.padding="0px 10px";
 }
 function OkRename(){
   var i;
   var name=document.getElementById("newname").value;
-  var p=document.getElementById("patch").selectedIndex;
+  var p=currentpatch;
   if(name.length>10)
     name=name.substr(0,10);
   patches[p].name=name;
@@ -233,14 +386,12 @@ function OkRename(){
     patches[p].data[133+i]=name.charCodeAt(i);
   for(i=8;i<=9;++i)
     patches[p].data[134+i]=name.charCodeAt(i);
-  document.getElementById("patch").options[p].innerHTML=(p+1)+":" +name;
+  GetCell(p).innerHTML=(p+1)+":"+patches[p].name;
   SelectPatch(p);
   SendPatch(p);
-  var el=document.getElementById("renamepane");
-  el.style.display="none";
-  SendPatch(p);
+  CancelRename();
 }
-window.addEventListener("load",InitMidi);
+window.addEventListener("load",Init);
 
 </script>
 <style>
@@ -250,6 +401,7 @@ body{
   padding:0px;
 }
 #base{
+  position:relative;
   width:800px;
   margin:0px auto;
   padding:1px 20px 40px 20px;
@@ -262,6 +414,36 @@ body{
   margin:0px;
   width:100%;
   height:90px;
+}
+#popupmenu{
+  position: absolute;
+  display:none;
+  width:100px;
+  background:#fff;
+  border: 1px solid #000;
+  list-style: none;
+  font-size:14px;
+  margin:0;
+  padding:0;
+}
+#popupmenu>li{
+  background:#fff;
+  text-decoration: none;
+  margin:0;
+  padding:0;
+}
+#popupmenu>li>a{
+  display:block;
+  text-decoration: none;
+  padding:0px 20px;
+}
+#popupmenu>li:hover{
+  background:#adf;
+  color:#fff;
+}
+.popupmenuitem{
+}
+.popupmenuitem :hover{
 }
 img{
   margin:0px;
@@ -277,16 +459,49 @@ img{
   width:220px;
   height:60px;
 }
-#renamepane{
+#renamepane {
   background:#66f;
   color:#fff;
   border:1px solid #000;
-  padding: 8px;
-  display:none;
+  padding: 0px 10px;
+  border:0px solid #000;
+  max-height:0px;
+  overflow:hidden;
+  transition:.5s;
+}
+#usage{
+  max-height:0px;
+  border:0px solid #000;
+  background:#ccf;
+  margin:5px;
+  transition:0.5s;
+  overflow:hidden;
+  padding:0px;
 }
 button{
   width:120px;
   height:30px;
+}
+button[disabled]{
+  color:#aaa;
+}
+table{
+  border:1px solid #000;
+  margin:0;
+  padding:0;
+}
+tr{
+  margin:0;
+  padding:0;
+}
+td{
+  border:1px solid #000;
+  margin:0;
+  padding:0px 0px 0px 5px;
+  width:160px;
+  height:30px;
+  cursor:pointer;
+  background:#ccf;
 }
 </style>
 </head>
@@ -296,34 +511,58 @@ button{
       <a href="http://www.g200kg.com/"><img src="./g200kg160x80.png" style="float:left;margin:4px 11px"/></a>
       <h1>Zoom MS-50G Utility</h1>
     </div>
-  <hr style="clear:both"/>
-  <p> This is a patch utility for ZOOM MS-50G MultiStomp guitar pedal.
-  </p>
-  <p> This is still a very tentative version for the confirmation of MIDI related fucntion.</p>
-  <p> If you are interested in MS-50G MIDI related function, check GitHub repository<p>
-  <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
-  <ul>
-    <li>Connect PC/Mac to MS-50G via USB</li>
-    <li>Launch this page. You should use Latest Chrome. In Windows, should start from all Chrome window are closed</li>
-    <li>Press accept if 'MIDI device' dialog is deplayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
-    <li>Select MidiPort to 'ZOOM MS Series'</li>
-    <li>Press 'Scan MS-50G'</li>
-    <li>After scan, select patch and 'Rename', 'SaveToFile' or 'LoadFromFile'.</li>
-    <li>If you want to choose save directory when 'SaveToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
-  </ul>
-  MidiPort : <select id="midiport" onchange="SelectPort()"></select><br/>
-  <button onclick="Init()">Scan MS-50G</button>
-  <br/>
-
+    <hr style="clear:both"/>
+    <p> This is a patch utility for ZOOM MS-50G MultiStomp guitar pedal.</p>
+  <hr/>
+  MidiPort : <select id="midiport" onchange="SelectPort()"></select><br/><br/>
+  <button id="scanbtn" onclick="Scan()">Scan MS-50G</button>
+  <button id="renamebtn" onclick="Rename()" disabled=true>Rename</button>
+  <button id="savebtn" onclick="Save()" disabled=true>Save To File</button>
+  <button id="loadbtn" onclick="Load()" disabled=true>Load From File</button>
+  <button id="usagebtn" onclick="Usage()">How To Use</button>
+  <div id="renamepane">
+    New name : <input id="newname"/><br/><br/><button onclick="CancelRename()">Cancel</button><button onclick="OkRename()">OK</button>
+  </div>
+  <div id="usage">
+    <h3>Usage</h3>
+    <p>
+      This is still a very tentative version for the confirmation of MIDI related fucntion.<br/>
+      If you are interested in MS-50G MIDI related function, check GitHub repository<br/>
+      <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
+    </p>
+    <ul>
+      <li>Connect PC/Mac to MS-50G via USB</li>
+      <li>Launch this page. You should use Latest Chrome. On Windows, unplugging the USB while running may cause freeze (under investigation). Once close all Chrome window if you have MidiPort detection problem.</li>
+      <li>Press accept if 'MIDI device' permission dialog is displayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
+      <li>Select MidiPort to 'ZOOM MS Series'</li>
+      <li>Press 'Scan MS-50G'</li>
+      <li>After scan, select patch by click and use buttons 'Rename', 'SaveToFile' or 'LoadFromFile'</li>
+      <li>Each patch can be drag and drop to another position. It will overwrite old patch.</li>
+      <li>Keyboard Left/Right is assigned to patch Down/Up, '1'-'9' and '0' is assigned to select patch '1' to '10'. </li>
+      <li>If you want to choose save directory when 'SaveToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
+    </ul>
+    <button onclick="Usage()">close</button>
+  </div>
   <hr/>
   Status : <span id="msg">Not Initialized</span><br/>
-  Patch : <select id="patch" onchange="SelectPatch(this.selectedIndex)"></select><br/>
-
-  <button onclick="Rename()">Rename</button> <button onclick="Save()">Save To File</button> <button onclick="Load()">Load From File</button>
-  <div id="renamepane">
-    New name : <input id="newname"/><br/><button onclick="CancelRename()">Cancel</button><button onclick="OkRename()">OK</button>
-  </div>
   <br/>
+<table id="table">
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+  <hr/>
 </div>
+<ul id="popupmenu">
+  <li><a href="#" onclick="PopupCopy()">Copy</a></li>
+  <li><a href="#" onclick="PopupCancel()">Cancel</a></li>
+</ul>
 </body>
 </html>
