@@ -91,7 +91,9 @@ function Init(){
           ip.value.addEventListener("midimessage",
             function(ev){
               midirecv=MakeStr(ev.data);
+              console.log(midirecv);
               if(ev.data[0]==0xc0){
+                console.log(ev.data[1]);
                 DispPatch(0);
                 currentpatch=ev.data[1];
                 DispPatch(1);
@@ -109,7 +111,7 @@ function Init(){
                     midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
                   }
                 }
-                console.log("name:"+name);
+//                console.log("name:"+name);
               }
             }
           );
@@ -212,9 +214,11 @@ function Scan(){
           document.getElementById("savebtn").disabled=false;
           document.getElementById("loadbtn").disabled=false;
           ready=true;
+          if(timerprg)
+            clearInterval(timerprg);
           timerprg=setInterval(function(){
             midiout.send([0xf0,0x52,0x00,0x58,0x33,0xf7]);
-          },150);
+          },200);
         }
         else{
           document.getElementById("msg").innerHTML="Scanning("+patchindex+")...";
