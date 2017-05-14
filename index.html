@@ -40,6 +40,7 @@ var currentpatch=-1;
 var timer,timerprg;
 var dragtarget=null;
 var ready=false;
+var keymap="abcdefghijklmnopqrstABCDEFGHIJKLMNOPQRST1234567890";
 
 function MakeStr(b){
   var str="";
@@ -91,14 +92,13 @@ function Init(){
           ip.value.addEventListener("midimessage",
             function(ev){
               midirecv=MakeStr(ev.data);
-              console.log(midirecv);
               if(ev.data[0]==0xc0){
-                console.log(ev.data[1]);
                 DispPatch(0);
                 currentpatch=ev.data[1];
                 DispPatch(1);
               }
               if(midirecv.substr(0,10)=="f052005828"){
+                console.log(midirecv);
                 var name=MakeName(ev.data);
                 if(patchindex>=0){
                   patches[patchindex++]={name:name,data:ev.data};
@@ -125,15 +125,9 @@ function Init(){
       var p;
       if(document.getElementById("renamepane").style.maxHeight=="500px")
         return;
-      if(ev.keyCode>=48 && ev.keyCode<=57){
-        if((p=ev.keyCode-49)<0)
-          p=9;
-        SelectPatch(p);
-        ev.preventDefault();
-      }
-      if(ev.keyCode==37 || ev.keyCode==39){
+      if(ev.key=="ArrowLeft" || ev.key=="ArrowRight"){
         p=currentpatch;
-        if(ev.keyCode==37){
+        if(ev.key=="ArrowLeft"){
           if(--p<0)
             p=49;
         }
@@ -141,6 +135,11 @@ function Init(){
           if(++p>=50)
             p=0;
         }
+        SelectPatch(p);
+        ev.preventDefault();
+      }
+      var p=keymap.indexOf(ev.key);
+      if(p>=0){
         SelectPatch(p);
         ev.preventDefault();
       }
@@ -542,7 +541,7 @@ td{
       <li>Press 'Scan MS-50G'</li>
       <li>After scan, select patch by click and use buttons 'Rename', 'SaveToFile' or 'LoadFromFile'</li>
       <li>Each patch can be drag and drop to another position. It will overwrite old patch.</li>
-      <li>Keyboard Left/Right is assigned to patch Down/Up, '1'-'9' and '0' is assigned to select patch '1' to '10'. </li>
+      <li>Keyboard Left/Right is assigned to patch Down/Up, 'a'-'t':patch1-patch20, 'A'-'T':patch21-patch40 '1'-'9','0':patch41-patch50</li>
       <li>If you want to choose save directory when 'SaveToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
     </ul>
     <button onclick="Usage()">close</button>
