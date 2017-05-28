@@ -1,16 +1,14 @@
 # zoom-ms-utility
-Online Zoom MS-50G multi stomp patch utility
+Online Zoom MS-50G multi stomp patch editor.
 
 This is a patch utility for ZOOM MS-50G MultiStomp guitar pedal.  
 This is still a very tentative version for the confirmation of MIDI related function.
 
 Usage :
 * Connect PC/Mac to MS-50G via USB
-* Launch this page. You should use Chrome
+* Launch this page. You should use latest Chrome
 * Press accept if 'MIDI device' dialog is displayed
 * Select MidiPort to 'ZOOM MS Series'
-* Press 'Scan MS-50G'
-* After scan, select patch and 'Rename', 'SaveToFile' or 'LoadFromFile'.
 
 [Zoom MS Utility Page](https://g200kg.github.io/zoom-ms-utility/)
 
