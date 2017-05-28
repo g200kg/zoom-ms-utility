@@ -1,5 +1,5 @@
 # bower
-bower_components/
+#bower_components/
 
 # Windows image file caches
 Thumbs.db
