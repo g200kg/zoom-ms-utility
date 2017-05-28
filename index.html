@@ -1527,7 +1527,13 @@ function Init(){
       k.onchange = function(k){
         var f=parseInt(k.target.id[1]);
         var p=parseInt(k.target.id[3]);
-        SetParamVal(f-1,p+1,k.target.value);
+        if(k.target.tab){
+          var v=k.target.tab[k.target.value|0];
+          console.log(v)
+          SetParamVal(f-1,p+1,v);
+        }
+        else
+          SetParamVal(f-1,p+1,k.target.value);
         DispPatch();
         isdirty=true;
       }
@@ -2056,7 +2062,6 @@ function DispPatch(){
       var ev=document.getElementById(s+"v");
       if(p<ef.param.length){
         el.innerHTML=ef.param[p].name;
-//        ek.style.display="block";
         ev.style.display="block";
         if(ef.param[p].max==1){
           es.style.display="block";
@@ -2067,6 +2072,14 @@ function DispPatch(){
           ek.style.display="block";
         }
         var v=GetParamVal(n,p+2);
+        if(typeof(ef.param[p].max)=="object"){
+          for(var k=ef.param[p].max.length-1;k>=0;--k){
+            if(ef.param[p].max[k]==v){
+              v=k;
+              break;
+            }
+          }
+        }
         var ds=ef.param[p].disp;
         switch(typeof(ds)){
         case "number":
@@ -2078,11 +2091,18 @@ function DispPatch(){
         default:
           ev.value=v;
         }
-        ek.max=ef.param[p].max;
-        ek.defvalue=ef.param[p].def;
-        es.defvalue=ef.param[p].def;
-        ek.setValue(v);
-        es.setValue(v);
+        if(typeof(ef.param[p].max)=="object"){
+            ek.max=ef.param[p].max.length-1;
+            ek.tab=ef.param[p].max;
+            ek.setValue(v);
+        }
+        else{
+          ek.max=ef.param[p].max;
+          ek.defvalue=ef.param[p].def;
+          es.defvalue=ef.param[p].def;
+          ek.setValue(v);
+          es.setValue(v);
+        }
       }
       else{
         el.innerHTML="";
@@ -2362,7 +2382,7 @@ td{
 .pcell{
   height:40px;
   font-size:12px;
-  font-weight:bold;
+  font-weight:normal;
 }
 input{
   width:45%;
@@ -2381,8 +2401,8 @@ td div div input{
   height:12px;
   margin:4px 0px 0px 0px;
   text-align: center;
-  font-size:14px;
-  font-weight:bold;
+  font-size:12px;
+  font-weight:normal;
   border-radius:2px;
 }
 webaudio-knob{
