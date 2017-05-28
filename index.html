@@ -1491,7 +1491,7 @@ function Init(){
                 }
               }
               if(midirecv.substr(0,10)=="f052005828"){
-                console.log(midirecv);
+//                console.log(midirecv);
                 var name=MakeName(ev.data);
                 if(patchscan>=0){
                   patches[patchscan++]={name:name,data:ev.data};
@@ -1500,8 +1500,10 @@ function Init(){
                     patchscan=-1;
                   }
                   else{
-                    midiout.send([0xc0,patchscan]);
-                    midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
+                    setTimeout(function(){
+                      midiout.send([0xc0,patchscan]);
+                      midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
+                    },50);
                   }
                 }
                 else{
