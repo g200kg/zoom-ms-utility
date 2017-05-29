@@ -10,6 +10,7 @@ Desktop.ini
 
 # Test files
 test/
+images/
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/

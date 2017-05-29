@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Hind" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 <link rel="import" href="bower_components/polymer/polymer.html">
@@ -61,6 +60,16 @@ var patchkeymap=[
   "1","2","3","4","5","6","7","8","9","0"];
 var effectkeymap=["F1","F2","F3","F4","F5","F6"];
 
+var emptypatch=[
+  0xf0,0x52,0x00,0x58,0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
+  0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x40,0x05,0x0f,0x45,0x00,0x6d,0x70,0x74,0x79,0x20,0x20,
+  0x20,0x00,0x20,0x20,0x00,0xf7
+]
 var effectlist={
   0x00000000:{name:"THRU",group:"THRU",order:1,param:[]},
   0x00100002:{name:"Comp",group:"COMP",order:100,param:[
@@ -1491,7 +1500,7 @@ function Init(){
                 }
               }
               if(midirecv.substr(0,10)=="f052005828"){
-//                console.log(midirecv);
+                console.log(midirecv);
                 var name=MakeName(ev.data);
                 if(patchscan>=0){
                   patches[patchscan++]={name:name,data:ev.data};
@@ -1529,7 +1538,6 @@ function Init(){
         var p=parseInt(k.target.id[3]);
         if(k.target.tab){
           var v=k.target.tab[k.target.value|0];
-          console.log(v)
           SetParamVal(f-1,p+1,v);
         }
         else
@@ -1539,7 +1547,6 @@ function Init(){
       }
       if(s)
         s.onchange=function(s){
-          console.log("click")
           var f=parseInt(s.target.id[1]);
           var p=parseInt(s.target.id[3]);
           SetParamVal(f-1,p+1,s.target.value);
@@ -1570,11 +1577,12 @@ function Init(){
   document.addEventListener("click",function(ev){
     PopupEffectCancel();
     PopupPatchCancel();
+    PopupPatchCancel2();
   });
   document.addEventListener("keydown",function(ev){
     if(ready){
       var p;
-      if(document.getElementById("renamepane").style.maxHeight=="500px")
+      if(document.getElementById("renamepanel").style.display=="block")
         return;
       if(ev.key=="ArrowLeft" || ev.key=="ArrowRight"){
         p=currentpatch;
@@ -1633,19 +1641,29 @@ function Scan(){
             cell2.onclick=function(ev){
               PopupEffectMenu(ev.target);
               ev.stopPropagation();
+              ev.preventDefault();
             };
           }
           for(i=0;i<50;++i){
-            var cell=GetCell(i);
-            cell.innerHTML=(i+1)+":"+patches[i].name;
-            cell.id=i;
+            var cell=document.getElementById((i+1)+"nam");
+            var btn=document.getElementById((i+1)+"btn");
+            cell.innerHTML=patches[i].name;
             cell.oncontextmenu=function(ev){
               PopupPatchMenu2(ev.target);
               ev.preventDefault();
             };
             cell.onmousedown=function(ev){
               document.getElementById("popuppatch").style.display="none";
-              SelectPatch(ev.target.id);
+              SelectPatch(parseInt(ev.target.id)-1);
+            };
+            btn.onmousedown=function(ev){
+              document.getElementById("popuppatch").style.display="none";
+              SelectPatch(parseInt(ev.target.id)-1);
+            }
+            btn.onclick=btn.oncontextmenu=function(ev){
+              PopupPatchMenu2(ev.target);
+              ev.stopPropagation();
+              ev.preventDefault();
             };
             cell.draggable=true;
             cell.ondragstart=function(ev){
@@ -1680,7 +1698,6 @@ function Scan(){
             };
           }
           document.getElementById("msg").innerHTML="Ready";
-          document.getElementById("renamebtn").disabled=false;
           document.getElementById("savebtn").disabled=false;
           document.getElementById("loadbtn").disabled=false;
           ready=true;
@@ -1715,18 +1732,33 @@ function EffectPanelCancel(){
   document.getElementById("effectpanel").style.display="none";
 }
 function PopupEffectDelete(){
-  for(var j=currenteffect;j<5;++j){
-    for(var i=0;i<11;++i){
-      SetParamVal(j,i,GetParamVal(j+1,i));
+  var tar=document.getElementById("fnam"+(currenteffect+1));
+  var panel=document.getElementById("confirmpanel");
+  document.getElementById("confirmmsg").innerHTML="Delete Effect Unit ?";
+  document.getElementById("confirmok").onclick=function(ev){
+    for(var j=currenteffect;j<5;++j){
+      for(var i=0;i<11;++i){
+        SetParamVal(j,i,GetParamVal(j+1,i));
+      }
     }
-  }
-  SetParamVal(currenteffect,5,1);
-  for(var i=1;i<10;++i)
-    SetParamVal(5,i,0);
-  TrimEffectMax();
-  DispPatch();
-  isdirty=true;
+    SetParamVal(5,0,1);
+    for(var i=1;i<10;++i)
+      SetParamVal(5,i,0);
+    TrimEffectMax();
+    DispPatch();
+    isdirty=true;
+    ev.target.parentNode.style.display="none";
+  };
+  var rc=tar.getBoundingClientRect();
+  panel.style.display="block";
+  panel.style.left=(rc.left+20+window.pageXOffset)+"px";
+  panel.style.top=(rc.top+20+window.pageYOffset)+"px";
+}
+
+function PopupEffectDeleteCancel(){
   PopupEffectCancel();
+}
+function PopupEffectDeleteOk(){
 }
 function PopupEffectReplace(){
   document.getElementById("effectpanelmsg").innerHTML="Replace Effect";
@@ -1798,10 +1830,23 @@ function PopupPatchCancel(){
 function PopupPatchOverwrite(){
   var e=document.getElementById("popuppatch");
   e.style.display="none";
-  Copy(currentpatch,dragtarget.id);
-  SelectPatch(dragtarget.id);
-  SendPatch(dragtarget.id);
+  clipboard=patches[currentpatch].data.slice(0);
+  SelectPatch(parseInt(dragtarget.id)-1);
+  PopupPatchPaste();
   dragtarget=null;
+}
+function PopupPatchExchange(){
+  var dst=parseInt(dragtarget.id)-1;
+  clipboard=patches[currentpatch].data.slice(0);
+  patches[currentpatch].data=patches[dst].data.slice(0);
+  patches[currentpatch].name=MakeName(patches[currentpatch].data);
+  document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
+  SendPatch(currentpatch);
+  SelectPatch(dst);
+  PopupPatchPaste();
+  dragtarget=null;
+  var e=document.getElementById("popuppatch");
+  e.style.display="none";
 }
 function PopupPatchCopy(){
   clipboard=patches[currentpatch].data.slice(0);
@@ -1811,17 +1856,58 @@ function PopupPatchPaste(){
   if(clipboard){
     patches[currentpatch].data=clipboard.slice(0);
     patches[currentpatch].name=MakeName(clipboard);
-    GetCell(currentpatch).innerHTML=(currentpatch+1)+":"+patches[currentpatch].name;
+    document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
     DispPatch();
     isdirty=true;
   }
   PopupPatchCancel2();
 }
-function Copy(s,d){
-  s=parseInt(s); d=parseInt(d);
-  patches[d].data=patches[s].data.slice(0);
-  patches[d].name=MakeName(patches[d].data);
-  GetCell(d).innerHTML=(d+1)+":"+patches[d].name;
+function PopupPatchDelete(){
+  var tar=document.getElementById((currentpatch+1)+"nam");
+  var panel=document.getElementById("confirmpanel");
+  document.getElementById("confirmmsg").innerHTML="Delete Patch ?";
+  document.getElementById("confirmok").addEventListener("click",
+    function(ev){
+      patches[currentpatch].data=emptypatch.slice(0);
+      patches[currentpatch].name=MakeName(emptypatch);
+      document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
+      DispPatch();
+      isdirty=true;
+    }
+  );
+  var rc=tar.getBoundingClientRect();
+  panel.style.display="block";
+  panel.style.left=(rc.left+20+window.pageXOffset)+"px";
+  panel.style.top=(rc.top+20+window.pageYOffset)+"px";
+  PopupPatchCancel2();
+}
+function PopupPatchRename(){
+  var tar=document.getElementById((currentpatch+1)+"nam");
+  var panel=document.getElementById("renamepanel");
+  var rc=tar.getBoundingClientRect();
+  panel.style.display="block";
+  panel.style.left=(rc.left+20+window.pageXOffset)+"px";
+  panel.style.top=(rc.top+20+window.pageYOffset)+"px";
+  PopupPatchCancel2();
+}
+function PopupPatchRenameCancel(){
+  document.getElementById("renamepanel").style.display="none";
+}
+function PopupPatchRenameOk(){
+  var i;
+  var name=document.getElementById("renametext").value;
+  if(name.length>10)
+    name=name.substr(0,10);
+  var p=currentpatch;
+  patches[p].name=name;
+  patches[p].data[132]=name.charCodeAt(0);
+  for(i=1;i<=7;++i)
+    patches[p].data[133+i]=name.charCodeAt(i);
+  for(i=8;i<=9;++i)
+    patches[p].data[134+i]=name.charCodeAt(i);
+  document.getElementById((p+1)+"nam").innerHTML=name;
+  isdirty=true;
+  PopupPatchRenameCancel();
 }
 function GetCell(p){
   if(p<0)
@@ -1976,11 +2062,12 @@ function SetEffectMax(n){
   pat.data[130]=(pat.data[130]&~0x1c)+((n<<2)&0x1c);
 }
 function TrimEffectMax(){
-  for(var i=5;i>0;--i){
+  var i;
+  for(i=5;i>0;--i){
+    console.log("id:"+i+","+GetEffectId(i));
     if(GetEffectId(i)!=0)
       break;
   }
-  console.log("trim:"+(i+1));
   SetEffectMax(i+1);
 }
 function GetEffectFromId(id){
@@ -2127,7 +2214,7 @@ function SelectPatch(p){
 function SelPatchList(f){
   if(currentpatch<0)
     return;
-  c=GetCell(currentpatch);
+  c=document.getElementById((currentpatch+1)+"nam");
   if(f){
     c.style.background="#c00";
     c.style.color="#fff";
@@ -2184,7 +2271,6 @@ function Save(){
   a.target="_blank";
   a.download=fname+".txt";
   a.click();
-  console.log(n,d,fname);
 }
 function Load(){
   var p=currentpatch;
@@ -2201,49 +2287,11 @@ function Load(){
       console.log(reader.result);
       patches[p].data=MakeBin(reader.result);
       patches[p].name=MakeName(patches[p].data);
-      GetCell(p).innerHTML=(p+1)+":"+patches[p].name;
+      document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
       SelectPatch(p);
       SendPatch(p);
     }
   },false);
-}
-function Rename(){
-  var p=currentpatch;
-  if(p<0)
-    return;
-  var el=document.getElementById("renamepane");
-  document.getElementById("newname").value=patches[currentpatch].name;
-  if(el.style.maxHeight!="500px"){
-    el.style.maxHeight="500px";
-    el.style.padding="10px";
-  }
-  else
-    CancelRename();
-}
-function CancelRename(){
-  var el=document.getElementById("renamepane");
-  el.style.maxHeight="0px";
-  el.style.padding="0px 10px";
-}
-function OkRename(){
-  var i;
-  var name=document.getElementById("newname").value;
-  var p=currentpatch;
-  if(name.length>10)
-    name=name.substr(0,10);
-  patches[p].name=name;
-  patches[p].data[132]=name.charCodeAt(0);
-  for(i=1;i<=7;++i)
-    patches[p].data[133+i]=name.charCodeAt(i);
-  for(i=8;i<=9;++i)
-    patches[p].data[134+i]=name.charCodeAt(i);
-  GetCell(p).innerHTML=(p+1)+":"+patches[p].name;
-  SelectPatch(p);
-  SendPatch(p);
-  CancelRename();
-}
-function test(){
-  console.log("test");
 }
 window.addEventListener("load",Init);
 
@@ -2281,19 +2329,21 @@ h1{
 }
 .popup{
   font-family:'Open Sans', sans-serif;
-  font-weight:bold;
+  font-weight:normal;
   font-size:14px;
   position: absolute;
   display:none;
   width:130px;
-  background:#fff;
-  border: 1px solid #000;
+  background:#cce;
+  border: 1px solid #666;
+  border-radius: 3px;
   list-style: none;
   margin:0;
   padding:0;
+  box-shadow: 2px 2px 3px 3px rgba(0,0,0,0.4);
 }
 .popup>li{
-  background:#fff;
+  background:#eef;
   text-decoration: none;
   margin:0;
   padding:0;
@@ -2301,18 +2351,18 @@ h1{
 .popup>li>a{
   display:block;
   text-decoration: none;
+  color:#448;
   padding:0px 20px;
 }
 .popup>li:hover{
-  background:#adf;
+  background:#88c;
+}
+.popup>li>a:hover{
   color:#fff;
 }
 img{
   margin:0px;
   padding:0px;
-}
-#rename {
-  display:none;
 }
 .patch{
   background: #66f;
@@ -2320,16 +2370,6 @@ img{
   border-radius: 5px;
   width:220px;
   height:60px;
-}
-#renamepane {
-  background:#66f;
-  color:#fff;
-  border:1px solid #000;
-  padding: 0px 10px;
-  border:0px solid #000;
-  max-height:0px;
-  overflow:hidden;
-  transition:.5s;
 }
 #usage{
   max-height:0px;
@@ -2347,31 +2387,80 @@ img{
 .menubtn[disabled]{
   color:#aaa;
 }
-table{
-  border:1px solid #668;
-  margin:0;
-  padding:0;
+#confirmpanel{
+  width:200px;
+  height:50px;
+  padding:10px;
 }
-tr{
-  margin:0;
-  padding:0;
+#confirmpanel button{
+  width:70px;
+  margin:5px;
 }
-td{
-  border:1px solid #88a;
-  border-radius:3px;
-  margin:0;
-  padding:0px 0px 0px 5px;
-  width:160px;
+#renamepanel{
+  width:200px;
+  height:100px;
+  padding:10px;
+}
+#renamepanel button{
+  width:70px;
+  margin:5px;
+}
+#patches td{
+  background:none;
+  border:none;
+}
+#patches button{
+  width:30px;
   height:22px;
-  cursor:pointer;
+  margin:0px 1px 0px 10px;
+}
+#patches div{
+  display:inline-block;
+  padding:3px 3px 3px 8px;
+  border:1px solid #88c;
   background:#ccf;
+  height:14px;
+  width:120px;
+  font-size:14px;
+  line-height: 14px;
+  vertical-align: middle;
+  font-weight: bold;
 }
 #effects th {
   width:22px;
 }
-#effects td {
+#effects td{
+  border:1px solid #88a;
+  border-radius:3px;
+  margin:0;
+  padding:0px 0px 0px 5px;
   width:100px;
+  height:22px;
+  cursor:pointer;
+  background:#ccf;
 }
+#effects td div{
+   display:flex;
+}
+#effects td div div{
+   display:flex;
+   flex-direction:column;
+}
+#effects td div div input{
+  display:none;
+  background:#ccc;
+  width:80%;
+  height:12px;
+  margin:4px 0px 0px 0px;
+  text-align: center;
+  font-size:12px;
+  font-weight:normal;
+  border-radius:2px;
+}
+#effects img{
+  float:left;
+}
+
 .fnam{
   text-align: center;
   background:#aad;
@@ -2386,24 +2475,6 @@ td{
 }
 input{
   width:45%;
-}
-td div{
-   display:flex;
-}
-td div div{
-   display:flex;
-   flex-direction:column;
-}
-td div div input{
-  display:none;
-  background:#ccc;
-  width:80%;
-  height:12px;
-  margin:4px 0px 0px 0px;
-  text-align: center;
-  font-size:12px;
-  font-weight:normal;
-  border-radius:2px;
 }
 webaudio-knob{
   display:none;
@@ -2472,13 +2543,9 @@ webaudio-switch{
   <hr/>
   MidiPort : <select id="midiport" onchange="SelectPort()"></select><br/><br/>
   <button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button>
-  <button class="menubtn" id="renamebtn" onclick="Rename()" disabled=true>Rename</button>
-  <button class="menubtn" id="savebtn" onclick="Save()" disabled=true>Save To File</button>
+  <button class="menubtn" id="savebtn" onclick="Save()" disabled=true>Export To File</button>
   <button class="menubtn" id="loadbtn" onclick="Load()" disabled=true>Load From File</button>
   <button class="menubtn" id="usagebtn" onclick="Usage()">How To Use</button>
-  <div id="renamepane">
-    New name : <input id="newname"/><br/><br/><button onclick="CancelRename()">Cancel</button><button onclick="OkRename()">OK</button>
-  </div>
   <div id="usage">
     <h3>Usage</h3>
     <ul>
@@ -2486,12 +2553,12 @@ webaudio-switch{
       <li>Launch this page. You should use Latest Chrome. On Windows, unplugging the USB while running may cause freeze (under investigation). Once close all Chrome window if you have MidiPort detection problem.</li>
       <li>Press accept if 'MIDI device' permission dialog is displayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
       <li>Confirm MidiPort to 'ZOOM MS Series'</li>
-      <li>After splash screen, all patches and effects with parameters are displayed<li>
+      <li>After splash screen, all patches and effects with parameters are displayed</li>
       <li>Click patch-name to select, Click effect-name to effect on/off. </li>
-      <li>Context menu for patches by right-click (ctrl+click on Mac) will do copy/paste.</li>
+      <li>Context menu for patches by right-click (ctrl+click on Mac) or click number buttons will do copy/paste/delete... patches</li>
       <li>Context menu for each effect will do Delete/Add/Move the effect</li>
       <li>Mouse drag or mouse wheel for Parameter value editing, fine control with SHIFT Press.</li>
-      <li>Also buttons 'Rename', 'SaveToFile' or 'LoadFromFile' can be used for each patch.</li>
+      <li>Also buttons 'SaveToFile' or 'LoadFromFile' can be used for each patch.</li>
       <li>Each patch can be draggable to other position for overwrite patch.</li>
       <li>Keyboard Left/Right is assigned to patch Down/Up, 'a'-'t':patch1-patch20, 'A'-'T':patch21-patch40 '1'-'9','0':patch41-patch50</li>
       <li>Keyboard 'F1'-'F6' is assigned to On/Off each effect.</li>
@@ -2503,16 +2570,76 @@ webaudio-switch{
   Status : <span id="msg">Not Initialized</span><br/>
   <br/>
 <table id="patches">
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
-  <tr><td></td><td></td><td></td><td></td><td></td></tr>
+  <tr>
+    <td id="1"><button id="1btn">1</button><div id="1nam"></div></td>
+    <td id="11"><button id="11btn">11</button><div id="11nam"></div></td>
+    <td id="21"><button id="21btn">21</button><div id="21nam"></div></td>
+    <td id="31"><button id="31btn">31</button><div id="31nam"></div></td>
+    <td id="41"><button id="41btn">41</button><div id="41nam"></div></td>
+  </tr>
+  <tr>
+    <td id="2"><button id="2btn">2</button><div id="2nam"></div></td>
+    <td id="12"><button id="12btn">12</button><div id="12nam"></div></td>
+    <td id="22"><button id="22btn">22</button><div id="22nam"></div></td>
+    <td id="32"><button id="32btn">32</button><div id="32nam"></div></td>
+    <td id="42"><button id="42btn">42</button><div id="42nam"></div></td>
+  </tr>
+  <tr>
+    <td id="3"><button id="3btn">3</button><div id="3nam"></div></td>
+    <td id="13"><button id="13btn">13</button><div id="13nam"></div></td>
+    <td id="23"><button id="23btn">23</button><div id="23nam"></div></td>
+    <td id="33"><button id="33btn">33</button><div id="33nam"></div></td>
+    <td id="43"><button id="43btn">43</button><div id="43nam"></div></td>
+  </tr>
+  <tr>
+    <td id="4"><button id="4btn">4</button><div id="4nam"></div></td>
+    <td id="14"><button id="14btn">14</button><div id="14nam"></div></td>
+    <td id="24"><button id="24btn">24</button><div id="24nam"></div></td>
+    <td id="34"><button id="34btn">34</button><div id="34nam"></div></td>
+    <td id="44"><button id="44btn">44</button><div id="44nam"></div></td>
+  </tr>
+  <tr>
+    <td id="5"><button id="5btn">5</button><div id="5nam"></div></td>
+    <td id="15"><button id="15btn">15</button><div id="15nam"></div></td>
+    <td id="25"><button id="25btn">25</button><div id="25nam"></div></td>
+    <td id="35"><button id="35btn">35</button><div id="35nam"></div></td>
+    <td id="45"><button id="45btn">45</button><div id="45nam"></div></td>
+  </tr>
+  <tr>
+    <td id="6"><button id="6btn">6</button><div id="6nam"></div></td>
+    <td id="16"><button id="16btn">16</button><div id="16nam"></div></td>
+    <td id="26"><button id="26btn">26</button><div id="26nam"></div></td>
+    <td id="36"><button id="36btn">36</button><div id="36nam"></div></td>
+    <td id="46"><button id="46btn">46</button><div id="46nam"></div></td>
+  </tr>
+  <tr>
+    <td id="7"><button id="7btn">7</button><div id="7nam"></div></td>
+    <td id="17"><button id="17btn">17</button><div id="17nam"></div></td>
+    <td id="27"><button id="27btn">27</button><div id="27nam"></div></td>
+    <td id="37"><button id="37btn">37</button><div id="37nam"></div></td>
+    <td id="47"><button id="47btn">47</button><div id="47nam"></div></td>
+  </tr>
+  <tr>
+    <td id="8"><button id="8btn">8</button><div id="8nam"></div></td>
+    <td id="18"><button id="18btn">18</button><div id="18nam"></div></td>
+    <td id="28"><button id="28btn">28</button><div id="28nam"></div></td>
+    <td id="38"><button id="38btn">38</button><div id="38nam"></div></td>
+    <td id="48"><button id="48btn">48</button><div id="48nam"></div></td>
+  </tr>
+  <tr>
+    <td id="9"><button id="9btn">9</button><div id="9nam"></div></td>
+    <td id="19"><button id="19btn">19</button><div id="19nam"></div></td>
+    <td id="29"><button id="29btn">29</button><div id="29nam"></div></td>
+    <td id="39"><button id="39btn">39</button><div id="39nam"></div></td>
+    <td id="49"><button id="49btn">49</button><div id="49nam"></div></td>
+  </tr>
+  <tr>
+    <td id="10"><button id="10btn">10</button><div id="10nam"></div></td>
+    <td id="20"><button id="20btn">20</button><div id="20nam"></div></td>
+    <td id="30"><button id="30btn">30</button><div id="30nam"></div></td>
+    <td id="40"><button id="40btn">40</button><div id="40nam"></div></td>
+    <td id="50"><button id="50btn">50</button><div id="50nam"></div></td>
+  </tr>
 </table>
   <hr/>
 <table id="effects">
@@ -2594,21 +2721,33 @@ webaudio-switch{
 <!--<button onclick="test()">test</button>-->
 <ul id="popuppatch" class="popup">
   <li><a href="#" onclick="PopupPatchOverwrite()">Overwrite</a></li>
+  <li><a href="#" onclick="PopupPatchExchange()">Exchange</a></li>
   <li><a href="#" onclick="PopupPatchCancel()">Cancel</a></li>
 </ul>
 <ul id="popuppatch2" class="popup">
   <li><a href="#" onclick="PopupPatchCopy()">Copy</a></li>
   <li><a href="#" onclick="PopupPatchPaste()">Paste</a></li>
+  <li><a href="#" onclick="PopupPatchDelete()">Delete</a></li>
+  <li><a href="#" onclick="PopupPatchRename()">Rename</a></li>
   <li><a href="#" onclick="PopupPatchCancel2()">Cancel</a></li>
 </ul>
 <ul id="popupeffect" class="popup">
-  <li><a href="#" onclick="PopupEffectInsert()">Insert</a></li>
   <li><a href="#" onclick="PopupEffectReplace()">Replace</a></li>
+  <li><a href="#" onclick="PopupEffectInsert()">Insert</a></li>
   <li><a href="#" onclick="PopupEffectUp()">Move Up</a></li>
   <li><a href="#" onclick="PopupEffectDown()">Move Down</a></li>
   <li><a href="#" onclick="PopupEffectDelete()">Delete</a></li>
   <li><a href="#" onclick="PopupEffectCancel()">Cancel</a></li>
 </ul>
+<div id="renamepanel" class="popup">
+  Patch rename :<br/><br/>
+  <input id="renametext" size="10" style="width:160px"/><br/>
+  <button onclick="PopupPatchRenameCancel()">Cancel</button> <button onclick="PopupPatchRenameOk()">Ok</button>
+</div>
+<div id="confirmpanel" class="popup">
+  <div id="confirmmsg"></div>
+  <button id="confirmcancel" onclick="this.parentNode.style.display='none'">Cancel</button> <button id="confirmok" onclick="this.parentNode.style.display='none'">Ok</button>
+</div>
 <div id="effectpanel">
   <div id="effectpanellist">
   <div id="effectpanelmsg">Replace Effect</div>
