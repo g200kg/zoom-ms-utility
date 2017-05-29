@@ -75,7 +75,7 @@
 				background-position: 0px 0px;
 			}
 			#wac-valuetip-row{
-				display:block;
+				display:none;
 				z-index: 10;
 				width:100%;
 				user-select: none;
@@ -87,7 +87,7 @@
 			#wac-valuetip {
 				text-align: center;
 				z-index: 10;
-				display: none;
+				display: inline-block;
 				opacity: 0;
 				border: solid 1px #666;
 				background-color: #fff;
@@ -381,7 +381,7 @@
 				this.showtip();
 			},
 			showtip: function() {
-				var vs=this.$['wac-valuetip'].style;
+				var vs=this.$['wac-valuetip-row'].style;
 				var ts=this.$['wac-tooltip-box'].style;
 				if(this.valuetip && this.vtflag) {
 					if(this.vtim) {
@@ -393,7 +393,7 @@
 				}
 				else if(vs.opacity) {
 					vs.opacity = 0;
-					this.vtim=setTimeout(function(){if(this.vtflag==0) this.$['wac-valuetip'].style.display="none";}.bind(this),500);
+					this.vtim=setTimeout(function(){if(this.vtflag==0) this.$['wac-valuetip-row'].style.display="none";}.bind(this),500);
 				}
 				if(this.tooltip && this.ttflag) {
 					ts.display="block";
