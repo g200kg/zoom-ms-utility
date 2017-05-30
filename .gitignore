@@ -10,7 +10,8 @@ Desktop.ini
 
 # Test files
 test/
-images/
+*.xcf
+*.skin
 
 # Recycle Bin used on file shares
 $RECYCLE.BIN/

@@ -54,6 +54,7 @@ var timer,timerprg;
 var dragtarget=null;
 var ready=false;
 var isdirty=false;
+var dump=0;
 
 var patchkeymap=[
   "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t",
@@ -1565,11 +1566,13 @@ function Init(){
                   var v=(ev.data[7]&0x7f)+((ev.data[8]&0x7f)<<7);
                   SetParamVal(ev.data[5],ev.data[6],v);
                   DispPatch();
-                  console.log(midirecv)
+                  if(dump)
+                    console.log(midirecv)
                 }
               }
               if(midirecv.substr(0,10)=="f052005828"){
-                console.log(midirecv);
+                if(dump)
+                  console.log(midirecv);
                 var name=MakeName(ev.data);
                 if(patchscan>=0){
                   patches[patchscan++]={name:name,data:ev.data};
@@ -1598,7 +1601,9 @@ function Init(){
   );
   for(var i=0;i<6;++i){
     var ef=document.getElementById("fnam"+(i+1));
+    var im=document.getElementById("fimg"+(i+1));
     ef.draggable=true;
+    im.draggable=false;
     ef.ondragstart=function(ev){
       ev.dataTransfer.setData("text",ev.target.id);
       this.classList.add("drag");
@@ -1614,15 +1619,19 @@ function Init(){
         ef.ondragenter=function(ev){
           var d=parseInt(ev.target.id[4])-1;
           if(d>currenteffect)
-            this.classList.add("overdown");
+            this.classList.toggle("overdown");
           else if(d<currenteffect)
-            this.classList.add("overup");
+            this.classList.toggle("overup");
         };
         ef.ondragleave=function(ev){
-          this.classList.remove("overup");
-          this.classList.remove("overdown");
+          var d=parseInt(ev.target.id[4])-1;
+          if(d>currenteffect)
+            this.classList.toggle("overdown");
+          else if(d<currenteffect)
+            this.classList.toggle("overup");
         };
         ef.ondragover=function(ev){
+          console.log("over:"+this.id)
           ev.preventDefault();
         };
         ef.ondrop=function(ev){
@@ -1687,14 +1696,18 @@ function Init(){
   for(var id in effectlist){
     var ef=effectlist[id];
     var e=document.createElement("div");
-    e.innerHTML=ef.name;
+    e.innerHTML="<img src='./images/"+ef.name.replace(/ /g,"_")+".png' draggable='false'/><div>"+ef.name+"</div>";
     e.setAttribute("class","efitem");
     var div=document.getElementById("ef"+ef.group);
     if(div){
       div.appendChild(e);
       e.id="e_"+id;
-      e.onclick=function(ev){
-        var ef=GetEffectFromId(ev.target.id.substring(2));
+      console.log(e.childNodes[0])
+      e.onclick=e.childNodes[0].onclick=e.childNodes[1].onclick=function(ev){
+        var id=ev.target.id;
+        if(!id)
+          id=ev.target.parentNode.id;
+        var ef=GetEffectFromId(id.substring(2));
         SetEffect(currenteffect,ef);
         TrimEffectMax();
         EffectPanelCancel();
@@ -1857,7 +1870,7 @@ function PopupEffectCancel(){
   document.getElementById("popupeffect").style.display="none";
 }
 function EffectPanelCancel(){
-  document.getElementById("effectpanel").style.display="none";
+  document.getElementById("effectpanelbase").style.display="none";
 }
 function PopupEffectDelete(){
   var tar=document.getElementById("fnam"+(currenteffect+1));
@@ -1884,8 +1897,8 @@ function PopupEffectDelete(){
   panel.style.top=(rc.top+20+window.pageYOffset)+"px";
 }
 function PopupEffectReplace(){
-  document.getElementById("effectpanelmsg").innerHTML="Replace Effect";
-  document.getElementById("effectpanel").style.display="block";
+  document.getElementById("effectpanelmsg").innerHTML="Add / Replace Effect";
+  document.getElementById("effectpanelbase").style.display="block";
 }
 function PopupEffectInsert(){
   if(GetEffectId(5)!=0)
@@ -2238,11 +2251,16 @@ function DispPatch(){
   for(n=0;n<6;++n){
     var id=GetEffectId(n);
     var ef=effectlist[id];
-    var c=tab.rows[n].cells[1];
+    var c=document.getElementById("fnam"+(n+1));
+    var t=document.getElementById("ftxt"+(n+1));
+    var img=document.getElementById("fimg"+(n+1));
+    var imgnam=ef.name.replace(/ /g,"_");
+    if(img)
+      img.src="./images/"+imgnam+".png"
     if(ef)
-      c.innerHTML=ef.name;
+      t.innerHTML=ef.name;
     else
-      c.innerHTML="unknown";
+      t.innerHTML="unknown";
     if(ef && id!=0 && GetEffectState(n))
       c.classList.add("press");
     else
@@ -2440,10 +2458,17 @@ body{
   font-size:14px;
   font-weight:bold;
   position:relative;
-  width:1150px;
-  margin:0px auto;
+  border-radius:10px;
+  width:1100px;
+  margin:4px auto;
   padding:1px 20px 40px 20px;
-  background:#fff;
+  background:url(./images/bg.png);
+  border-right:3px solid #666;
+  border-bottom:3px solid #666;
+  border-left:3px solid #fff;
+  border-top:3px solid #fff;
+/*  background:url(./images/bg2.png);*/
+  box-shadow:3px 3px 3px 4px rgba(0,0,0,0.4);
 }
 #info{
   font-size:10px;
@@ -2452,6 +2477,7 @@ body{
 }
 h1{
   font-family: 'Audiowide', cursive;
+  margin:10px 0px 0px 0px;
 }
 #header{
   background:#036;
@@ -2459,6 +2485,15 @@ h1{
   margin:0px;
   width:100%;
   height:90px;
+}
+#header .info{
+  width:250px;
+  margin-right:10px;
+  margin-left:auto;
+  font-size:8px;
+}
+#header a{
+  color:#ccf;
 }
 .popup{
   font-family:'Open Sans', sans-serif;
@@ -2484,7 +2519,7 @@ h1{
 .popup>li>a{
   display:block;
   text-decoration: none;
-  color:#448;
+  color:#226;
   padding:0px 20px;
 }
 .popup>li:hover{
@@ -2539,6 +2574,18 @@ img{
   width:70px;
   margin:5px;
 }
+#patchesbase{
+  background:linear-gradient(#a0b0d0,#9caccc);
+  border-top:5px solid #666;
+  border-left:12px solid #888;
+  border-right:12px solid #ccc;
+  border-bottom:5px solid #fff;
+  border-radius: 5px;
+  box-shadow:14px 14px 14px 14px rgba(0,0,0,0.05) inset;
+  padding:5px 10px;
+  margin:0 auto;
+  width:830px;
+}
 #patches{
   border-collapse: collapse;
 }
@@ -2554,9 +2601,9 @@ img{
 #patches div{
   display:inline-block;
   padding:3px 3px 3px 8px;
-  border:1px solid #88c;
-  background:#ccf;
-  color:#004;
+  border:1px solid #8ab;
+  background:linear-gradient(#b4c4e4,#b0c0e0);
+  color:#124;
   height:22px;
   width:120px;
   font-size:14px;
@@ -2565,8 +2612,11 @@ img{
   font-weight: bold;
   box-sizing:border-box
 }
+#patches div:hover{
+  background:linear-gradient(#cde,#bcd);
+}
 #patches div.sel{
-  background:#c00;
+  background:linear-gradient(#c33,#b22);
   color:#fff;
 }
 #patches div.over{
@@ -2589,7 +2639,9 @@ img{
   border-spacing:12px;
   border:1px solid #888;
   cursor:default;
-  background:linear-gradient(#cce,#bbd);
+  background:url(./images/bg-grad.png);
+}
+#effects td div{
 }
 #effects td div{
 }
@@ -2607,15 +2659,30 @@ img{
   font-weight:normal;
   border-radius:3px;
 }
-#effects img{
+#effects .fimg{
+  width:40px;
+  height:40px;
+  margin:-5px 0px 0px -2px;
   float:left;
 }
 #effects .fnam{
   text-align: center;
-  background:linear-gradient(#ccf,#aad);
-  color:#006;
-  width:100px;
-  box-sizing:border-box
+  background:linear-gradient(#822,#400);
+  color:#fcc;
+  width:120px;
+  box-sizing:border-box;
+  vertical-align:middle;
+  position:relative;
+  text-align: center;
+}
+#effects .fnam:hover{
+  background:linear-gradient(#a44,#622);
+}
+#effects .ftxt{
+  display:inline;
+  position:absolute;
+  bottom:4px;
+  right:4px;
 }
 #effects .fnam.drag{
   opacity: 0.5;
@@ -2627,7 +2694,11 @@ img{
   border-bottom: 4px solid #fff;
 }
 #effects .fnam.press{
-  background:linear-gradient(#d00,#b00);
+  background:linear-gradient(#b00 0%,#d77 25%,#d00 50%,#b00 100%);
+  color:#fff;
+}
+#effects .fnam.press:hover{
+  background:linear-gradient(#d22 0%,#f99 25%,#f22 50%,#d22 100%);
   color:#fff;
 }
 .fnum{
@@ -2650,22 +2721,70 @@ webaudio-switch{
   display:none;
   width:32px;
 }
-#effectpanel{
+#effectpanelbase{
   display:none;
   position:absolute;
   left:0px;
   top:0px;
   width:100%;
   height:100%;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,0.3);
 }
-#effectpanellist{
- background:#fff;
- border:1px solid:#000;
+#effectpanel{
+ background:url(./images/bg.png);
+ border:3px solid:#333;
+ border-radius: 4px;
  width:1060px;
  height:750px;
- margin:100px auto;
+ margin:20px auto;
  padding:5px;
+ cursor:default;
+ box-shadow:2px 2px 2px 2px rgba(0,0,0,0.4);
+}
+#effectpanelscr{
+  width:990px;
+  height:650px;
+  margin:4px auto;
+  overflow-y:scroll;
+  background:#888;
+  color:#fff;
+}
+#effectpanellist{
+  width:950px;
+}
+.efgrp{
+  width:880px;
+  padding:4px 0px;
+  border-bottom:1px solid #000;
+}
+.efitem{
+  display:inline-block;
+  border-radius: 3px;
+  border:1px solid #668;
+  width:80px;
+  height:84px;
+  padding:0px;
+  margin:1px;
+  font-size:11px;
+  font-weight: normal;
+  color:#000;
+  cursor:pointer;
+  background:linear-gradient(#ddf,#cce);
+}
+.efitem img{
+  display:block;
+  width:64px;
+  height:52px;
+  margin:0px auto;
+}
+.efitem div{
+  text-align: center;
+}
+.efitem:hover{
+  background:linear-gradient(#eef,#ddf);
+}
+.efitem div{
+  padding:0px 4px;
 }
 #splash{
   position:absolute;
@@ -2685,26 +2804,14 @@ webaudio-switch{
   padding:5px;
   text-align:center;
 }
-.efitem{
-  display:inline-block;
-  background:#fff;
-  border-radius: 3px;
-  border:1px solid #66c;
-  width:70px;
-  height:20px;
-  padding:3px 5px;
-  margin:0;
-  font-size:11px;
-  font-weight: normal;
-}
 </style>
 </head>
 <body>
   <div id="base">
     <div id="header">
-      <a href="http://www.g200kg.com/" target="_blank"><img src="./g200kg160x80.png" style="float:left;margin:4px 11px"/></a>
+      <a href="http://www.g200kg.com/" target="_blank"><img src="./images/g200kg160x80.png" style="float:left;margin:4px 11px"/></a>
       <h1>Zoom MS-50G Utility</h1>
-      <p> Patch utility for ZOOM MS-50G MultiStomp guitar pedal</p>
+      Patch utility for ZOOM MS-50G MultiStomp guitar pedal<div class="info">Source code is available at GitHub : <a href="https://github.com/g200kg/zoom-ms-utility" target="_blank">https://github.com/g200kg/zoom-ms-utility</a></div>
     </div>
   <hr/>
   MidiPort : <select id="midiport" onchange="SelectPort()"></select><br/><br/>
@@ -2755,6 +2862,7 @@ webaudio-switch{
   <hr/>
   Status : <span id="msg">Not Initialized</span><br/>
   <br/>
+<div id="patchesbase">
 <table id="patches">
   <tr>
     <td id="1"><button id="1btn">1</button><div id="1nam"></div></td>
@@ -2827,6 +2935,7 @@ webaudio-switch{
     <td id="50"><button id="50btn">50</button><div id="50nam"></div></td>
   </tr>
 </table>
+</div>
   <hr/>
 <table>
 <tr>
@@ -2835,76 +2944,76 @@ webaudio-switch{
 </table>
 <table id="effects">
   <tr>
-    <th><button class="fnum" id="fnum1">1</button></th><td id="fnam1" class="fnam"></td>
-    <td><div class="pcell"><webaudio-knob id="f1p1k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p1s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p1v" disabled/></div><div id="f1p1l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p2k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p2s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p2v" disabled/></div><div id="f1p2l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p3k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p3s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p3v" disabled/></div><div id="f1p3l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p4k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p4s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p4v" disabled/></div><div id="f1p4l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p5k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p5s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p5v" disabled/></div><div id="f1p5l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p6k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p6s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p6v" disabled/></div><div id="f1p6l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p7k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p7s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p7v" disabled/></div><div id="f1p7l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p8k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p8s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p8v" disabled/></div><div id="f1p8l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f1p9k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p9s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p9v" disabled/></div><div id="f1p9l"></div></div></div></td>
+    <th><button class="fnum" id="fnum1">1</button></th><td id="fnam1" class="fnam"><img id="fimg1" class="fimg"/><div id="ftxt1" class="ftxt"></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p1v" disabled/></div><div id="f1p1l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p2v" disabled/></div><div id="f1p2l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p3v" disabled/></div><div id="f1p3l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p4v" disabled/></div><div id="f1p4l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p5v" disabled/></div><div id="f1p5l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p6v" disabled/></div><div id="f1p6l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p7v" disabled/></div><div id="f1p7l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p8v" disabled/></div><div id="f1p8l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f1p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p9v" disabled/></div><div id="f1p9l"></div></div></div></td>
   </tr>
   <tr>
-    <th><button class="fnum" id="fnum2">2</button></th><td id="fnam2" class="fnam"></td>
-    <td><div class="pcell"><webaudio-knob id="f2p1k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p1s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p1v" disabled/></div><div id="f2p1l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p2k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p2s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p2v" disabled/></div><div id="f2p2l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p3k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p3s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p3v" disabled/></div><div id="f2p3l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p4k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p4s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p4v" disabled/></div><div id="f2p4l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p5k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p5s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p5v" disabled/></div><div id="f2p5l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p6k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p6s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p6v" disabled/></div><div id="f2p6l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p7k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p7s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p7v" disabled/></div><div id="f2p7l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p8k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p8s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p8v" disabled/></div><div id="f2p8l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f2p9k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p9s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p9v" disabled/></div><div id="f2p9l"></div></div></div></td>
+    <th><button class="fnum" id="fnum2">2</button></th><td id="fnam2" class="fnam"><img id="fimg2" class="fimg"/><div id="ftxt2" class="ftxt"></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p1v" disabled/></div><div id="f2p1l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p2v" disabled/></div><div id="f2p2l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p3v" disabled/></div><div id="f2p3l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p4v" disabled/></div><div id="f2p4l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p5v" disabled/></div><div id="f2p5l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p6v" disabled/></div><div id="f2p6l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p7v" disabled/></div><div id="f2p7l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p8v" disabled/></div><div id="f2p8l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f2p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p9v" disabled/></div><div id="f2p9l"></div></div></div></td>
   </tr>
   <tr>
-    <th><button class="fnum" id="fnum3">3</button></th><td id="fnam3" class="fnam"></td>
-    <td><div class="pcell"><webaudio-knob id="f3p1k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p1s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p1v" disabled/></div><div id="f3p1l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p2k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p2s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p2v" disabled/></div><div id="f3p2l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p3k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p3s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p3v" disabled/></div><div id="f3p3l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p4k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p4s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p4v" disabled/></div><div id="f3p4l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p5k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p5s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p5v" disabled/></div><div id="f3p5l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p6k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p6s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p6v" disabled/></div><div id="f3p6l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p7k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p7s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p7v" disabled/></div><div id="f3p7l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p8k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p8s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p8v" disabled/></div><div id="f3p8l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f3p9k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p9s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p9v" disabled/></div><div id="f3p9l"></div></div></div></td>
+    <th><button class="fnum" id="fnum3">3</button></th><td id="fnam3" class="fnam"><img id="fimg3" class="fimg"/><div id="ftxt3" class="ftxt"></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p1v" disabled/></div><div id="f3p1l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p2v" disabled/></div><div id="f3p2l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p3v" disabled/></div><div id="f3p3l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p4v" disabled/></div><div id="f3p4l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p5v" disabled/></div><div id="f3p5l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p6v" disabled/></div><div id="f3p6l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p7v" disabled/></div><div id="f3p7l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p8v" disabled/></div><div id="f3p8l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f3p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p9v" disabled/></div><div id="f3p9l"></div></div></div></td>
   </tr>
   <tr>
-    <th><button class="fnum" id="fnum4">4</button></th><td id="fnam4" class="fnam"></td>
-    <td><div class="pcell"><webaudio-knob id="f4p1k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p1s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p1v" disabled/></div><div id="f4p1l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p2k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p2s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p2v" disabled/></div><div id="f4p2l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p3k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p3s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p3v" disabled/></div><div id="f4p3l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p4k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p4s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p4v" disabled/></div><div id="f4p4l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p5k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p5s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p5v" disabled/></div><div id="f4p5l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p6k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p6s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p6v" disabled/></div><div id="f4p6l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p7k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p7s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p7v" disabled/></div><div id="f4p7l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p8k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p8s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p8v" disabled/></div><div id="f4p8l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f4p9k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p9s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p9v" disabled/></div><div id="f4p9l"></div></div></div></td>
+    <th><button class="fnum" id="fnum4">4</button></th><td id="fnam4" class="fnam"><img id="fimg4" class="fimg"/><div id="ftxt4" class="ftxt"></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p1v" disabled/></div><div id="f4p1l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p2v" disabled/></div><div id="f4p2l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p3v" disabled/></div><div id="f4p3l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p4v" disabled/></div><div id="f4p4l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p5v" disabled/></div><div id="f4p5l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p6v" disabled/></div><div id="f4p6l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p7v" disabled/></div><div id="f4p7l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p8v" disabled/></div><div id="f4p8l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f4p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p9v" disabled/></div><div id="f4p9l"></div></div></div></td>
   </tr>
   <tr>
-    <th><button class="fnum" id="fnum5">5</button></th><td id="fnam5" class="fnam"></td>
-    <td><div class="pcell"><webaudio-knob id="f5p1k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p1s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p1v" disabled/></div><div id="f5p1l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p2k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p2s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p2v" disabled/></div><div id="f5p2l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p3k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p3s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p3v" disabled/></div><div id="f5p3l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p4k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p4s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p4v" disabled/></div><div id="f5p4l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p5k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p5s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p5v" disabled/></div><div id="f5p5l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p6k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p6s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p6v" disabled/></div><div id="f5p6l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p7k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p7s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p7v" disabled/></div><div id="f5p7l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p8k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p8s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p8v" disabled/></div><div id="f5p8l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f5p9k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p9s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p9v" disabled/></div><div id="f5p9l"></div></div></div></td>
+    <th><button class="fnum" id="fnum5">5</button></th><td id="fnam5" class="fnam"><img id="fimg5" class="fimg"/><div id="ftxt5" class="ftxt"></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p1v" disabled/></div><div id="f5p1l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p2v" disabled/></div><div id="f5p2l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p3v" disabled/></div><div id="f5p3l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p4v" disabled/></div><div id="f5p4l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p5v" disabled/></div><div id="f5p5l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p6v" disabled/></div><div id="f5p6l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p7v" disabled/></div><div id="f5p7l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p8v" disabled/></div><div id="f5p8l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f5p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p9v" disabled/></div><div id="f5p9l"></div></div></div></td>
   </tr>
   <tr>
-    <th><button class="fnum" id="fnum6">6</button></th><td id="fnam6" class="fnam"></td>
-    <td><div class="pcell"><webaudio-knob id="f6p1k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p1s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p1v" disabled/></div><div id="f6p1l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p2k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p2s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p2v" disabled/></div><div id="f6p2l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p3k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p3s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p3v" disabled/></div><div id="f6p3l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p4k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p4s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p4v" disabled/></div><div id="f6p4l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p5k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p5s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p5v" disabled/></div><div id="f6p5l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p6k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p6s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p6v" disabled/></div><div id="f6p6l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p7k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p7s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p7v" disabled/></div><div id="f6p7l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p8k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p8s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p8v" disabled/></div><div id="f6p8l"></div></div></div></td>
-    <td><div class="pcell"><webaudio-knob id="f6p9k" diameter="32" src="./simpleknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p9s" src="./switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p9v" disabled/></div><div id="f6p9l"></div></div></div></td>
+    <th><button class="fnum" id="fnum6">6</button></th><td id="fnam6" class="fnam"><img id="fimg6" class="fimg"/><div id="ftxt6" class="ftxt"></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p1v" disabled/></div><div id="f6p1l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p2v" disabled/></div><div id="f6p2l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p3v" disabled/></div><div id="f6p3l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p4v" disabled/></div><div id="f6p4l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p5v" disabled/></div><div id="f6p5l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p6v" disabled/></div><div id="f6p6l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p7v" disabled/></div><div id="f6p7l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p8v" disabled/></div><div id="f6p8l"></div></div></div></td>
+    <td><div class="pcell"><webaudio-knob id="f6p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p9v" disabled/></div><div id="f6p9l"></div></div></div></td>
   </tr>
 </table>
   <hr/>
@@ -2925,8 +3034,8 @@ webaudio-switch{
   <li><a href="#" onclick="PopupPatchCancel2()">Cancel</a></li>
 </ul>
 <ul id="popupeffect" class="popup">
-  <li><a href="#" onclick="PopupEffectReplace()">Replace</a></li>
-  <li><a href="#" onclick="PopupEffectInsert()">Insert</a></li>
+  <li><a href="#" onclick="PopupEffectReplace()">Add/Replace</a></li>
+  <li><a href="#" onclick="PopupEffectInsert()">Insert Space</a></li>
   <li><a href="#" onclick="PopupEffectUp()">Move Up</a></li>
   <li><a href="#" onclick="PopupEffectDown()">Move Down</a></li>
   <li><a href="#" onclick="PopupEffectDelete()">Delete</a></li>
@@ -2941,42 +3050,46 @@ webaudio-switch{
   <div id="confirmmsg"></div>
   <button id="confirmcancel" onclick="this.parentNode.style.display='none'">Cancel</button> <button id="confirmok">Ok</button>
 </div>
-<div id="effectpanel">
-  <div id="effectpanellist">
-  <div id="effectpanelmsg">Replace Effect</div>
-  <table>
-    <tr>
-      <th>COMP</th><td><div style="display:block;width:930px;height:30px;padding:4px 0px" id="efCOMP"></div></td>
-    </tr>
-    <tr>
-      <th>FILTER</th><td><div style="display:block;width:930px;height:60px;padding:4px 0px" id="efFILTER"></div></td>
-    </tr>
-    <tr>
-      <th>DRIVE</th><td><div style="display:block;width:930px;height:90px;padding:4px 0px" id="efDRIVE"></div></td>
-    </tr>
-    <tr>
-      <th>AMP</th><td><div style="display:block;width:930px;height:60px;padding:4px 0px" id="efAMP"></div></td>
-    </tr>
-    <tr>
-      <th>MOD</th><td><div style="display:block;width:930px;height:90px;padding:4px 0px" id="efMOD"></div></td>
-    </tr>
-    <tr>
-      <th>SFX</th><td><div style="display:block;width:930px;height:30px;padding:4px 0px" id="efSFX"></div></td>
-    </tr>
-    <tr>
-      <th>DELAY</th><td><div style="display:block;width:930px;height:90px;padding:4px 0px" id="efDELAY"></div></td>
-    </tr>
-    <tr>
-      <th>REVERB</th><td><div style="display:block;width:930px;height:90px;padding:4px 0px" id="efREVERB"></div></td>
-    </tr>
-  </table>
-  <button onclick="EffectPanelCancel()" style="width:120px;height:30px;margin:5px">Cancel</button>
-</div>
+<div id="effectpanelbase">
+  <div id="effectpanel">
+    <div id="effectpanelmsg">Add/Replace Effect</div>
+    <div id="effectpanelscr">
+      <div id="effectpanellist">
+        <table>
+          <tr>
+            <th>COMP</th><td><div class="efgrp" id="efCOMP"></div></td>
+          </tr>
+          <tr>
+            <th>FILTER</th><td><div class="efgrp" id="efFILTER"></div></td>
+          </tr>
+          <tr>
+            <th>DRIVE</th><td><div class="efgrp" id="efDRIVE"></div></td>
+          </tr>
+          <tr>
+            <th>AMP</th><td><div class="efgrp" id="efAMP"></div></td>
+          </tr>
+          <tr>
+            <th>MOD</th><td><div class="efgrp" id="efMOD"></div></td>
+          </tr>
+          <tr>
+            <th>SFX</th><td><div class="efgrp" id="efSFX"></div></td>
+          </tr>
+          <tr>
+            <th>DELAY</th><td><div class="efgrp" id="efDELAY"></div></td>
+          </tr>
+          <tr>
+            <th>REVERB</th><td><div class="efgrp" id="efREVERB"></div></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+    <button onclick="EffectPanelCancel()" style="width:120px;height:30px;margin:5px">Cancel</button>
+  </div>
 </div>
 <div id="splash">
   <div id="splashpanel">
     <h1>Zoom MS-50G Utility</h1>
-    <img src="./g200kg160x80.png"/><br/>
+    <img src="./images/g200kg160x80.png"/><br/>
     <p>This is a browser based ZOOM MS-50G patch editor<br/>
     Launch this page with latest Chrome after connect ZOOM MS-50G via USB.</p>
     <p>これはブラウザで動作する ZOOM MS-50G 用のパッチエディタです<br/>
