@@ -1602,50 +1602,57 @@ function Init(){
     ef.ondragstart=function(ev){
       ev.dataTransfer.setData("text",ev.target.id);
       this.classList.add("drag");
-    };
-    ef.ondragend=function(ev){
-      this.classList.remove("drag");
-    };
-    ef.ondragenter=function(ev){
-      var d=parseInt(ev.target.id[4])-1;
-      if(d>currenteffect)
-        this.classList.add("overdown");
-      else if(d<currenteffect)
-        this.classList.add("overup");
-    };
-    ef.ondragleave=function(ev){
-      this.classList.remove("overup");
-      this.classList.remove("overdown");
-    };
-    ef.ondragover=function(ev){
-      ev.preventDefault();
-    };
-    ef.ondrop=function(ev){
-      this.classList.remove("overup");
-      this.classList.remove("overdown");
-      var s=parseInt(event.dataTransfer.getData("text")[4])-1;
-      var d=parseInt(ev.target.id[4])-1;
-      if(s!=d){
-        if(s>d){
-          var e=GetEffect(s);
-          for(var i=s;i>d;--i)
-            SetEffect(i,GetEffect(i-1));
-          SetEffect(d,e);
-          SetCurrentEffect(d);
-          TrimEffectMax();
-          isdirty=true;
-        }
-        else{
-          var e=GetEffect(s);
-          for(var i=s;i<d;++i)
-            SetEffect(i,GetEffect(i+1));
-          SetEffect(d,e);
-          SetCurrentEffect(d);
-          TrimEffectMax();
-          isdirty=true;
-        }
+      for(var j=0;j<6;++j){
+        var ef=document.getElementById("fnam"+(j+1));
+        ef.ondragend=function(ev){
+          this.classList.remove("drag");
+          for(var jj=0;jj<6;++jj){
+            var dst=document.getElementById("fnam"+(jj+1));
+            dst.ondragenter=dst.ondragleave=dst.ondragover=dst.ondrop=null;
+          }
+        };
+        ef.ondragenter=function(ev){
+          var d=parseInt(ev.target.id[4])-1;
+          if(d>currenteffect)
+            this.classList.add("overdown");
+          else if(d<currenteffect)
+            this.classList.add("overup");
+        };
+        ef.ondragleave=function(ev){
+          this.classList.remove("overup");
+          this.classList.remove("overdown");
+        };
+        ef.ondragover=function(ev){
+          ev.preventDefault();
+        };
+        ef.ondrop=function(ev){
+          this.classList.remove("overup");
+          this.classList.remove("overdown");
+          var s=parseInt(event.dataTransfer.getData("text")[4])-1;
+          var d=parseInt(ev.target.id[4])-1;
+          if(s!=d){
+            if(s>d){
+              var e=GetEffect(s);
+              for(var i=s;i>d;--i)
+                SetEffect(i,GetEffect(i-1));
+              SetEffect(d,e);
+              SetCurrentEffect(d);
+              TrimEffectMax();
+              isdirty=true;
+            }
+            else{
+              var e=GetEffect(s);
+              for(var i=s;i<d;++i)
+                SetEffect(i,GetEffect(i+1));
+              SetEffect(d,e);
+              SetCurrentEffect(d);
+              TrimEffectMax();
+              isdirty=true;
+            }
+          }
+          ev.preventDefault();
+        };
       }
-      ev.preventDefault();
     };
     for(var j=0;j<9;++j){
       var c="f"+(i+1)+"p"+(j+1);
@@ -1794,29 +1801,30 @@ function Scan(){
             cell.ondragstart=function(ev){
               ev.dataTransfer.setData("text",ev.target.id);
               this.classList.add("drag");
-            };
-            cell.ondragenter=function(ev){
-              this.classList.add("over");
-            };
-            cell.ondragleave=function(ev){
-              this.classList.remove("over");
-            };
-            cell.ondragover=function(ev){
-              ev.preventDefault();
-            };
-            cell.ondrop=function(ev){
-              this.classList.remove("over");
-              var s=parseInt(event.dataTransfer.getData("text"));
-              var d=parseInt(ev.target.id);
-              if(s!=d){
-                PopupPatchMenu(ev.target);
-                dragtarget=ev.target;
+              for(var j=0;j<50;++j){
+                var c=document.getElementById((j+1)+"nam");
+                c.ondragenter=function(ev){this.classList.add("over");};
+                c.ondragleave=function(ev){this.classList.remove("over");};
+                c.ondragover=function(ev){ev.preventDefault();};
+                c.ondrop=function(ev){
+                  this.classList.remove("over");
+                  var s=parseInt(event.dataTransfer.getData("text"));
+                  var d=parseInt(ev.target.id);
+                  if(s!=d){
+                    PopupPatchMenu(ev.target);
+                    dragtarget=ev.target;
+                  }
+                  ev.preventDefault();
+                };
+                c.ondragend=function(ev){
+                  this.classList.remove("over");
+                  this.classList.remove("drag");
+                  for(var jj=0;jj<50;++jj){
+                    cc=document.getElementById((jj+1)+"nam");
+                    cc.ondragenter=cc.ondragleave=cc.ondragover=cc.ondrop=cc.ondragend=null;
+                  }
+                };
               }
-              ev.preventDefault();
-            };
-            cell.ondragend=function(ev){
-              this.classList.remove("over");
-              this.classList.remove("drag");
             };
           }
           document.getElementById("msg").innerHTML="Ready";
@@ -2342,8 +2350,8 @@ function Edit(p){
 }
 function Usage(){
   var e=document.getElementById("usage");
-  if(e.style.maxHeight!="500px"){
-    e.style.maxHeight="500px";
+  if(e.style.maxHeight!="600px"){
+    e.style.maxHeight="600px";
     e.style.border="1px solid #000";
     e.style.padding="10px";
   }
