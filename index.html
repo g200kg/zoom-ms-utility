@@ -1597,6 +1597,56 @@ function Init(){
     function(e){alert("requestMIDIAccess Error");},
   );
   for(var i=0;i<6;++i){
+    var ef=document.getElementById("fnam"+(i+1));
+    ef.draggable=true;
+    ef.ondragstart=function(ev){
+      ev.dataTransfer.setData("text",ev.target.id);
+      this.classList.add("drag");
+    };
+    ef.ondragend=function(ev){
+      this.classList.remove("drag");
+    };
+    ef.ondragenter=function(ev){
+      var d=parseInt(ev.target.id[4])-1;
+      if(d>currenteffect)
+        this.classList.add("overdown");
+      else if(d<currenteffect)
+        this.classList.add("overup");
+    };
+    ef.ondragleave=function(ev){
+      this.classList.remove("overup");
+      this.classList.remove("overdown");
+    };
+    ef.ondragover=function(ev){
+      ev.preventDefault();
+    };
+    ef.ondrop=function(ev){
+      this.classList.remove("overup");
+      this.classList.remove("overdown");
+      var s=parseInt(event.dataTransfer.getData("text")[4])-1;
+      var d=parseInt(ev.target.id[4])-1;
+      if(s!=d){
+        if(s>d){
+          var e=GetEffect(s);
+          for(var i=s;i>d;--i)
+            SetEffect(i,GetEffect(i-1));
+          SetEffect(d,e);
+          SetCurrentEffect(d);
+          TrimEffectMax();
+          isdirty=true;
+        }
+        else{
+          var e=GetEffect(s);
+          for(var i=s;i<d;++i)
+            SetEffect(i,GetEffect(i+1));
+          SetEffect(d,e);
+          SetCurrentEffect(d);
+          TrimEffectMax();
+          isdirty=true;
+        }
+      }
+      ev.preventDefault();
+    };
     for(var j=0;j<9;++j){
       var c="f"+(i+1)+"p"+(j+1);
       var k=document.getElementById(c+"k");
@@ -1704,6 +1754,9 @@ function Scan(){
               PopupEffectMenu(ev.target);
               ev.preventDefault();
             };
+            cell.onmousedown=function(ev){
+              currenteffect=ev.target.id[4]-1;
+            };
             cell.onclick=function(ev){
               var n=parseInt(ev.target.id[4]);
               SetCurrentEffect(n-1);
@@ -1740,33 +1793,30 @@ function Scan(){
             cell.draggable=true;
             cell.ondragstart=function(ev){
               ev.dataTransfer.setData("text",ev.target.id);
+              this.classList.add("drag");
             };
             cell.ondragenter=function(ev){
-              if(ev.target.id!=currentpatch){
-                ev.target.style.background="#aaf";
-                ev.target.style.color="#000";
-                dragtarget=ev.target;
-              }
+              this.classList.add("over");
             };
             cell.ondragleave=function(ev){
-              ev.target.style.background="#ccf";
-              ev.target.style.color="#000";
+              this.classList.remove("over");
             };
             cell.ondragover=function(ev){
               ev.preventDefault();
             };
             cell.ondrop=function(ev){
+              this.classList.remove("over");
               var s=parseInt(event.dataTransfer.getData("text"));
               var d=parseInt(ev.target.id);
-              if(s!=d)
+              if(s!=d){
                 PopupPatchMenu(ev.target);
+                dragtarget=ev.target;
+              }
               ev.preventDefault();
             };
             cell.ondragend=function(ev){
-              var e=document.getElementById("popuppatch");
-              if(dragtarget && e.style.display!="block")
-                dragtarget.style.background="#ccf";
-              SelectPatch(currentpatch);
+              this.classList.remove("over");
+              this.classList.remove("drag");
             };
           }
           document.getElementById("msg").innerHTML="Ready";
@@ -1815,6 +1865,7 @@ function PopupEffectDelete(){
     for(var i=1;i<10;++i)
       SetParamVal(5,i,0);
     TrimEffectMax();
+    SetCurrentEffect(currenteffect);
     DispPatch();
     isdirty=true;
     ev.target.parentNode.style.display="none";
@@ -1823,12 +1874,6 @@ function PopupEffectDelete(){
   panel.style.display="block";
   panel.style.left=(rc.left+20+window.pageXOffset)+"px";
   panel.style.top=(rc.top+20+window.pageYOffset)+"px";
-}
-
-function PopupEffectDeleteCancel(){
-  PopupEffectCancel();
-}
-function PopupEffectDeleteOk(){
 }
 function PopupEffectReplace(){
   document.getElementById("effectpanelmsg").innerHTML="Replace Effect";
@@ -1847,6 +1892,7 @@ function PopupEffectInsert(){
     SetParamVal(currenteffect,k,0);
   TrimEffectMax();
   DispPatch();
+  SetCurrentEffect(currenteffect);
   isdirty=true;
   PopupEffectCancel();
 }
@@ -1881,7 +1927,7 @@ function PopupPatchCancel2(){
   document.getElementById("popuppatch2").style.display="none";
 }
 function PopupPatchMenu(tar){
-  tar.style.background="#aaf";
+//  tar.style.background="#aaf";
   var rc=tar.getBoundingClientRect();
   var e=document.getElementById("popuppatch");
   e.style.display="block";
@@ -1892,8 +1938,8 @@ function PopupPatchCancel(){
   var e=document.getElementById("popuppatch");
   e.style.display="none";
   if(dragtarget){
-    dragtarget.style.background="#ccf";
-    dragtarget.style.color="#000";
+//    dragtarget.style.background="#ccf";
+//    dragtarget.style.color="#000";
     dragtarget=null;
   }
 }
@@ -2169,14 +2215,10 @@ function SetEffectState(n,on){
   var id=GetEffectId(n);
   var ef=effectlist[id];
   var c=document.getElementById("fnam"+(n+1));
-  if(ef && id!=0 && on){
-    c.style.background="linear-gradient(#d00,#b00)";
-    c.style.color="#fff";
-  }
-  else{
-    c.style.background="linear-gradient(#ccf,#aad)";
-    c.style.color="#000";
-  }
+  if(ef && id!=0 && on)
+    c.classList.add("press");
+  else
+    c.classList.remove("press");
 }
 function ToggleEffect(n){
   SetEffectState(n,GetEffectState(n)^1);
@@ -2193,14 +2235,10 @@ function DispPatch(){
       c.innerHTML=ef.name;
     else
       c.innerHTML="unknown";
-    if(ef && id!=0 && GetEffectState(n)){
-      c.style.background="linear-gradient(#d00,#b00)";;
-      c.style.color="#fff";
-    }
-    else{
-      c.style.background="linear-gradient(#ccf,#aad)";
-      c.style.color="#000";
-    }
+    if(ef && id!=0 && GetEffectState(n))
+      c.classList.add("press");
+    else
+      c.classList.remove("press");
     for(p=0;p<9;++p){
       cell=tab.rows[n].cells[p+1];
       var s="f"+(n+1)+"p"+(p+1);
@@ -2276,14 +2314,10 @@ function SelPatchList(f){
   if(currentpatch<0)
     return;
   c=document.getElementById((currentpatch+1)+"nam");
-  if(f){
-    c.style.background="#c00";
-    c.style.color="#fff";
-  }
-  else{
-    c.style.background="#ccf";
-    c.style.color="#004";
-  }
+  if(f)
+    c.classList.add("sel");
+  else
+    c.classList.remove("sel");
 }
 function SendPatch(p){
   p=parseInt(p);
@@ -2514,12 +2548,24 @@ img{
   padding:3px 3px 3px 8px;
   border:1px solid #88c;
   background:#ccf;
-  height:14px;
+  color:#004;
+  height:22px;
   width:120px;
   font-size:14px;
   line-height: 14px;
   vertical-align: middle;
   font-weight: bold;
+  box-sizing:border-box
+}
+#patches div.sel{
+  background:#c00;
+  color:#fff;
+}
+#patches div.over{
+  border: 2px dotted #44c;
+}
+#patches div.drag{
+  opacity: 0.5;
 }
 #effects{
   border-collapse:separate;
@@ -2558,9 +2604,23 @@ img{
 }
 #effects .fnam{
   text-align: center;
-  background:#aad;
-  color:#600;
+  background:linear-gradient(#ccf,#aad);
+  color:#006;
   width:100px;
+  box-sizing:border-box
+}
+#effects .fnam.drag{
+  opacity: 0.5;
+}
+#effects .fnam.overup{
+  border-top: 4px solid #fff;
+}
+#effects .fnam.overdown{
+  border-bottom: 4px solid #fff;
+}
+#effects .fnam.press{
+  background:linear-gradient(#d00,#b00);
+  color:#fff;
 }
 .fnum{
   height:40px;
@@ -2672,6 +2732,7 @@ webaudio-switch{
           <li>From right-click or number-button context menu, each effect can be add/move/del</li>
           <li>Each parameter can be edit by drag(coarse)/shift-drag(fine)</li>
           <li>Mouse wheel and Shift+wheel are also available to value edit</li>
+          <li>Effects are draggable to another position to change order</li>
         </ul>
       </li>
       <li>Keyboard<br/>
