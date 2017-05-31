@@ -1557,8 +1557,6 @@ function Init(){
                 }
               }
               var cmd=midirecv.substr(0,2);
-//              if(cmd!="b0" && cmd!="c0")
-//                console.log(midirecv);
               if(midirecv.substr(0,10)=="f052005831"){
                 if(ev.data[6]==0)
                   SetEffectState(ev.data[5],0);
@@ -1631,7 +1629,6 @@ function Init(){
             this.classList.toggle("overup");
         };
         ef.ondragover=function(ev){
-          console.log("over:"+this.id)
           ev.preventDefault();
         };
         ef.ondrop=function(ev){
@@ -1702,7 +1699,6 @@ function Init(){
     if(div){
       div.appendChild(e);
       e.id="e_"+id;
-      console.log(e.childNodes[0])
       e.onclick=e.childNodes[0].onclick=e.childNodes[1].onclick=function(ev){
         var id=ev.target.id;
         if(!id)
@@ -2368,15 +2364,17 @@ function Edit(p){
 }
 function Usage(){
   var e=document.getElementById("usage");
-  if(e.style.maxHeight!="600px"){
-    e.style.maxHeight="600px";
+  if(e.style.maxHeight!="700px"){
+    e.style.maxHeight="700px";
     e.style.border="1px solid #000";
     e.style.padding="10px";
+    e.style.opacity=1.0;
   }
   else{
     e.style.maxHeight="0px";
     e.style.border="0px solid #000";
     e.style.padding="0px";
+    e.style.opacity=0.0;
   }
 }
 function SaveBank(){
@@ -2460,6 +2458,7 @@ body{
   position:relative;
   border-radius:10px;
   width:1100px;
+  height:650px;
   margin:4px auto;
   padding:1px 20px 40px 20px;
   background:url(./images/bg.png);
@@ -2467,7 +2466,6 @@ body{
   border-bottom:3px solid #666;
   border-left:3px solid #fff;
   border-top:3px solid #fff;
-/*  background:url(./images/bg2.png);*/
   box-shadow:3px 3px 3px 4px rgba(0,0,0,0.4);
 }
 #info{
@@ -2480,13 +2478,22 @@ h1{
   margin:10px 0px 0px 0px;
 }
 #header{
+  position:absolute;
+  top:10px;
+  left:20px;
   background:#036;
   color:#ddf;
   margin:0px;
-  width:100%;
-  height:90px;
+  width:1100px;
+  height:70px;
+}
+#header img{
+  height:60px;
 }
 #header .info{
+  position: absolute;
+  top:10px;
+  right:0px;
   width:250px;
   margin-right:10px;
   margin-left:auto;
@@ -2521,6 +2528,7 @@ h1{
   text-decoration: none;
   color:#226;
   padding:0px 20px;
+  cursor:pointer;
 }
 .popup>li:hover{
   background:#88c;
@@ -2540,14 +2548,20 @@ img{
   height:60px;
 }
 #usage{
+  position:absolute;
+  top:80px;
+  left:100px;
+  width:900px;
   max-height:0px;
   border:0px solid #000;
   background:#ccf;
-  margin:5px;
   transition:0.5s;
   overflow:hidden;
   padding:0px;
+  font-size:14px;
   font-weight: normal;
+  box-shadow:2px 2px 2px 2px rgba(0,0,0,0.4);
+  opacity:0.0;
 }
 .menubtn{
   width:120px;
@@ -2574,7 +2588,27 @@ img{
   width:70px;
   margin:5px;
 }
+#mainmenu{
+  position:absolute;
+  width:190px;
+  left:15px;
+  top:80px;
+}
+#mainmenu select{
+  height:20px;
+}
+#mainmenu ul{
+  padding:0;
+  list-style: none;
+}
+#mainmenu ul li{
+  margin:4px;
+}
 #patchesbase{
+  position:absolute;
+  left:230px;
+  top:120px;
+  width:830px;
   background:linear-gradient(#a0b0d0,#9caccc);
   border-top:5px solid #666;
   border-left:12px solid #888;
@@ -2583,8 +2617,7 @@ img{
   border-radius: 5px;
   box-shadow:14px 14px 14px 14px rgba(0,0,0,0.05) inset;
   padding:5px 10px;
-  margin:0 auto;
-  width:830px;
+  margin:0px 15px 0px auto;
 }
 #patches{
   border-collapse: collapse;
@@ -2626,6 +2659,8 @@ img{
   opacity: 0.5;
 }
 #effects{
+  position:absolute;
+  top:380px;
   border-collapse:separate;
   border-spacing:0px;
   box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
@@ -2735,7 +2770,7 @@ webaudio-switch{
  border:3px solid:#333;
  border-radius: 4px;
  width:1060px;
- height:750px;
+ height:650px;
  margin:20px auto;
  padding:5px;
  cursor:default;
@@ -2743,7 +2778,7 @@ webaudio-switch{
 }
 #effectpanelscr{
   width:990px;
-  height:650px;
+  height:550px;
   margin:4px auto;
   overflow-y:scroll;
   background:#888;
@@ -2799,7 +2834,7 @@ webaudio-switch{
   border:1px solid:#000;
   border-radius: 5px;
   width:1060px;
-  height:750px;
+  height:550px;
   margin:100px auto;
   padding:5px;
   text-align:center;
@@ -2813,55 +2848,16 @@ webaudio-switch{
       <h1>Zoom MS-50G Utility</h1>
       Patch utility for ZOOM MS-50G MultiStomp guitar pedal<div class="info">Source code is available at GitHub : <a href="https://github.com/g200kg/zoom-ms-utility" target="_blank">https://github.com/g200kg/zoom-ms-utility</a></div>
     </div>
-  <hr/>
-  MidiPort : <select id="midiport" onchange="SelectPort()"></select><br/><br/>
-  <button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button>
-<!--  <button class="menubtn" id="savebankbtn" onclick="SaveBank()">Save All Patches</button>
-  <button class="menubtn" id="loadbankbtn" onclick="LoadBank()">Load All Patches</button>-->
-  <button class="menubtn" id="usagebtn" onclick="Usage()">How To Use</button>
-  <div id="usage">
-    <h3>Usage</h3>
-    <ul>
-      <li>Launch<br/>
-        <ul>
-          <li>Connect PC/Mac to MS-50G via USB</li>
-          <li>Launch this page. You should use Latest Chrome. On Windows, unplugging the USB while running may cause freeze (under investigation). Once close all Chrome window if you have MidiPort detection problem.</li>
-          <li>Press accept if 'MIDI device' permission dialog is displayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
-          <li>Confirm MidiPort to 'ZOOM MS Series'</li>
-          <li>After splash screen, all patches and effects with parameters are displayed</li>
-        </ul>
-      </li>
-      <li>Patches<br/>
-        <ul>
-          <li>Click patch name to select</li>
-          <li>Right-click (ctrl+click for Mac) or patch number button will show Context-menu.</li>
-          <li>From context-menu, Copy/Paste/Rename/etc patches</li>
-          <li>By SaveToFile/LoadFromFile, each patch can be backup/restore to local file</li>
-          <li>If you want to choose save directory when 'SaveToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
-          <li>Patches are draggable to another position for overwrite/exchange</li>
-        </ul>
-      </li>
-      <li>Effects<br/>
-        <ul>
-          <li>Click effect name to switch effect/bypass</li>
-          <li>From right-click or number-button context menu, each effect can be add/move/del</li>
-          <li>Each parameter can be edit by drag(coarse)/shift-drag(fine)</li>
-          <li>Mouse wheel and Shift+wheel are also available to value edit</li>
-          <li>Effects are draggable to another position to change order</li>
-        </ul>
-      </li>
-      <li>Keyboard<br/>
-        <ul>
-          <li>Keyboard Left/Right is assigned to patch Down/Up, 'a'-'t':patch1-patch20, 'A'-'T':patch21-patch40 '1'-'9','0':patch41-patch50</li>
-          <li>Keyboard 'F1'-'F6' is assigned to On/Off each effect.</li>
-        </ul>
-      </li>
-    </ul>
-    <button onclick="Usage()">close</button>
-  </div>
-  <hr/>
-  Status : <span id="msg">Not Initialized</span><br/>
   <br/>
+<div id="mainmenu">
+<ul>
+  <li>MidiPort : <select id="midiport" onchange="SelectPort()"></select></li>
+  <li>Status : <span id="msg">Not Initialized</span></li>
+  <li><hr/></li>
+  <li><button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button></li>
+  <li><button class="menubtn" id="usagebtn" onclick="Usage()">How To Use</button></li>
+</ul>
+</div>
 <div id="patchesbase">
 <table id="patches">
   <tr>
@@ -2936,7 +2932,6 @@ webaudio-switch{
   </tr>
 </table>
 </div>
-  <hr/>
 <table>
 <tr>
   <td></td>
@@ -3016,9 +3011,50 @@ webaudio-switch{
     <td><div class="pcell"><webaudio-knob id="f6p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p9v" disabled/></div><div id="f6p9l"></div></div></div></td>
   </tr>
 </table>
-  <hr/>
+
+<div id="usage">
+  <h3>Usage</h3>
+  <ul>
+    <li>Launch<br/>
+      <ul>
+        <li>Connect PC/Mac to MS-50G via USB</li>
+        <li>Launch this page. You should use Latest Chrome. On Windows, unplugging the USB while running may cause freeze (under investigation). Once close all Chrome window if you have MidiPort detection problem.</li>
+        <li>Press accept if 'MIDI device' permission dialog is displayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
+        <li>Confirm MidiPort to 'ZOOM MS Series'</li>
+        <li>After splash screen, all patches and effects with parameters are displayed</li>
+      </ul>
+    </li>
+    <li>Patches<br/>
+      <ul>
+        <li>Click patch name to select</li>
+        <li>Right-click (ctrl+click for Mac) or patch number button will show Context-menu.</li>
+        <li>From context-menu, Copy/Paste/Rename/etc patches</li>
+        <li>By SaveToFile/LoadFromFile, each patch can be backup/restore to local file</li>
+        <li>If you want to choose save directory when 'SaveToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
+        <li>Patches are draggable to another position for overwrite/exchange</li>
+      </ul>
+    </li>
+    <li>Effects<br/>
+      <ul>
+        <li>Click effect name to switch effect/bypass</li>
+        <li>From right-click or number-button context menu, each effect can be add/move/del</li>
+        <li>Each parameter can be edit by drag(coarse)/shift-drag(fine)</li>
+        <li>Mouse wheel and Shift+wheel are also available to value edit</li>
+        <li>Effects are draggable to another position to change order</li>
+      </ul>
+    </li>
+    <li>Keyboard<br/>
+      <ul>
+        <li>Keyboard Left/Right is assigned to patch Down/Up, 'a'-'t':patch1-patch20, 'A'-'T':patch21-patch40 '1'-'9','0':patch41-patch50</li>
+        <li>Keyboard 'F1'-'F6' is assigned to On/Off each effect.</li>
+      </ul>
+    </li>
+  </ul>
+  <button onclick="Usage()">close</button>
 </div>
-<!--<button onclick="test()">test</button>-->
+
+
+</div>
 <ul id="popuppatch" class="popup">
   <li><a onclick="PopupPatchOverwrite()">Overwrite</a></li>
   <li><a onclick="PopupPatchExchange()">Exchange</a></li>
@@ -3085,6 +3121,7 @@ webaudio-switch{
     </div>
     <button onclick="EffectPanelCancel()" style="width:120px;height:30px;margin:5px">Cancel</button>
   </div>
+
 </div>
 <div id="splash">
   <div id="splashpanel">
