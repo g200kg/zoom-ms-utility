@@ -1483,6 +1483,10 @@ function MidiIf(ma){
             cell.onmousedown=function(ev){
               currenteffect=ev.target.id[4]-1;
             };
+            cell.ondblclick=function(ev){
+              document.getElementById("effectpanelmsg").innerHTML="Add / Replace Effect";
+              document.getElementById("effectpanelbase").style.display="block";
+            };
             cell.onclick=function(ev){
               var n=parseInt(ev.target.id[4]);
               SetCurrentEffect(n-1);
