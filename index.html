@@ -1780,7 +1780,6 @@ function Init(){
         var id=ev.target.id;
         if(id[0]!="f")
           id=ev.target.parentNode.parentNode.id;
-        console.log(id)
         currenteffect=parseInt(id[1])-1;
         currentparam=parseInt(id[3])-1;
         UpdateFocus();
@@ -1851,6 +1850,43 @@ function Init(){
         return;
       if(ev.ctrlKey||ev.altKey)
         return;
+      if(ev.key=="ArrowUp"||ev.key=="ArrowDown"||ev.key=="PageUp"||ev.key=="PageDown"){
+        if(currenteffect>=0&&currentparam>=0){
+          var i="f"+(currenteffect+1)+"p"+(currentparam+1);
+          var k=document.getElementById(i+"k");
+          var s=document.getElementById(i+"s");
+          if(k){
+            var p1=Math.max((((k.max-k.min)*0.05)|0),1);
+            var p2=Math.max((((k.max-k.min)*0.01)|0),1);
+            var v=k.value;
+            switch(ev.key){
+            case "ArrowUp":
+              if(ev.shiftKey)
+                v=Math.min(v+=1,k.max);
+              else if(ev.ctrlKey)
+                v=Math.min(v+=p1,k.max);
+              else
+                v=Math.min(v+=p2,k.max);
+              break;
+            case "ArrowDown":
+              if(ev.shiftKey)
+                v=Math.max(v-=1,k.min);
+              else if(ev.ctrlKey)
+                v=Math.min(v-=p1,k.min);
+              else
+                v=Math.max(v-=p2,k.min);
+              break;
+            case "PageUp":
+              v=Math.min(v+=p1,k.max);
+              break;
+            case "PageDown":
+              v=Math.max(v-=p1,k.min);
+              break;
+            }
+            k.setValue(v,true);
+          }
+        }
+      }
       if(ev.key=="ArrowLeft" || ev.key=="ArrowRight"){
         p=currentpatch;
         if(ev.key=="ArrowLeft"){
@@ -3143,7 +3179,7 @@ webaudio-switch{
     <table id="effects">
       <tr>
         <th><button class="fnum" id="fnum1">1</button></th><td id="fnam1" class="fnam"><img id="fimg1" class="fimg"/><div id="ftxt1" class="ftxt"></div></td>
-        <td><div class="pcell" id="f1p1"><webaudio-knob id="f1p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p1v" disabled/></div><div id="f1p1l"></div></div></div></td>
+        <td><div class="pcell pfocus" id="f1p1"><webaudio-knob id="f1p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p1v" disabled/></div><div id="f1p1l"></div></div></div></td>
         <td><div class="pcell" id="f1p2"><webaudio-knob id="f1p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p2v" disabled/></div><div id="f1p2l"></div></div></div></td>
         <td><div class="pcell" id="f1p3"><webaudio-knob id="f1p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p3v" disabled/></div><div id="f1p3l"></div></div></div></td>
         <td><div class="pcell" id="f1p4"><webaudio-knob id="f1p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p4v" disabled/></div><div id="f1p4l"></div></div></div></td>
