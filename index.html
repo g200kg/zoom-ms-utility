@@ -41,21 +41,19 @@
 //  ??? :                 [0xf0,0x52,0x00,0x58,0x60,0xf7]
 //
 
-var midiaccess=null;
+var midiif=null;
 var midioutputs=[];
 var midiout=null;
 var midiin=null;
 var midirecv="";
 var patches=[];
 var clipboard=null;
-var patchscan=-1;
+var inst=null;
 var currentpatch=-1;
 var currenteffect=0;
 var timer,timerprg;
 var dragtarget=null;
 var ready=false;
-var isdirty=false;
-var dump=0;
 
 var patchkeymap=[
   "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t",
@@ -74,58 +72,58 @@ var emptypatch=[
   0x20,0x00,0x20,0x20,0x00,0xf7
 ]
 var effectlist={
-  0x00000000:{name:"THRU",group:"THRU",order:1,param:[]},
-  0x00100002:{name:"Comp",group:"COMP",order:100,param:[
+  0x00000000:{name:"THRU",group:"THRU",order:1,install:1,param:[]},
+  0x00100002:{name:"Comp",group:"COMP",order:100,install:0,param:[
     {name:"Sense",def:6,max:10},
     {name:"Tone",def:6,max:10},
     {name:"Level",def:100,max:150},
     {name:"ATTCK",def:0,max:1,disp:["Slow","Fast"]}
   ]},
-  0x00200002:{name:"RackComp",group:"COMP",order:101,param:[
+  0x00200002:{name:"RackComp",group:"COMP",order:101,install:0,param:[
     {name:"THRSH",def:40,max:50},
     {name:"Ratio",def:5,max:9,disp:1},
     {name:"Level",def:100,max:150},
     {name:"ATTCK",def:6,max:9,disp:1}
   ]},
-  0x00400002:{name:"M Comp",group:"COMP",order:102,param:[
+  0x00400002:{name:"M Comp",group:"COMP",order:102,install:0,param:[
     {name:"THRSH",def:40,max:50},
     {name:"Ratio",def:3,max:9,disp:1},
     {name:"Level",def:100,max:150},
     {name:"ATTCK",def:0,max:9,disp:1}
   ]},
-  0x00600002:{name:"OptComp",group:"COMP",order:103,param:[
+  0x00600002:{name:"OptComp",group:"COMP",order:103,install:0,param:[
     {name:"Drive",def:7,max:10},
     {name:"Tone",def:54,max:100},
     {name:"Level",def:50,max:150}
   ]},
-  0x40000002:{name:"SlowATTCK",group:"COMP",order:104,param:[
+  0x40000002:{name:"SlowATTCK",group:"COMP",order:104,install:0,param:[
     {name:"Time",def:20,max:49,disp:1},
     {name:"Curve",def:10,max:10},
     {name:"Level",def:100,max:150}
   ]},
-  0x40200002:{name:"ZNR",group:"COMP",order:105,param:[
+  0x40200002:{name:"ZNR",group:"COMP",order:105,install:0,param:[
     {name:"THRSH",def:9,max:24,disp:1},
     {name:"DETCT",def:1,max:1,disp:["GtrIn","EfxIn"]},
     {name:"Level",def:100,max:150}
   ]},
-  0x40400002:{name:"NoiseGate",group:"COMP",order:106,param:[
+  0x40400002:{name:"NoiseGate",group:"COMP",order:106,install:0,param:[
     {name:"THRSH",def:9,max:24,disp:1},
     {name:"Level",def:100,max:150}
   ]},
-  0x40600002:{name:"DirtyGate",group:"COMP",order:107,param:[
+  0x40600002:{name:"DirtyGate",group:"COMP",order:107,install:0,param:[
     {name:"THRSH",def:9,max:24,disp:1},
     {name:"Level",def:100,max:150}
   ]},
-  0x00000102:{name:"OrangeLim",group:"COMP",order:108,param:[]},
-  0x00200102:{name:"GrayComp",group:"COMP",order:109,param:[
+  0x00000102:{name:"OrangeLim",group:"COMP",order:108,install:0,param:[]},
+  0x00200102:{name:"GrayComp",group:"COMP",order:109,install:0,param:[
     {name:"SUSTN",def:63,max:100},
     {name:"OUT",def:88,max:100}
   ]},
-  0x00100004:{name:"LineSel",group:"FILTER",order:200,param:[
+  0x00100004:{name:"LineSel",group:"FILTER",order:200,install:0,param:[
     {name:"EFX_L",def:100,max:150},
     {name:"OUT_L",def:100,max:150}
   ]},
-  0x00200004:{name:"GraphicEQ",group:"FILTER",order:201,param:[
+  0x00200004:{name:"GraphicEQ",group:"FILTER",order:201,install:0,param:[
     {name:"160Hz",def:12,max:24,disp:-12},
     {name:"400Hz",def:12,max:24,disp:-12},
     {name:"800Hz",def:12,max:24,disp:-12},
@@ -134,7 +132,7 @@ var effectlist={
     {name:"12kHz",def:12,max:24,disp:-12},
     {name:"Level",def:100,max:150}
   ]},
-  0x00400004:{name:"ParaEQ",group:"FILTER",order:202,param:[
+  0x00400004:{name:"ParaEQ",group:"FILTER",order:202,install:0,param:[
     {name:"Freq1",def:8,max:30,
       disp:["20Hz","25Hz","32Hz","40Hz","50Hz","63Hz","80Hz","100Hz","125Hz","160Hz","200Hz","250Hz","320Hz","400Hz","500Hz","630Hz",
       "800Hz","1.0kHz","1.2kHz","1.6kHz","2.0kHz","2.5kHz","3.2kHz","4.0kHz","5.0kHz","6.3kHz","8.0kHz","10kHz","12kHz","16kHz","20kHz"]},
@@ -147,35 +145,35 @@ var effectlist={
     {name:"Gain2",def:12,max:24,disp:-12},
     {name:"Level",def:100,max:150}
   ]},
-  0x00600004:{name:"Exciter",group:"FILTER",order:203,param:[
+  0x00600004:{name:"Exciter",group:"FILTER",order:203,install:0,param:[
     {name:"Bass",def:0,max:100},
     {name:"Trebl",def:0,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40000004:{name:"CombFLTR",group:"FILTER",order:204,param:[
+  0x40000004:{name:"CombFLTR",group:"FILTER",order:204,install:0,param:[
     {name:"Freq",def:24,max:49,disp:1},
     {name:"Reso",def:15,max:20,disp:-10},
     {name:"Mix",def:30,max:100},
     {name:"HiDMP",def:6,max:10},
     {name:"Level",def:100,max:150}
   ]},
-  0x40200004:{name:"AutoWah",group:"FILTER",order:205,param:[
+  0x40200004:{name:"AutoWah",group:"FILTER",order:205,install:0,param:[
     {name:"Sense",def:17,max:19,disp:-9},
     {name:"Reso",def:8,max:10},
     {name:"Level",def:100,max:150}
   ]},
-  0x40400004:{name:"Resonance",group:"FILTER",order:206,param:[
+  0x40400004:{name:"Resonance",group:"FILTER",order:206,install:0,param:[
     {name:"Sense",def:14,max:19,disp:-9},
     {name:"Reso",def:8,max:10},
     {name:"Level",def:100,max:150}
   ]},
-  0x40600004:{name:"Cry",group:"FILTER",order:207,param:[
+  0x40600004:{name:"Cry",group:"FILTER",order:207,install:0,param:[
     {name:"Range",def:6,max:9,disp:1},
     {name:"Reso",def:8,max:10},
     {name:"Sense",def:16,max:19,disp:-9},
     {name:"Bal",def:100,max:100},
     {name:"Level",def:100,max:150}]},
-  0x00000104:{name:"SlowFLTR",group:"FILTER",order:208,param:[
+  0x00000104:{name:"SlowFLTR",group:"FILTER",order:208,install:0,param:[
     {name:"Time",def:20,max:49,disp:1},
     {name:"Curve",def:10,max:10},
     {name:"Level",def:100,max:150},
@@ -183,7 +181,7 @@ var effectlist={
     {name:"Chara",def:1,max:1,disp:["2Pole","4Pole"]},
     {name:"DRCTN",def:0,max:1,disp:["Open","Close"]}
   ]},
-  0x00200104:{name:"M-Filter",group:"FILTER",order:209,param:[
+  0x00200104:{name:"M-Filter",group:"FILTER",order:209,install:0,param:[
     {name:"Freq",def:56,max:100},
     {name:"Sense",def:5,max:10},
     {name:"Reso",def:7,max:10},
@@ -193,14 +191,14 @@ var effectlist={
     {name:"Bal",def:100,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00400104:{name:"Step",group:"FILTER",order:210,param:[
+  0x00400104:{name:"Step",group:"FILTER",order:210,install:0,param:[
     {name:"Depth",def:60,max:100},
     {name:"Rate",def:25,max:78},
     {name:"Reso",def:8,max:10},
     {name:"Shape",def:10,max:10},
     {name:"Level",def:100,max:150}
   ]},
-  0x00600104:{name:"SeqFLTR",group:"FILTER",order:211,param:[
+  0x00600104:{name:"SeqFLTR",group:"FILTER",order:211,install:0,param:[
     {name:"Step",def:6,max:6,disp:2},
     {name:"PTTRN",def:6,max:7,disp:1},
     {name:"Speed",def:25,max:77,disp:1},
@@ -208,7 +206,7 @@ var effectlist={
     {name:"Reso",def:10,max:10},
     {name:"Level",def:100,max:150}
   ]},
-  0x40000104:{name:"RndmFLTR",group:"FILTER",order:212,param:[
+  0x40000104:{name:"RndmFLTR",group:"FILTER",order:212,install:0,param:[
     {name:"Speed",def:34,max:77,disp:1},
     {name:"Range",def:50,max:100},
     {name:"Reso",def:6,max:10},
@@ -217,14 +215,14 @@ var effectlist={
     {name:"Bal",def:90,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40200104:{name:"fCycle",group:"FILTER",order:213,param:[
+  0x40200104:{name:"fCycle",group:"FILTER",order:213,install:0,param:[
     {name:"Rate",def:5,max:77,disp:1},
     {name:"Wave",def:3,max:3,disp:["Sine","Tri","SawUp","SawDn"]},
     {name:"Level",def:100,max:150},
     {name:"Depth",def:100,max:100},
     {name:"Reso",def:8,max:10}
   ]},
-  0x40400104:{name:"St Gt GEQ",group:"FILTER",order:214,param:[
+  0x40400104:{name:"St Gt GEQ",group:"FILTER",order:214,install:0,param:[
     {name:"160Hz",def:12,max:24,disp:-12},
     {name:"400Hz",def:12,max:24,disp:-12},
     {name:"800Hz",def:12,max:24,disp:-12},
@@ -233,127 +231,127 @@ var effectlist={
     {name:"12kHz",def:12,max:24,disp:-12},
     {name:"Level",def:100,max:150}
   ]},
-  0x00100006:{name:"Booster",group:"DRIVE",order:300,param:[
+  0x00100006:{name:"Booster",group:"DRIVE",order:300,install:0,param:[
     {name:"Gain",def:80,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00200006:{name:"OverDrive",group:"DRIVE",order:301,param:[
+  0x00200006:{name:"OverDrive",group:"DRIVE",order:301,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00400006:{name:"T Scream",group:"DRIVE",order:302,param:[
+  0x00400006:{name:"T Scream",group:"DRIVE",order:302,install:0,param:[
     {name:"Gain",def:70,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00600006:{name:"Governor",group:"DRIVE",order:303,param:[
+  0x00600006:{name:"Governor",group:"DRIVE",order:303,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40000006:{name:"Dist+",group:"DRIVE",order:304,param:[
+  0x40000006:{name:"Dist+",group:"DRIVE",order:304,install:0,param:[
     {name:"Gain",def:80,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40200006:{name:"Dist 1",group:"DRIVE",order:305,param:[
+  0x40200006:{name:"Dist 1",group:"DRIVE",order:305,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40400006:{name:"Squeak",group:"DRIVE",order:306,param:[
+  0x40400006:{name:"Squeak",group:"DRIVE",order:306,install:0,param:[
     {name:"Gain",def:40,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40600006:{name:"FuzzSmile",group:"DRIVE",order:307,param:[
+  0x40600006:{name:"FuzzSmile",group:"DRIVE",order:307,install:0,param:[
     {name:"Gain",def:70,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00000106:{name:"GreatMuff",group:"DRIVE",order:308,param:[
+  0x00000106:{name:"GreatMuff",group:"DRIVE",order:308,install:0,param:[
     {name:"Gain",def:70,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00200106:{name:"MetalWRLD",group:"DRIVE",order:309,param:[
+  0x00200106:{name:"MetalWRLD",group:"DRIVE",order:309,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00400106:{name:"HotBox",group:"DRIVE",order:310,param:[
+  0x00400106:{name:"HotBox",group:"DRIVE",order:310,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00600106:{name:"Z Clean",group:"DRIVE",order:311,param:[
+  0x00600106:{name:"Z Clean",group:"DRIVE",order:311,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40000106:{name:"Z MP1",group:"DRIVE",order:312,param:[
+  0x40000106:{name:"Z MP 1",group:"DRIVE",order:312,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40200106:{name:"Z Bottom",group:"DRIVE",order:313,param:[
+  0x40200106:{name:"Z Bottom",group:"DRIVE",order:313,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40400106:{name:"Z Dream",group:"DRIVE",order:314,param:[
+  0x40400106:{name:"Z Dream",group:"DRIVE",order:314,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40600106:{name:"Z Scream",group:"DRIVE",order:315,param:[
+  0x40600106:{name:"Z Scream",group:"DRIVE",order:315,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00000206:{name:"Z Neos",group:"DRIVE",order:316,param:[
+  0x00000206:{name:"Z Neos",group:"DRIVE",order:316,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00200206:{name:"Z Wild",group:"DRIVE",order:317,param:[
+  0x00200206:{name:"Z Wild",group:"DRIVE",order:317,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00400206:{name:"Lead",group:"DRIVE",order:318,param:[
+  0x00400206:{name:"Lead",group:"DRIVE",order:318,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x00600206:{name:"ExtremeDS",group:"DRIVE",order:319,param:[
+  0x00600206:{name:"ExtremeDS",group:"DRIVE",order:319,install:0,param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40000206:{name:"Aco.Sim",group:"DRIVE",order:320,param:[
+  0x40000206:{name:"Aco.Sim",group:"DRIVE",order:320,install:0,param:[
     {name:"Top",def:80,max:100},
     {name:"Body",def:50,max:100},
     {name:"Level",def:100,max:150}
   ]},
-  0x40200206:{name:"CentaGold",group:"DRIVE",order:321,param:[
+  0x40200206:{name:"CentaGold",group:"DRIVE",order:321,install:0,param:[
     {name:"GAIN",def:69,max:100},
     {name:"TRBL",def:56,max:100},
     {name:"OUT",def:43,max:100}
   ]},
-  0x40400206:{name:"NYC Muff",group:"DRIVE",order:322,param:[
+  0x40400206:{name:"NYC Muff",group:"DRIVE",order:322,install:0,param:[
     {name:"VOL",def:58,max:100},
     {name:"TONE",def:55,max:100},
     {name:"SUSTN",def:70,max:100}
   ]},
-  0x40600206:{name:"TS Drive",group:"DRIVE",order:323,param:[
+  0x40600206:{name:"TS Drive",group:"DRIVE",order:323,install:0,param:[
     {name:"O.DRV",def:74,max:100},
     {name:"TONE",def:57,max:100},
     {name:"LEVEL",def:82,max:100}
   ]},
-  0x00000306:{name:"BG_THRTTL",group:"DRIVE",order:324,param:[
+  0x00000306:{name:"BG_THRTTL",group:"DRIVE",order:324,install:0,param:[
     {name:"LEVEL",def:54,max:100},
     {name:"LO/HI",def:1,max:1,disp:["LO","HI"]},
     {name:"GAIN",def:78,max:100},
@@ -361,17 +359,17 @@ var effectlist={
     {name:"TONE",def:56,max:100},
     {name:"BOOST",def:1,max:1,disp:["OFF","ON"]}
   ]},
-  0x00200306:{name:"OctFuzz",group:"DRIVE",order:325,param:[
+  0x00200306:{name:"OctFuzz",group:"DRIVE",order:325,install:0,param:[
     {name:"VOL",def:68,max:100},
     {name:"COLOR",def:1,max:1,disp:["1","2"]},
     {name:"BOOST",def:65,max:100}
   ]},
-  0x00400306:{name:"BG GRID",group:"DRIVE",order:326,param:[
+  0x00400306:{name:"BG GRID",group:"DRIVE",order:326,install:0,param:[
     {name:"LEVEL",def:74,max:100},
     {name:"TONE",def:50,max:100},
     {name:"GAIN",def:68,max:100}
   ]},
-  0x00600306:{name:"RedCrunch",group:"DRIVE",order:327,param:[
+  0x00600306:{name:"RedCrunch",group:"DRIVE",order:327,install:0,param:[
     {name:"VOL",def:61,max:100},
     {name:"LO/HI",def:1,max:1,disp:["LO","HI"]},
     {name:"GAIN",def:68,max:100},
@@ -379,29 +377,29 @@ var effectlist={
     {name:"COMP",def:0,max:2,disp:["1","0","2"]},
     {name:"TONE",def:47,max:100}
   ]},
-  0x40000306:{name:"TB MK1.5",group:"DRIVE",order:328,param:[
+  0x40000306:{name:"TB MK1.5",group:"DRIVE",order:328,install:0,param:[
     {name:"LEVEL",def:92,max:100},
     {name:"COLOR",def:1,max:1,disp:["1","2"]},
     {name:"ATTCK",def:90,max:100}
   ]},
-  0x40200306:{name:"SweetDrv",group:"DRIVE",order:329,param:[
+  0x40200306:{name:"SweetDrv",group:"DRIVE",order:329,install:0,param:[
     {name:"VOL",def:62,max:100},
     {name:"FOCUS",def:67,max:100},
     {name:"DRIVE",def:78,max:100}
   ]},
-  0x40600306:{name:"RC Boost",group:"DRIVE",order:330,param:[
+  0x40600306:{name:"RC Boost",group:"DRIVE",order:330,install:0,param:[
     {name:"GAIN",def:58,max:100},
     {name:"TRBL",def:52,max:100},
     {name:"BASS",def:48,max:100},
     {name:"VOL",def:48,max:100}
   ]},
-  0x00200406:{name:"DynmcDrv",group:"DRIVE",order:331,param:[
+  0x00200406:{name:"DynmcDrv",group:"DRIVE",order:331,install:0,param:[
     {name:"LEVEL",def:62,max:100},
     {name:"TONE",def:67,max:100},
     {name:"GAIN",def:78,max:100},
     {name:"MODE",def:1,max:1,disp:["COMBO","STACK"]}
   ]},
-  0x00100008:{name:"FD COMBO",group:"AMP",order:400,param:[
+  0x00100008:{name:"FD COMBO",group:"AMP",order:400,install:0,param:[
     {name:"Gain",def:24,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:86,max:150},
@@ -413,7 +411,7 @@ var effectlist={
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}
   ]},
-  0x00200008:{name:"DELUXE-R",group:"AMP",order:401,param:[
+  0x00200008:{name:"DELUXE-R",group:"AMP",order:401,install:0,param:[
     {name:"Gain",def:50,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:100,max:150},
@@ -425,7 +423,7 @@ var effectlist={
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}
   ]},
-  0x00400008:{name:"FD VIBRO",group:"AMP",order:402,param:[
+  0x00400008:{name:"FD VIBRO",group:"AMP",order:402,install:0,param:[
     {name:"Gain",def:56,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:98,max:150},
@@ -437,7 +435,7 @@ var effectlist={
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}
   ]},
-  0x00600008:{name:"US BLUES",group:"AMP",order:403,param:[
+  0x00600008:{name:"US BLUES",group:"AMP",order:403,install:0,param:[
     {name:"Gain",def:59,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:107,max:150},
@@ -448,7 +446,7 @@ var effectlist={
     {name:"CAB",def:48,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40000008:{name:"VX COMBO",group:"AMP",order:404,param:[
+  0x40000008:{name:"VX COMBO",group:"AMP",order:404,install:0,param:[
     {name:"Gain",def:31,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:100,max:150},
@@ -459,7 +457,7 @@ var effectlist={
     {name:"CAB",def:64,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40200008:{name:"VX JMI",group:"AMP",order:405,param:[
+  0x40200008:{name:"VX JMI",group:"AMP",order:405,install:0,param:[
     {name:"Gain",def:50,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:100,max:150},
@@ -471,7 +469,7 @@ var effectlist={
       "FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:[
       "LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40400008:{name:"BG CRUNCH",group:"AMP",order:406,param:[
+  0x40400008:{name:"BG CRUNCH",group:"AMP",order:406,install:0,param:[
     {name:"Gain",def:57,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:99,max:150},
@@ -482,7 +480,7 @@ var effectlist={
     {name:"CAB",def:96,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40600008:{name:"MATCH 30",group:"AMP",order:408,param:[
+  0x40600008:{name:"MATCH 30",group:"AMP",order:408,install:0,param:[
     {name:"Gain",def:28,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:100,max:150},
@@ -493,7 +491,7 @@ var effectlist={
     {name:"CAB",def:112,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00000108:{name:"CAR DRIVE",group:"AMP",order:409,param:[
+  0x00000108:{name:"CAR DRIVE",group:"AMP",order:409,install:0,param:[
     {name:"Gain",def:51,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:74,max:150},
@@ -504,7 +502,7 @@ var effectlist={
     {name:"CAB",def:128,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00200108:{name:"TW ROCK",group:"AMP",order:410,param:[
+  0x00200108:{name:"TW ROCK",group:"AMP",order:410,install:0,param:[
     {name:"Gain",def:53,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:95,max:150},
@@ -515,7 +513,7 @@ var effectlist={
     {name:"CAB",def:144,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00400108:{name:"TONE CITY",group:"AMP",order:411,param:[
+  0x00400108:{name:"TONE CITY",group:"AMP",order:411,install:0,param:[
     {name:"Gain",def:78,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:89,max:150},
@@ -526,7 +524,7 @@ var effectlist={
     {name:"CAB",def:160,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00600108:{name:"HW STACK",group:"AMP",order:412,param:[
+  0x00600108:{name:"HW STACK",group:"AMP",order:412,install:0,param:[
     {name:"Gain",def:54,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:106,max:150},
@@ -537,7 +535,7 @@ var effectlist={
     {name:"CAB",def:176,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40000108:{name:"TANGERINE",group:"AMP",order:413,param:[
+  0x40000108:{name:"TANGERINE",group:"AMP",order:413,install:0,param:[
     {name:"Gain",def:70,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:99,max:150},
@@ -548,7 +546,7 @@ var effectlist={
     {name:"CAB",def:192,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40200108:{name:"B-BREAKER",group:"AMP",order:414,param:[
+  0x40200108:{name:"B-BREAKER",group:"AMP",order:414,install:0,param:[
     {name:"Gain",def:61,max:100},
     {name:"Tube",def:31,max:100},
     {name:"Level",def:100,max:150},
@@ -559,7 +557,7 @@ var effectlist={
     {name:"CAB",def:208,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40400108:{name:"MS CRUNCH",group:"AMP",order:415,param:[
+  0x40400108:{name:"MS CRUNCH",group:"AMP",order:415,install:0,param:[
     {name:"Gain",def:72,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:98,max:150},
@@ -570,7 +568,7 @@ var effectlist={
     {name:"CAB",def:224,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40600108:{name:"MS 1959",group:"AMP",order:416,param:[
+  0x40600108:{name:"MS 1959",group:"AMP",order:416,install:0,param:[
     {name:"Gain",def:58,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:100,max:150},
@@ -581,7 +579,7 @@ var effectlist={
     {name:"CAB",def:240,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00000208:{name:"MS DRIVE",group:"AMP",order:417,param:[
+  0x00000208:{name:"MS DRIVE",group:"AMP",order:417,install:0,param:[
     {name:"Gain",def:82,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:103,max:150},
@@ -592,7 +590,7 @@ var effectlist={
     {name:"CAB",def:256,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00200208:{name:"BGN DRIVE",group:"AMP",order:418,param:[
+  0x00200208:{name:"BGN DRIVE",group:"AMP",order:418,install:0,param:[
     {name:"Gain",def:84,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:91,max:150},
@@ -603,7 +601,7 @@ var effectlist={
     {name:"CAB",def:272,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00400208:{name:"BG DRIVE",group:"AMP",order:419,param:[
+  0x00400208:{name:"BG DRIVE",group:"AMP",order:419,install:0,param:[
     {name:"Gain",def:47,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:97,max:150},
@@ -614,7 +612,7 @@ var effectlist={
     {name:"CAB",def:288,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x00600208:{name:"DZ DRIVE",group:"AMP",order:420,param:[
+  0x00600208:{name:"DZ DRIVE",group:"AMP",order:420,install:0,param:[
     {name:"Gain",def:45,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:93,max:150},
@@ -625,7 +623,7 @@ var effectlist={
     {name:"CAB",def:304,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40000208:{name:"ALIEN",group:"AMP",order:421,param:[
+  0x40000208:{name:"ALIEN",group:"AMP",order:421,install:0,param:[
     {name:"Gain",def:62,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:87,max:150},
@@ -636,7 +634,7 @@ var effectlist={
     {name:"CAB",def:320,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x40200208:{name:"REVO-1",group:"AMP",order:422,param:[
+  0x40200208:{name:"REVO-1",group:"AMP",order:422,install:0,param:[
     {name:"Gain",def:64,max:100},
     {name:"Tube",def:30,max:100},
     {name:"Level",def:89,max:150},
@@ -647,14 +645,14 @@ var effectlist={
     {name:"CAB",def:336,max:[8,16,32,48,64,80,96,112,128,144,160,176,192,208,224,240,256,272,288,304,320,336,0],
       disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"]},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
-  0x0010000c:{name:"Tremolo",group:"MOD",order:500,param:[
+  0x0010000c:{name:"Tremolo",group:"MOD",order:500,install:0,param:[
     {name:"Depth",def:80,max:100},
     {name:"Rate",def:33,max:78},
     {name:"Level",def:130,max:150},
     {name:"Wave",def:21,max:29,disp:["UP 0","UP 1","UP 2","UP 3","UP 4","UP 5","UP 6","UP 7","UP 8","UP 9",
       "DWN 0","DWN 1","DWN 2","DWN 3","DWN 4","DWN 5","DWN 6","DWN 7","DWN 8","DWN 9",
       "TRI 0","TRI 1","TRI 2","TRI 3","TRI 4","TRI 5","TRI 6","TRI 7","TRI 8","TRI 9"]}]},
-  0x0020000c:{name:"DuoTrem",group:"MOD",order:501,param:[
+  0x0020000c:{name:"DuoTrem",group:"MOD",order:501,install:0,param:[
     {name:"RateA",def:46,max:78},
     {name:"RateB",def:5,max:78},
     {name:"Level",def:100,max:150},
@@ -668,19 +666,19 @@ var effectlist={
       "DWN 0","DWN 1","DWN 2","DWN 3","DWN 4","DWN 5","DWN 6","DWN 7","DWN 8","DWN 9",
       "TRI 0","TRI 1","TRI 2","TRI 3","TRI 4","TRI 5","TRI 6","TRI 7","TRI 8","TRI 9"]},
   ]},
-  0x0040000c:{name:"Slicer",group:"MOD",order:502,param:[
+  0x0040000c:{name:"Slicer",group:"MOD",order:502,install:0,param:[
     {name:"PTTRN",def:0,max:19,disp:1},
     {name:"Speed",def:24,max:77,disp:1},
     {name:"Bal",def:100,max:100},
     {name:"THRSH",def:20,max:50},
     {name:"Level",def:130,max:150},
   ]},
-  0x0060000c:{name:"Phaser",group:"MOD",order:503,param:[
+  0x0060000c:{name:"Phaser",group:"MOD",order:503,install:0,param:[
     {name:"Rate",def:11,max:77,disp:1},
     {name:"Color",def:3,max:3,disp:["4 STG","8 STG","inv 4","inv 8"]},
     {name:"Level",def:100,max:150},
   ]},
-  0x006a000c:{name:"DuoPhase",group:"MOD",order:504,param:[
+  0x006a000c:{name:"DuoPhase",group:"MOD",order:504,install:0,param:[
     {name:"RateA",def:46,max:77,disp:1},
     {name:"RateB",def:5,max:51,disp:1},
     {name:"Level",def:100,max:150},
@@ -690,13 +688,13 @@ var effectlist={
     {name:"DPT_A",def:36,max:99,disp:1},
     {name:"DPT_B",def:62,max:99,disp:1},
   ]},
-  0x0074000c:{name:"WarpPhase",group:"MOD",order:505,param:[
+  0x0074000c:{name:"WarpPhase",group:"MOD",order:505,install:0,param:[
     {name:"Speed",def:24,max:77,disp:1},
     {name:"Reso",def:7,max:10},
     {name:"Level",def:100,max:150},
     {name:"DRCTN",def:0,max:1,disp:["Go","Back"]},
   ]},
-  0x4000000c:{name:"TheVibe",group:"MOD",order:506,param:[
+  0x4000000c:{name:"TheVibe",group:"MOD",order:506,install:0,param:[
     {name:"Speed",def:25,max:50},
     {name:"Depth",def:60,max:100},
     {name:"Bias",def:48,max:100},
@@ -704,48 +702,48 @@ var effectlist={
     {name:"Mode",def:1,max:1,disp:["VIBRT","CHORS"]},
     {name:"Level",def:100,max:150},
   ]},
-  0x4060000c:{name:"Chorus",group:"MOD",order:507,param:[
+  0x4060000c:{name:"Chorus",group:"MOD",order:507,install:0,param:[
     {name:"Depth",def:40,max:100},
     {name:"Rate",def:24,max:49,disp:1},
     {name:"Mix",def:50,max:100},
     {name:"Tone",def:7,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x0000010c:{name:"Detune",group:"MOD",order:508,param:[
+  0x0000010c:{name:"Detune",group:"MOD",order:508,install:0,param:[
     {name:"Cent",def:35,max:50,disp:-25},
     {name:"PreD",def:0,max:50},
     {name:"Mix",def:52,max:100},
     {name:"Tone",def:8,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x0020010c:{name:"VintageCE",group:"MOD",order:509,param:[
+  0x0020010c:{name:"VintageCE",group:"MOD",order:509,install:0,param:[
     {name:"Comp",def:2,max:9},
     {name:"Rate",def:24,max:49,disp:1},
     {name:"Mix",def:50,max:100},
     {name:"Level",def:100,max:150},
   ]},
-  0x0040010c:{name:"StereoCho",group:"MOD",order:510,param:[
+  0x0040010c:{name:"StereoCho",group:"MOD",order:510,install:0,param:[
     {name:"Depth",def:80,max:100},
     {name:"Rate",def:29,max:49,disp:1},
     {name:"Mix",def:60,max:100},
     {name:"Tone",def:7,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x0060010c:{name:"Ensemble",group:"MOD",order:511,param:[
+  0x0060010c:{name:"Ensemble",group:"MOD",order:511,install:0,param:[
     {name:"Depth",def:40,max:100},
     {name:"Rate",def:29,max:49,disp:1},
     {name:"Mix",def:60,max:100},
     {name:"Tone",def:8,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x4020010c:{name:"SuperCho",group:"MOD",order:512,param:[
+  0x4020010c:{name:"SuperCho",group:"MOD",order:512,install:0,param:[
     {name:"E.LVL",def:50,max:120},
     {name:"Rate",def:50,max:100},
     {name:"Depth",def:50,max:100},
     {name:"EQ",def:50,max:100},
     {name:"Mode",def:0,max:1,disp:["MONO","STR"]},
   ]},
-  0x4030010c:{name:"VinFLNGR",group:"MOD",order:513,param:[
+  0x4030010c:{name:"VinFLNGR",group:"MOD",order:513,install:0,param:[
     {name:"Depth",def:47,max:100},
     {name:"Rate",def:7,max:78},
     {name:"Reso",def:18,max:20,disp:-10},
@@ -753,7 +751,7 @@ var effectlist={
     {name:"Mix",def:65,max:100},
     {name:"Level",def:100,max:150},
   ]},
-  0x4040010c:{name:"Flanger",group:"MOD",order:514,param:[
+  0x4040010c:{name:"Flanger",group:"MOD",order:514,install:0,param:[
     {name:"Depth",def:47,max:100},
     {name:"Rate",def:7,max:78},
     {name:"Reso",def:18,max:20,disp:-10},
@@ -761,21 +759,21 @@ var effectlist={
     {name:"Mix",def:65,max:100},
     {name:"Level",def:100,max:150},
   ]},
-  0x4060010c:{name:"DynaFLNGR",group:"MOD",order:515,param:[
+  0x4060010c:{name:"DynaFLNGR",group:"MOD",order:515,install:0,param:[
     {name:"Depth",def:30,max:100},
     {name:"Rate",def:38,max:78},
     {name:"Sense",def:0,max:19,disp:-10},
     {name:"Reso",def:15,max:20,disp:-10},
     {name:"Level",def:100,max:150},
   ]},
-  0x0000020c:{name:"Vibrato",group:"MOD",order:516,param:[
+  0x0000020c:{name:"Vibrato",group:"MOD",order:516,install:0,param:[
     {name:"Depth",def:40,max:100},
     {name:"Rate",def:30,max:78},
     {name:"Bal",def:72,max:100},
     {name:"Tone",def:7,max:10},
     {name:"Level",def:120,max:150},
   ]},
-  0x0020020c:{name:"Octave",group:"MOD",order:517,param:[
+  0x0020020c:{name:"Octave",group:"MOD",order:517,install:0,param:[
     {name:"Oct1",def:80,max:100},
     {name:"Oct2",def:15,max:100},
     {name:"Dry",def:100,max:100},
@@ -783,28 +781,28 @@ var effectlist={
     {name:"Tone",def:8,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x0040020c:{name:"PitchSHFT",group:"MOD",order:518,param:[
+  0x0040020c:{name:"PitchSHFT",group:"MOD",order:518,install:0,param:[
     {name:"Shift",def:19,max:25,disp:-12},
     {name:"Tone",def:7,max:10},
     {name:"Bal",def:40,max:100},
     {name:"Fine",def:25,max:50,disp:-25},
     {name:"Level",def:100,max:150},
   ]},
-  0x0060020c:{name:"MonoPitch",group:"MOD",order:519,param:[
+  0x0060020c:{name:"MonoPitch",group:"MOD",order:519,install:0,param:[
     {name:"Shift",def:0,max:25,disp:-12},
     {name:"Tone",def:6,max:10},
     {name:"Bal",def:50,max:100},
     {name:"Fine",def:25,max:50,disp:-25},
     {name:"Level",def:100,max:150},
   ]},
-  0x4000020c:{name:"HPS",group:"MOD",order:520,param:[
+  0x4000020c:{name:"HPS",group:"MOD",order:520,install:0,param:[
     {name:"Scale",def:6,max:9,disp:-6},
     {name:"Key",def:0,max:11,disp:["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]},
     {name:"Mix",def:70,max:100},
     {name:"Tone",def:6,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x4020020c:{name:"BendCho",group:"MOD",order:521,param:[
+  0x4020020c:{name:"BendCho",group:"MOD",order:521,install:0,param:[
     {name:"Depth",def:40,max:100},
     {name:"Time",def:50,max:50},
     {name:"Bal",def:100,max:100},
@@ -812,20 +810,20 @@ var effectlist={
     {name:"Tone",def:8,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x4040020c:{name:"MojoRolle",group:"MOD",order:522,param:[
+  0x4040020c:{name:"MojoRolle",group:"MOD",order:522,install:0,param:[
     {name:"Depth",def:37,max:100},
     {name:"Speed",def:57,max:128},
     {name:"Rise",def:0,max:100},
     {name:"Mode",def:0,max:2,disp:["Up-Dn","Up","Down"]},
     {name:"Level",def:100,max:150},
   ]},
-  0x4060020c:{name:"RingMod",group:"MOD",order:523,param:[
+  0x4060020c:{name:"RingMod",group:"MOD",order:523,install:0,param:[
     {name:"Freq",def:27,max:49,disp:1},
     {name:"Tone",def:10,max:10},
     {name:"Bal",def:50,max:100},
     {name:"Level",def:120,max:150},
   ]},
-  0x0000030c:{name:"CE-Cho5",group:"MOD",order:524,param:[
+  0x0000030c:{name:"CE-Cho5",group:"MOD",order:524,install:0,param:[
     {name:"E.LVL",def:100,max:120},
     {name:"RATE",def:31,max:100},
     {name:"DEPTH",def:67,max:100},
@@ -833,21 +831,21 @@ var effectlist={
     {name:"HIGH",def:50,max:100},
     {name:"MODE",def:0,max:1,disp:["MONO","STR"]},
   ]},
-  0x0020030c:{name:"CloneCho",group:"MOD",order:525,param:[
+  0x0020030c:{name:"CloneCho",group:"MOD",order:525,install:0,param:[
     {name:"DEPTH",def:1,max:1,disp:["1","2"]},
     {name:"RATE",def:23,max:100},
   ]},
-  0x0040030c:{name:"StonePha",group:"MOD",order:526,param:[
+  0x0040030c:{name:"StonePha",group:"MOD",order:526,install:0,param:[
     {name:"COLOR",def:0,max:1,disp:["1","2"]},
     {name:"RATE",def:50,max:100},
   ]},
-  0x0060030c:{name:"BF FLG 2",group:"MOD",order:527,param:[
+  0x0060030c:{name:"BF FLG 2",group:"MOD",order:527,install:0,param:[
     {name:"MNL",def:100,max:100},
     {name:"DEPTH",def:80,max:100},
     {name:"RATE",def:30,max:100},
     {name:"RES",def:50,max:100},
   ]},
-  0x4000030c:{name:"SilkyCho",group:"MOD",order:528,param:[
+  0x4000030c:{name:"SilkyCho",group:"MOD",order:528,install:0,param:[
     {name:"LoMix",def:38,max:100},
     {name:"HiMix",def:100,max:100},
     {name:"ChMix",def:50,max:100},
@@ -858,7 +856,7 @@ var effectlist={
     {name:"Depth",def:46,max:100},
     {name:"Tone",def:50,max:100},
   ]},
-  0x4020030c:{name:"MirageCho",group:"MOD",order:529,param:[
+  0x4020030c:{name:"MirageCho",group:"MOD",order:529,install:0,param:[
     {name:"Depth",def:60,max:100},
     {name:"Rate",def:38,max:100},
     {name:"Mix",def:55,max:100},
@@ -866,14 +864,14 @@ var effectlist={
     {name:"Tone",def:50,max:100},
     {name:"Level",def:100,max:150},
   ]},
-  0x4040030c:{name:"CoronaCho",group:"MOD",order:530,param:[
+  0x4040030c:{name:"CoronaCho",group:"MOD",order:530,install:0,param:[
     {name:"SPEED",def:50,max:100},
     {name:"DEPTH",def:50,max:100},
     {name:"FxLVL",def:65,max:100},
     {name:"TONE",def:75,max:100},
     {name:"DRY",def:1,max:1,disp:["OFF","ON"]},
   ]},
-  0x4060030c:{name:"ANA234Cho",group:"MOD",order:531,param:[
+  0x4060030c:{name:"ANA234Cho",group:"MOD",order:531,install:0,param:[
     {name:"LEVEL",def:70,max:100},
     {name:"RATE",def:60,max:100},
     {name:"DEPTH",def:50,max:100},
@@ -881,21 +879,21 @@ var effectlist={
     {name:"HIGH",def:50,max:100},
     {name:"Mode",def:0,max:1,disp:["MONO","STR"]},
   ]},
-  0x0000040c:{name:"CoronaTri",group:"MOD",order:532,param:[
+  0x0000040c:{name:"CoronaTri",group:"MOD",order:532,install:0,param:[
     {name:"SPEED",def:25,max:100},
     {name:"DEPTH",def:100,max:100},
     {name:"FxLVL",def:100,max:100},
     {name:"TONE",def:100,max:100},
     {name:"DRY",def:1,max:1,disp:["OFF","ON"]},
   ]},
-  0x0020000e:{name:"BitCrush",group:"SFX",order:600,param:[
+  0x0020000e:{name:"BitCrush",group:"SFX",order:600,install:0,param:[
     {name:"Bit",def:5,max:12,disp:4},
     {name:"SMPL",def:2,max:50},
     {name:"Bal",def:90,max:100},
     {name:"Tone",def:8,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x0040000e:{name:"Bomber",group:"SFX",order:601,param:[
+  0x0040000e:{name:"Bomber",group:"SFX",order:601,install:0,param:[
     {name:"PTTRN",def:3,max:3,disp:["HndGn","Arm","Bomb","Thndr"]},
     {name:"Deay",def:49,max:99,disp:1},
     {name:"Bal",def:15,max:100},
@@ -904,7 +902,7 @@ var effectlist={
     {name:"Tone",def:4,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x0060000e:{name:"MonoSynth",group:"SFX",order:602,param:[
+  0x0060000e:{name:"MonoSynth",group:"SFX",order:602,install:0,param:[
     {name:"Synth",def:40,max:100},
     {name:"Dry",def:100,max:100},
     {name:"Level",def:100,max:150},
@@ -912,7 +910,7 @@ var effectlist={
     {name:"Tone",def:8,max:10},
     {name:"Speed",def:0,max:100},
   ]},
-  0x4000000e:{name:"Z-Organ",group:"SFX",order:603,param:[
+  0x4000000e:{name:"Z-Organ",group:"SFX",order:603,install:0,param:[
     {name:"Upper",def:70,max:100},
     {name:"Lower",def:80,max:100},
     {name:"Dry",def:80,max:100},
@@ -920,20 +918,20 @@ var effectlist={
     {name:"LPF",def:8,max:10},
     {name:"Level",def:100,max:150},
   ]},
-  0x4020000e:{name:"AutoPan",group:"SFX",order:604,param:[
+  0x4020000e:{name:"AutoPan",group:"SFX",order:604,install:0,param:[
     {name:"Rate",def:5,max:78},
     {name:"Width",def:100,max:100,disp:-50},
     {name:"Level",def:100,max:150},
     {name:"Depth",def:7,max:10},
     {name:"Clip",def:0,max:10},
   ]},
-  0x4040000e:{name:"Rt Closet",group:"SFX",order:605,param:[
+  0x4040000e:{name:"Rt Closet",group:"SFX",order:605,install:0,param:[
     {name:"Bal",def:50,max:100},
     {name:"Mode",def:0,max:1,disp:["Slow","Fast"]},
     {name:"Level",def:100,max:150},
     {name:"Drive",def:20,max:100},
   ]},
-  0x00100010:{name:"Delay",group:"DELAY",order:700,param:[
+  0x00100010:{name:"Delay",group:"DELAY",order:700,install:0,param:[
     {name:"Time",def:559,max:4022,disp:1},
     {name:"F.B",def:30,max:100},
     {name:"Mix",def:70,max:100},
@@ -942,7 +940,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00200010:{name:"TapeEcho",group:"DELAY",order:701,param:[
+  0x00200010:{name:"TapeEcho",group:"DELAY",order:701,install:0,param:[
     {name:"Time",def:559,max:2014,disp:1},
     {name:"F.B",def:64,max:100},
     {name:"Mix",def:56,max:100},
@@ -950,7 +948,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00400010:{name:"ModDelay",group:"DELAY",order:702,param:[
+  0x00400010:{name:"ModDelay",group:"DELAY",order:702,install:0,param:[
     {name:"Time",def:499,max:2014,disp:1},
     {name:"F.B",def:50,max:100},
     {name:"Mix",def:62,max:100},
@@ -958,7 +956,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00600010:{name:"AnalogDly",group:"DELAY",order:703,param:[
+  0x00600010:{name:"AnalogDly",group:"DELAY",order:703,install:0,param:[
     {name:"Time",def:359,max:4022,disp:1},
     {name:"F.B",def:28,max:100},
     {name:"Mix",def:40,max:100},
@@ -967,7 +965,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40000010:{name:"ReverseDL",group:"DELAY",order:704,param:[
+  0x40000010:{name:"ReverseDL",group:"DELAY",order:704,install:0,param:[
     {name:"Time",def:990,max:2005,disp:10},
     {name:"F.B",def:20,max:100},
     {name:"Bal",def:50,max:100},
@@ -975,7 +973,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40200010:{name:"MultiTapD",group:"DELAY",order:705,param:[
+  0x40200010:{name:"MultiTapD",group:"DELAY",order:705,install:0,param:[
     {name:"Time",def:2999,max:3018,disp:1},
     {name:"PTTRN",def:1,max:7,disp:1},
     {name:"Mix",def:20,max:100},
@@ -983,7 +981,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40400010:{name:"DynaDelay",group:"DELAY",order:706,param:[
+  0x40400010:{name:"DynaDelay",group:"DELAY",order:706,install:0,param:[
     {name:"Time",def:359,max:2014,disp:1},
     {name:"Sense",def:5,max:19,disp:["-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","1","2","3","4","5","6","7","8","9","10"]},
     {name:"Mix",def:80,max:100},
@@ -991,7 +989,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40600010:{name:"FilterDly",group:"DELAY",order:707,param:[
+  0x40600010:{name:"FilterDly",group:"DELAY",order:707,install:0,param:[
     {name:"Time",def:499,max:2014,disp:1},
     {name:"F.B",def:50,max:100},
     {name:"Mix",def:90,max:100},
@@ -1001,7 +999,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00000110:{name:"PitchDly",group:"DELAY",order:708,param:[
+  0x00000110:{name:"PitchDly",group:"DELAY",order:708,install:0,param:[
     {name:"Time",def:89,max:1999,disp:1},
     {name:"Pitch",def:21,max:30,disp:[
       "-12","-11","-10","-9","-8","-7","-6","-5","-4","-3","-2","-1",
@@ -1014,7 +1012,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00200110:{name:"StereoDly",group:"DELAY",order:709,param:[
+  0x00200110:{name:"StereoDly",group:"DELAY",order:709,install:0,param:[
     {name:"TimeL",def:164,max:2014,disp:1},
     {name:"TimeR",def:504,max:2014,disp:1},
     {name:"Mix",def:100,max:100},
@@ -1025,7 +1023,7 @@ var effectlist={
     {name:"RchLv",def:100,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00400110:{name:"PhaseDly",group:"DELAY",order:710,param:[
+  0x00400110:{name:"PhaseDly",group:"DELAY",order:710,install:0,param:[
     {name:"Time",def:499,max:2014,disp:1},
     {name:"F.B",def:28,max:100},
     {name:"Mix",def:57,max:100},
@@ -1034,7 +1032,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00600110:{name:"TrgHldDly",group:"DELAY",order:711,param:[
+  0x00600110:{name:"TrgHldDly",group:"DELAY",order:711,install:0,param:[
     {name:"Time",def:40,max:990,disp:10},
     {name:"Duty",def:75,max:75,disp:25},
     {name:"Mix",def:100,max:100},
@@ -1042,7 +1040,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40000110:{name:"StompDly",group:"DELAY",order:712,param:[
+  0x40000110:{name:"StompDly",group:"DELAY",order:712,install:0,param:[
     {name:"E.LVL",def:30,max:120},
     {name:"F.B",def:20,max:100},
     {name:"Time",def:359,max:599,disp:1},
@@ -1051,7 +1049,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"HiDMP",def:5,max:10},
   ]},
-  0x40200110:{name:"TapeEcho3",group:"DELAY",order:713,param:[
+  0x40200110:{name:"TapeEcho3",group:"DELAY",order:713,install:0,param:[
     {name:"F.B",def:20,max:100},
     {name:"MIX",def:50,max:100},
     {name:"TIME",def:350,max:990,disp:10},
@@ -1059,7 +1057,7 @@ var effectlist={
     {name:"SYNC",def:0,max:15,disp:["OFF","1/16","1/12","3/32","1/8","1/6","3/16","1/4","3/8","1/2","3/4","4/4","5/4","6/4","7/4","8/4"]},
     {name:"P-Amp",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40400110:{name:"DualDigiD",group:"DELAY",order:714,param:[
+  0x40400110:{name:"DualDigiD",group:"DELAY",order:714,install:0,param:[
     {name:"TimeA",def:500,max:2005},
     {name:"TimeB",def:375,max:2005},
     {name:"FdbkA",def:50,max:110},
@@ -1070,7 +1068,7 @@ var effectlist={
     {name:"DlyMx",def:25,max:100},
     {name:"Mix",def:50,max:100},
   ]},
-  0x40600110:{name:"CarbonDly",group:"DELAY",order:715,param:[
+  0x40600110:{name:"CarbonDly",group:"DELAY",order:715,install:0,param:[
     {name:"DELAY",def:387,max:562,disp:19},
     {name:"REGEN",def:47,max:100},
     {name:"MIX",def:69,max:100},
@@ -1080,7 +1078,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Sync",def:0,max:15,disp:["OFF","1/16","1/12","3/32","1/8","1/6","3/16","1/4","3/8","1/2","3/4","4/4","5/4","6/4","7/4","8/4"]},
   ]},
-  0x00000210:{name:"DriveEcho",group:"DELAY",order:716,param:[
+  0x00000210:{name:"DriveEcho",group:"DELAY",order:716,install:0,param:[
     {name:"DRIVE",def:39,max:100},
     {name:"MIX",def:80,max:100},
     {name:"TIME",def:355,max:1985,disp:20},
@@ -1090,7 +1088,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Mode",def:0,max:1,disp:["MONO","STR"]},
   ]},
-  0x00200210:{name:"SlapBackD",group:"DELAY",order:717,param:[
+  0x00200210:{name:"SlapBackD",group:"DELAY",order:717,install:0,param:[
     {name:"TIME",def:98,max:300,disp:1},
     {name:"SubDv",def:0,max:2,disp:["1/4","3/16","P-P"]},
     {name:"F.B",def:29,max:100},
@@ -1099,14 +1097,14 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Mode",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00400210:{name:"SmoothDly",group:"DELAY",order:718,param:[
+  0x00400210:{name:"SmoothDly",group:"DELAY",order:718,install:0,param:[
     {name:"TIME",def:322,max:3014,disp:1},
     {name:"F.B",def:39,max:100},
     {name:"E.LVL",def:49,max:100},
     {name:"TONE",def:83,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00600210:{name:"LO-FI Dly",group:"DELAY",order:719,param:[
+  0x00600210:{name:"LO-FI Dly",group:"DELAY",order:719,install:0,param:[
     {name:"TIME",def:248,max:1913,disp:2},
     {name:"F.B",def:25,max:100},
     {name:"MIX",def:50,max:100},
@@ -1117,7 +1115,7 @@ var effectlist={
     {name:"FLT",def:2,max:8,disp:["OFF","1","2","3","4","5","6","7","8"]},
     {name:"VINYL",def:0,max:18,disp:["OFF","D:1","D:2","D:3","D:4","D:5","D:6","D:7","D:8","D:9","S:1","S:2","S:3","S:4","S:5","S:6","S:7","S:8","S:9"]},
   ]},
-  0x40000210:{name:"SlwAtkDly",group:"DELAY",order:720,param:[
+  0x40000210:{name:"SlwAtkDly",group:"DELAY",order:720,install:0,param:[
     {name:"TIME",def:489,max:1914,disp:1},
     {name:"F.B",def:71,max:100},
     {name:"MIX",def:64,max:100},
@@ -1126,7 +1124,7 @@ var effectlist={
     {name:"Mode",def:0,max:1,disp:["MONO","STR"]},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40200210:{name:"TremDelay",group:"DELAY",order:721,param:[
+  0x40200210:{name:"TremDelay",group:"DELAY",order:721,install:0,param:[
     {name:"TIME",def:300,max:1855,disp:60},
     {name:"F.B",def:70,max:100},
     {name:"MIX",def:60,max:100},
@@ -1139,7 +1137,7 @@ var effectlist={
       "OFF","20","40","60","80","100","120","140","160","180","200","230","260","300","350","400","500","600","700","800","900"]},
     {name:"GRIT",def:2,max:10},
   ]},
-  0x40400210:{name:"FLTR PPD",group:"DELAY",order:722,param:[
+  0x40400210:{name:"FLTR PPD",group:"DELAY",order:722,install:0,param:[
     {name:"TimeA",def:500,max:1915},
     {name:"TimeB",def:250,max:1915},
     {name:"Mix",def:50,max:100},
@@ -1150,7 +1148,7 @@ var effectlist={
     {name:"Depth",def:8,max:21},
     {name:"Wave",def:35,max:47},
   ]},
-  0x40600210:{name:"A-Pan DLY",group:"DELAY",order:723,param:[
+  0x40600210:{name:"A-Pan DLY",group:"DELAY",order:723,install:0,param:[
     {name:"Time",def:222,max:2014,disp:1},
     {name:"F.B",def:87,max:100},
     {name:"Mix",def:53,max:100},
@@ -1161,7 +1159,7 @@ var effectlist={
     {name:"Link",def:1,max:1,disp:["P-D","D-P"]},
     {name:"Level",def:100,max:200},
   ]},
-  0x00000310:{name:"ICE Delay",group:"DELAY",order:724,param:[
+  0x00000310:{name:"ICE Delay",group:"DELAY",order:724,install:0,param:[
     {name:"TIME",def:440,max:1255,disp:60},
     {name:"F.B",def:64,max:100},
     {name:"MIX",def:60,max:100},
@@ -1175,7 +1173,7 @@ var effectlist={
     {name:"HPF",def:1,max:20,disp:[
       "OFF","20","40","60","80","100","120","140","160","180","200","230","260","300","350","400","500","600","700","800","900"]},
   ]},
-  0x00100012:{name:"HD Hall",group:"REVERB",order:800,param:[
+  0x00100012:{name:"HD Hall",group:"REVERB",order:800,install:0,param:[
     {name:"PreD",def:80,max:199,disp:1},
     {name:"Decay",def:45,max:100},
     {name:"Mix",def:62,max:100},
@@ -1183,7 +1181,7 @@ var effectlist={
     {name:"HiDMP",def:70,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00180012:{name:"HD Reverb",group:"REVERB",order:801,param:[
+  0x00180012:{name:"HD Reverb",group:"REVERB",order:801,install:0,param:[
     {name:"Decay",def:10,max:100},
     {name:"Tone",def:7,max:10},
     {name:"Mix",def:46,max:100},
@@ -1192,7 +1190,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00200012:{name:"Hall",group:"REVERB",order:802,param:[
+  0x00200012:{name:"Hall",group:"REVERB",order:802,install:0,param:[
     {name:"Decay",def:9,max:29,disp:1},
     {name:"Tone",def:5,max:10},
     {name:"Mix",def:46,max:100},
@@ -1200,7 +1198,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00400012:{name:"Room",group:"REVERB",order:803,param:[
+  0x00400012:{name:"Room",group:"REVERB",order:803,install:0,param:[
     {name:"Decay",def:9,max:29,disp:1},
     {name:"Tone",def:8,max:10},
     {name:"Mix",def:60,max:100},
@@ -1208,7 +1206,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00600012:{name:"TiledRoom",group:"REVERB",order:804,param:[
+  0x00600012:{name:"TiledRoom",group:"REVERB",order:804,install:0,param:[
     {name:"Decay",def:19,max:29,disp:1},
     {name:"Tone",def:4,max:10},
     {name:"Mix",def:46,max:100},
@@ -1216,7 +1214,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40000012:{name:"Spring",group:"REVERB",order:805,param:[
+  0x40000012:{name:"Spring",group:"REVERB",order:805,install:0,param:[
     {name:"Decay",def:19,max:29,disp:1},
     {name:"Tone",def:8,max:10},
     {name:"Mix",def:50,max:100},
@@ -1224,7 +1222,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40200012:{name:"Arena",group:"REVERB",order:806,param:[
+  0x40200012:{name:"Arena",group:"REVERB",order:806,install:0,param:[
     {name:"Decay",def:14,max:29,disp:1},
     {name:"Tone",def:7,max:10},
     {name:"Mix",def:56,max:100},
@@ -1232,7 +1230,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40400012:{name:"EarlyRef",group:"REVERB",order:807,param:[
+  0x40400012:{name:"EarlyRef",group:"REVERB",order:807,install:0,param:[
     {name:"Decay",def:14,max:29,disp:1},
     {name:"Shape",def:20,max:20,disp:-10},
     {name:"Mix",def:50,max:100},
@@ -1240,7 +1238,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40600012:{name:"Air",group:"REVERB",order:808,param:[
+  0x40600012:{name:"Air",group:"REVERB",order:808,install:0,param:[
     {name:"Size",def:19,max:99,disp:1},
     {name:"Tone",def:8,max:10},
     {name:"Mix",def:60,max:100},
@@ -1248,7 +1246,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00200112:{name:"Plate",group:"REVERB",order:809,param:[
+  0x00200112:{name:"Plate",group:"REVERB",order:809,install:0,param:[
     {name:"PreD",def:8,max:199,disp:1},
     {name:"Decay",def:52,max:100},
     {name:"Mix",def:44,max:100},
@@ -1258,7 +1256,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Level",def:100,max:150},
   ]},
-  0x00400112:{name:"ModReverb",group:"REVERB",order:810,param:[
+  0x00400112:{name:"ModReverb",group:"REVERB",order:810,install:0,param:[
     {name:"Depth",def:38,max:100},
     {name:"Decay",def:19,max:29,disp:1},
     {name:"Mix",def:45,max:100},
@@ -1268,7 +1266,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00600112:{name:"SlapBack",group:"REVERB",order:811,param:[
+  0x00600112:{name:"SlapBack",group:"REVERB",order:811,install:0,param:[
     {name:"Time",def:379,max:1010,disp:1},
     {name:"Decay",def:9,max:29,disp:1},
     {name:"Mix",def:48,max:100},
@@ -1278,20 +1276,20 @@ var effectlist={
     {name:"Level",def:100,max:150},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40000112:{name:"Spring63",group:"REVERB",order:812,param:[
+  0x40000112:{name:"Spring63",group:"REVERB",order:812,install:0,param:[
     {name:"DWELL",def:35,max:100},
     {name:"MIXER",def:51,max:100},
     {name:"TONE",def:58,max:100},
     {name:"LEVEL",def:100,max:150},
   ]},
-  0x40200112:{name:"Chamber",group:"REVERB",order:813,param:[
+  0x40200112:{name:"Chamber",group:"REVERB",order:813,install:0,param:[
     {name:"Decay",def:50,max:100},
     {name:"Tone",def:73,max:100},
     {name:"Mix",def:48,max:100},
     {name:"PreD",def:24,max:200},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40400112:{name:"LOFI Rev",group:"REVERB",order:814,param:[
+  0x40400112:{name:"LOFI Rev",group:"REVERB",order:814,install:0,param:[
     {name:"DECAY",def:52,max:100},
     {name:"TONE",def:95,max:100},
     {name:"FxLVL",def:44,max:100},
@@ -1299,7 +1297,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Dry",def:1,max:1,disp:["OFF","ON"]},
   ]},
-  0x40600112:{name:"Church",group:"REVERB",order:815,param:[
+  0x40600112:{name:"Church",group:"REVERB",order:815,install:0,param:[
     {name:"DECAY",def:49,max:100},
     {name:"PreD",def:96,max:200},
     {name:"MIX",def:46,max:100},
@@ -1308,14 +1306,14 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Dry",def:1,max:1,disp:["OFF","ON"]},
   ]},
-  0x00000212:{name:"Cave",group:"REVERB",order:816,param:[
+  0x00000212:{name:"Cave",group:"REVERB",order:816,install:0,param:[
     {name:"Decay",def:52,max:100},
     {name:"Tone",def:54,max:100},
     {name:"Mix",def:40,max:100},
     {name:"PreD",def:62,max:200},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00200212:{name:"Ambience",group:"REVERB",order:817,param:[
+  0x00200212:{name:"Ambience",group:"REVERB",order:817,install:0,param:[
     {name:"DECAY",def:70,max:100},
     {name:"TONE",def:80,max:100},
     {name:"MIX",def:50,max:100},
@@ -1323,21 +1321,21 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Dry",def:1,max:1,disp:["OFF","ON"]},
   ]},
-  0x00400212:{name:"GateRev",group:"REVERB",order:818,param:[
+  0x00400212:{name:"GateRev",group:"REVERB",order:818,install:0,param:[
     {name:"Level",def:60,max:100},
     {name:"Tone",def:50,max:100},
     {name:"Decay",def:55,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Dry",def:1,max:1,disp:["OFF","ON"]},
   ]},
-  0x00600212:{name:"ReverseRv",group:"REVERB",order:819,param:[
+  0x00600212:{name:"ReverseRv",group:"REVERB",order:819,install:0,param:[
     {name:"Level",def:100,max:100},
     {name:"Tone",def:70,max:100},
     {name:"Decay",def:100,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Dry",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40000212:{name:"Echo",group:"REVERB",order:820,param:[
+  0x40000212:{name:"Echo",group:"REVERB",order:820,install:0,param:[
     {name:"DECAY",def:25,max:100},
     {name:"TIME",def:125,max:200},
     {name:"TONE",def:70,max:100},
@@ -1345,7 +1343,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
     {name:"Mode",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40200212:{name:"TremoloRv",group:"REVERB",order:821,param:[
+  0x40200212:{name:"TremoloRv",group:"REVERB",order:821,install:0,param:[
     {name:"Decay",def:50,max:100},
     {name:"PDLY",def:70,max:500},
     {name:"Mix",def:45,max:100},
@@ -1356,11 +1354,11 @@ var effectlist={
     {name:"Low",def:100,max:200,disp:-100},
     {name:"High",def:100,max:200,disp:-100},
   ]},
-  0x40400212:{name:"HolyFLERB",group:"REVERB",order:822,param:[
+  0x40400212:{name:"HolyFLERB",group:"REVERB",order:822,install:0,param:[
     {name:"RVRB",def:50,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x40600212:{name:"DynaRev",group:"REVERB",order:823,param:[
+  0x40600212:{name:"DynaRev",group:"REVERB",order:823,install:0,param:[
     {name:"Decay",def:82,max:100},
     {name:"PreD",def:0,max:100},
     {name:"Color",def:76,max:100},
@@ -1368,7 +1366,7 @@ var effectlist={
     {name:"Mix",def:40,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00000312:{name:"ShimmerRv",group:"REVERB",order:824,param:[
+  0x00000312:{name:"ShimmerRv",group:"REVERB",order:824,install:0,param:[
     {name:"PreD",def:39,max:99,disp:1},
     {name:"DECAY",def:90,max:100},
     {name:"MIX",def:50,max:100},
@@ -1376,7 +1374,7 @@ var effectlist={
     {name:"HiDMP",def:74,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00200312:{name:"ParticleR",group:"REVERB",order:825,param:[
+  0x00200312:{name:"ParticleR",group:"REVERB",order:825,install:0,param:[
     {name:"DWELL",def:40,max:100},
     {name:"GAIN",def:100,max:100},
     {name:"MODE",def:0,max:2,disp:["STBL","CRTCL","HZD"]},
@@ -1384,7 +1382,7 @@ var effectlist={
     {name:"MONO",def:0,max:1,disp:["OFF","ON"]},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
-  0x00400312:{name:"SpaceHole",group:"REVERB",order:826,param:[
+  0x00400312:{name:"SpaceHole",group:"REVERB",order:826,install:0,param:[
     {name:"Decay",def:50,max:200,disp:-100},
     {name:"PDLY",def:80,max:1000},
     {name:"Mix",def:40,max:100},
@@ -1395,7 +1393,7 @@ var effectlist={
     {name:"Low",def:87,max:200,disp:-100},
     {name:"High",def:82,max:200,disp:-100},
   ]},
-  0x00600312:{name:"MangledSp",group:"REVERB",order:827,param:[
+  0x00600312:{name:"MangledSp",group:"REVERB",order:827,install:0,param:[
     {name:"PDLY",def:80,max:500},
     {name:"Clip",def:50,max:100},
     {name:"Mix",def:38,max:100},
@@ -1406,7 +1404,7 @@ var effectlist={
     {name:"High",def:101,max:200,disp:-100},
     {name:"Level",def:85,max:200},
   ]},
-  0x40000312:{name:"DualRev",group:"REVERB",order:828,param:[
+  0x40000312:{name:"DualRev",group:"REVERB",order:828,install:0,param:[
     {name:"PDlyA",def:350,max:750},
     {name:"PDlyB",def:700,max:750},
     {name:"Mix",def:30,max:100},
@@ -1426,345 +1424,55 @@ var effectlist={
   ]},
 }
 
-function MidiIf(){
-  this.scanque=[];
+function MidiIf(ma){
+  this.midiaccess=ma;
+  this.que=[];
   this.scan=-1;
-  this.dump=0;
+  this.dump=1;
+  this.supress=0;
+  this.waitdata=null;
+  this.callback=null;
   this.recv=function(ev){
     midirecv=MakeStr(ev.data);
+    switch(this.dump){
+    case 1:
+      if(ev.data[0]>=0xf0)
+        console.log(midirecv);
+      break;
+    case 2:
+      console.log(midirecv);
+      break;
+    }
     if(ev.data[0]==0xc0){
       if(currentpatch!=ev.data[1]){
         SelPatchList(0);
         currentpatch=ev.data[1];
         DispPatch();
         SelPatchList(1);
-        isdirty=false;
       }
     }
     var cmd=midirecv.substr(0,2);
     if(midirecv.substr(0,10)=="f052005831"){
       if(ev.data[6]==0)
-        SetEffectState(ev.data[5],0);
+        SetEffectState(currentpatch,ev.data[5],0);
       if(ev.data[6]>=2){
         var v=(ev.data[7]&0x7f)+((ev.data[8]&0x7f)<<7);
-        SetParamVal(ev.data[5],ev.data[6],v);
+        SetParamVal(currentpatch,ev.data[5],ev.data[6],v);
         DispPatch();
-        if(this.dump)
-          console.log(midirecv);
       }
     }
     if(midirecv.substr(0,10)=="f052005828"){
-      if(this.dump)
-        console.log(midirecv);
       var name=MakeName(ev.data);
       if(this.scan>=0){
+        document.getElementById("scanningmsg").innerHTML="Scanning Patches...("+this.scan+"/50)";
         patches[this.scan++]={name:name,data:ev.data};
         if(this.scan>49){
-          SelectPatch(currentpatch);
           this.scan=-1;
-        }
-        else{
-          this.scanque.push([0xc0,this.scan]);
-          this.scanque.push([0xf0,0x52,0,0x58,0x29,0xf7]);
-        }
-      }
-      else{
-        patches[currentpatch]={name:name,data:ev.data};
-        DispPatch();
-      }
-    }
-  };
-  this.StartScan=function(){
-    this.scan=0;
-  };
-  this.timer=function(){
-    if(this.scan>=0){
-      var d=this.que.shift();
-      midiout.send(d);
-    }
-    else if(isdirty){
-      SendPatch(currentpatch);
-      isdirty=false;
-    }
-    else {
-      midiout.send()
-    }
-  };
-  this.timerid=setInterval(this.timer,100);
-}
-
-function MakeStr(b){
-  var str="";
-  for(var j=0;j<b.length;++j)
-    str+=("00"+b[j].toString(16)).substr(-2);
-  return str;
-}
-function MakeName(b){
-  var name="";
-  for(var j=0;j<13;++j){
-    var c=b[132+j];
-    if(c)
-      name+=String.fromCharCode(c);
-  }
-  return name;
-}
-function MakeBin(s){
-  var bin=[];
-  for(var j=0;j<s.length;j+=2)
-    bin.push(parseInt(s.substr(j,2),16));
-  return bin;
-}
-function Init(){
-  var i;
-  if(!navigator.requestMIDIAccess){
-    alert("This browser does not support Web MIDI API. Please use latest Chrome.");
-    return;
-  }
-  navigator.requestMIDIAccess({sysex:true}).then(
-    function(ma){
-      var i=0,pt=0;
-      midiaccess=ma;
-      midiaccess.onstatechange=StateChange;
-      var outputIterator=midiaccess.outputs.values();
-      for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
-          midioutputs[i]=o.value;
-          var op=new Option(o.value.name);
-          if(o.value.name=="ZOOM MS Series")
-            op.selected=true;
-          document.getElementById("midiport").options[i]=op;
-          i++;
-      }
-      SelectPort();
-      if(!midiout)
-        alert("MIDI port is not found.");
-      var inputIterator=midiaccess.inputs.values();
-      for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
-        if(ip.value.name==="ZOOM MS Series"){
-          console.log(ip.value);
-          ip.value.addEventListener("midimessage",
-            function(ev){
-              midirecv=MakeStr(ev.data);
-              if(ev.data[0]==0xc0){
-                if(currentpatch!=ev.data[1]){
-                  SelPatchList(0);
-                  currentpatch=ev.data[1];
-                  DispPatch();
-                  SelPatchList(1);
-                  isdirty=false;
-                }
-                if(isdirty){
-                  SendPatch(currentpatch);
-                  isdirty=false;
-                }
-              }
-              var cmd=midirecv.substr(0,2);
-              if(midirecv.substr(0,10)=="f052005831"){
-                if(ev.data[6]==0)
-                  SetEffectState(ev.data[5],0);
-                if(ev.data[6]>=2){
-                  var v=(ev.data[7]&0x7f)+((ev.data[8]&0x7f)<<7);
-                  SetParamVal(ev.data[5],ev.data[6],v);
-                  DispPatch();
-                  if(dump)
-                    console.log(midirecv)
-                }
-              }
-              if(midirecv.substr(0,10)=="f052005828"){
-                if(dump)
-                  console.log(midirecv);
-                var name=MakeName(ev.data);
-                if(patchscan>=0){
-                  patches[patchscan++]={name:name,data:ev.data};
-                  if(patchscan>49){
-                    SelectPatch(currentpatch);
-                    patchscan=-1;
-                  }
-                  else{
-                    setTimeout(function(){
-                      midiout.send([0xc0,patchscan]);
-                      midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
-                    },50);
-                  }
-                }
-                else{
-                  patches[currentpatch]={name:name,data:ev.data};
-                  DispPatch();
-                }
-              }
-            }
-          );
-        }
-      }
-    },
-    function(e){alert("requestMIDIAccess Error");},
-  );
-  for(var i=0;i<6;++i){
-    var ef=document.getElementById("fnam"+(i+1));
-    var im=document.getElementById("fimg"+(i+1));
-    ef.draggable=true;
-    im.draggable=false;
-    ef.ondragstart=function(ev){
-      ev.dataTransfer.setData("text",ev.target.id);
-      this.classList.add("drag");
-      for(var j=0;j<6;++j){
-        var ef=document.getElementById("fnam"+(j+1));
-        ef.ondragend=function(ev){
-          this.classList.remove("drag");
-          for(var jj=0;jj<6;++jj){
-            var dst=document.getElementById("fnam"+(jj+1));
-            dst.ondragenter=dst.ondragleave=dst.ondragover=dst.ondrop=null;
-          }
-        };
-        ef.ondragenter=function(ev){
-          var d=parseInt(ev.target.id[4])-1;
-          if(d>currenteffect)
-            this.classList.toggle("overdown");
-          else if(d<currenteffect)
-            this.classList.toggle("overup");
-        };
-        ef.ondragleave=function(ev){
-          var d=parseInt(ev.target.id[4])-1;
-          if(d>currenteffect)
-            this.classList.toggle("overdown");
-          else if(d<currenteffect)
-            this.classList.toggle("overup");
-        };
-        ef.ondragover=function(ev){
-          ev.preventDefault();
-        };
-        ef.ondrop=function(ev){
-          this.classList.remove("overup");
-          this.classList.remove("overdown");
-          var s=parseInt(event.dataTransfer.getData("text")[4])-1;
-          var d=parseInt(ev.target.id[4])-1;
-          if(s!=d){
-            if(s>d){
-              var e=GetEffect(s);
-              for(var i=s;i>d;--i)
-                SetEffect(i,GetEffect(i-1));
-              SetEffect(d,e);
-              SetCurrentEffect(d);
-              TrimEffectMax();
-              isdirty=true;
-            }
-            else{
-              var e=GetEffect(s);
-              for(var i=s;i<d;++i)
-                SetEffect(i,GetEffect(i+1));
-              SetEffect(d,e);
-              SetCurrentEffect(d);
-              TrimEffectMax();
-              isdirty=true;
-            }
-          }
-          ev.preventDefault();
-        };
-      }
-    };
-    for(var j=0;j<9;++j){
-      var c="f"+(i+1)+"p"+(j+1);
-      var k=document.getElementById(c+"k");
-      var s=document.getElementById(c+"s");
-      k.valuetip=0;
-      k.onchange = function(k){
-        var f=parseInt(k.target.id[1]);
-        var p=parseInt(k.target.id[3]);
-        SetCurrentEffect(f-1);
-        if(k.target.tab){
-          var v=k.target.tab[k.target.value|0];
-          SetParamVal(f-1,p+1,v);
-        }
-        else
-          SetParamVal(f-1,p+1,k.target.value);
-        DispPatch();
-        isdirty=true;
-      }
-      if(s)
-        s.onchange=function(s){
-          var f=parseInt(s.target.id[1]);
-          var p=parseInt(s.target.id[3]);
-          SetCurrentEffect(f-1);
-          SetParamVal(f-1,p+1,s.target.value);
+          SelectPatch(currentpatch);
           DispPatch();
-          isdirty=true;
-        }
-    }
-  }
-  var p=document.getElementById("efpanel0");
-  for(var id in effectlist){
-    var ef=effectlist[id];
-    var e=document.createElement("div");
-    e.innerHTML="<img src='./images/"+ef.name.replace(/ /g,"_")+".png' draggable='false'/><div>"+ef.name+"</div>";
-    e.setAttribute("class","efitem");
-    var div=document.getElementById("ef"+ef.group);
-    if(div){
-      div.appendChild(e);
-      e.id="e_"+id;
-      e.onclick=e.childNodes[0].onclick=e.childNodes[1].onclick=function(ev){
-        var id=ev.target.id;
-        if(!id)
-          id=ev.target.parentNode.id;
-        var ef=GetEffectFromId(id.substring(2));
-        SetEffect(currenteffect,ef);
-        TrimEffectMax();
-        EffectPanelCancel();
-        isdirty=true;
-      }
-    }
-    ShowDoc(GetLang());
-  }
-  document.addEventListener("click",function(ev){
-    PopupEffectCancel();
-    PopupPatchCancel();
-    PopupPatchCancel2();
-  });
-  document.addEventListener("keydown",function(ev){
-    if(ready){
-      var p;
-      if(document.getElementById("inputpanel").style.display=="block" || document.getElementById("confirmpanel").style.display=="block")
-        return;
-      if(ev.key=="ArrowLeft" || ev.key=="ArrowRight"){
-        p=currentpatch;
-        if(ev.key=="ArrowLeft"){
-          if(--p<0)
-            p=49;
-        }
-        else{
-          if(++p>=50)
-            p=0;
-        }
-        SelectPatch(p);
-        ev.preventDefault();
-      }
-      var p=patchkeymap.indexOf(ev.key);
-      if(p>=0){
-        SelectPatch(p);
-        ev.preventDefault();
-      }
-      var e=effectkeymap.indexOf(ev.key);
-      if(e>=0){
-        SetCurrentEffect(e);
-        ToggleEffect(e);
-        ev.preventDefault();
-      }
-    }
-  });
-}
-function Scan(){
-  if(!midiout || midiout.name!="ZOOM MS Series"){
-    alert("ZOOM MS Series is not found.");
-    return;
-  }
-  midiout.send([0xf0,0x52,0x00,0x58,0x33,0xf7]);
-  if(timerprg)
-    clearInterval(timerprg);
-  setTimeout(function(){
-    Edit(1);
-    setTimeout(function(){
-      DumpPatches();
-      timer=setInterval(function(){
-        if(patchscan<0){
-          clearInterval(timer);
+          document.getElementById("scanning").style.display="none";
+//          document.getElementById("msg").innerHTML="Ready";
+          ready=true;
           for(i=0;i<6;++i){
             var cell=document.getElementById("fnam"+(i+1));
             var cell2=document.getElementById("fnum"+(i+1));
@@ -1788,6 +1496,13 @@ function Scan(){
             };
           }
           for(i=0;i<50;++i){
+            for(var ii=0;ii<6;++ii){
+              var id=GetEffectId(i,ii);
+              if(id){
+                effectlist[id].install=1;
+                document.getElementById("e_"+id).classList.add("install");
+              }
+            }
             var cell=document.getElementById((i+1)+"nam");
             var btn=document.getElementById((i+1)+"btn");
             cell.innerHTML=patches[i].name;
@@ -1838,20 +1553,316 @@ function Scan(){
               }
             };
           }
-          document.getElementById("msg").innerHTML="Ready";
-          ready=true;
-          if(timerprg)
-            clearInterval(timerprg);
-          timerprg=setInterval(function(){
-            midiout.send([0xf0,0x52,0x00,0x58,0x33,0xf7]);
-          },200);
         }
         else{
-          document.getElementById("msg").innerHTML="Scanning("+patchscan+")...";
+          this.que.push([0xc0,this.scan]);
+          this.que.push([0xf0,0x52,0,0x58,0x29,0xf7]);
         }
-      },200);
-    },200);
-  },200);
+      }
+      else{
+        patches[currentpatch]={name:name,data:ev.data};
+        for(var ii=0;ii<6;++ii){
+          var id=GetEffectId(currentpatch,ii);
+          if(id){
+            effectlist[id].install=1;
+            document.getElementById("e_"+id).classList.add("install");
+          }
+        }
+        DispPatch();
+      }
+    }
+    if(this.waitdata){
+      if(midirecv.indexOf(this.waitdata)==0){
+        this.supress=0;
+        this.waitdata=null;
+        if(this.callback)
+          this.callback();
+      }
+    }
+  };
+  this.StartScan=function(){
+    document.getElementById("scanning").style.display="block";
+    this.scan=0;
+    this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0",function(){
+      this.que.push([0xf0,0x52,0x00,0x58,0x50,0xf7]);
+      this.que.push([0xc0,this.scan]);
+      this.que.push([0xf0,0x52,0,0x58,0x29,0xf7]);
+    }.bind(this));
+  };
+  this.SendDirect=function(d){
+//    console.log("senddirect",MakeStr(d))
+    midiout.send(d);
+  };
+  this.Send=function(d){
+    this.que.push(d);
+  };
+  this.SendCurrentPatch=function(){
+    this.Send(patches[currentpatch].data);
+  };
+  this.SendCurrentPatchVerify=function(success,fail){
+    var o=[];
+    for(var i=0;i<6;++i){
+      o.push(GetEffectId(currentpatch,i));
+    }
+    this.SendCurrentPatch();
+    setTimeout(function(){
+      this.SendWait([0xf0,0x52,0x00,0x58,0x29,0xf7],"f052005828",function(){
+        var s="";
+        for(var j=0;j<6;++j){
+          if(o[j]!=GetEffectId(currentpatch,j)){
+            document.getElementById("e_"+o[j]).classList.add("notinstall");
+            effectlist[o[j]].install=-1;
+            s+="[ "+effectlist[o[j]].name+"]";
+          }
+        }
+        if(success&&s.length==0)
+          success(s);
+        if(fail&&s.length>0)
+          fail(s);
+      })
+    }.bind(this),200);
+  };
+  this.SendWait=function(sd,rv,cb){
+    this.supress=1;
+    this.callback=cb;
+    this.waitdata=rv;
+    this.SendDirect(sd);
+  };
+  this.timer=function(){
+    if(this.supress){
+      console.log("supress")
+      return;
+    }
+    if(this.scan>=0){
+      if(this.que.length>0){
+        var d=this.que.shift();
+        this.SendDirect(d);
+      }
+      return;
+    }
+    else if(this.que.length>0){
+      var d=this.que.shift();
+      this.SendDirect(d);
+    }
+    else
+      this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0");
+  };
+  var i=0;
+  var outputIterator=this.midiaccess.outputs.values();
+  for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
+      midioutputs[i]=o.value;
+      var op=new Option(o.value.name);
+      if(o.value.name=="ZOOM MS Series")
+        op.selected=true;
+      document.getElementById("midiport").options[i]=op;
+      i++;
+  }
+  SelectPort();
+  if(!midiout)
+    alert("MIDI port is not found.");
+  var inputIterator=this.midiaccess.inputs.values();
+  for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
+    if(ip.value.name==="ZOOM MS Series"){
+      console.log(ip.value);
+      ip.value.addEventListener("midimessage",this.recv.bind(this));
+    }
+  }
+  this.timerid=setInterval(this.timer.bind(this),70);
+}
+
+function MakeStr(b){
+  var str="";
+  for(var j=0;j<b.length;++j)
+    str+=("00"+b[j].toString(16)).substr(-2);
+  return str;
+}
+function MakeName(b){
+  var name="";
+  for(var j=0;j<13;++j){
+    var c=b[132+j];
+    if(c)
+      name+=String.fromCharCode(c);
+  }
+  return name;
+}
+function MakeBin(s){
+  var bin=[];
+  for(var j=0;j<s.length;j+=2)
+    bin.push(parseInt(s.substr(j,2),16));
+  return bin;
+}
+function Init(){
+  var i;
+  if(!navigator.requestMIDIAccess){
+    alert("This browser does not support Web MIDI API. Please use latest Chrome.");
+    return;
+  }
+  navigator.requestMIDIAccess({sysex:true}).then(
+      function(ma){midiif=new MidiIf(ma);},
+      function(e){alert("requestMIDIAccess Error");},
+    );
+  for(var i=0;i<6;++i){
+    var ef=document.getElementById("fnam"+(i+1));
+    var im=document.getElementById("fimg"+(i+1));
+    ef.draggable=true;
+    im.draggable=false;
+    ef.ondragstart=function(ev){
+      ev.dataTransfer.setData("text",ev.target.id);
+      this.classList.add("drag");
+      for(var j=0;j<6;++j){
+        var ef=document.getElementById("fnam"+(j+1));
+        ef.ondragend=function(ev){
+          this.classList.remove("drag");
+          for(var jj=0;jj<6;++jj){
+            var dst=document.getElementById("fnam"+(jj+1));
+            dst.ondragenter=dst.ondragleave=dst.ondragover=dst.ondrop=null;
+          }
+        };
+        ef.ondragenter=function(ev){
+          var d=parseInt(ev.target.id[4])-1;
+          if(d>currenteffect)
+            this.classList.toggle("overdown");
+          else if(d<currenteffect)
+            this.classList.toggle("overup");
+        };
+        ef.ondragleave=function(ev){
+          var d=parseInt(ev.target.id[4])-1;
+          if(d>currenteffect)
+            this.classList.toggle("overdown");
+          else if(d<currenteffect)
+            this.classList.toggle("overup");
+        };
+        ef.ondragover=function(ev){
+          ev.preventDefault();
+        };
+        ef.ondrop=function(ev){
+          this.classList.remove("overup");
+          this.classList.remove("overdown");
+          var s=parseInt(event.dataTransfer.getData("text")[4])-1;
+          var d=parseInt(ev.target.id[4])-1;
+          if(s!=d){
+            if(s>d){
+              var e=GetEffect(currentpatch,s);
+              for(var i=s;i>d;--i)
+                SetEffect(currentpatch,i,GetEffect(currentpatch,i-1));
+              SetEffect(currentpatch,d,e);
+              SetCurrentEffect(d);
+              TrimEffectMax();
+              midiif.SendCurrentPatch();
+            }
+            else{
+              var e=GetEffect(currentpatch,s);
+              for(var i=s;i<d;++i)
+                SetEffect(currentpatch,i,GetEffect(currentpatch,i+1));
+              SetEffect(currentpatch,d,e);
+              SetCurrentEffect(d);
+              TrimEffectMax();
+              midiif.SendCurrentPatch();
+            }
+          }
+          ev.preventDefault();
+        };
+      }
+    };
+    for(var j=0;j<9;++j){
+      var c="f"+(i+1)+"p"+(j+1);
+      var k=document.getElementById(c+"k");
+      var s=document.getElementById(c+"s");
+      k.valuetip=0;
+      k.onchange = function(k){
+        var f=parseInt(k.target.id[1]);
+        var p=parseInt(k.target.id[3]);
+        SetCurrentEffect(f-1);
+        if(k.target.tab){
+          var v=k.target.tab[k.target.value|0];
+          SetParamVal(currentpatch,f-1,p+1,v);
+        }
+        else
+          SetParamVal(currentpatch,f-1,p+1,k.target.value);
+        DispPatch();
+        midiif.SendCurrentPatch();
+      }
+      if(s)
+        s.onchange=function(s){
+          var f=parseInt(s.target.id[1]);
+          var p=parseInt(s.target.id[3]);
+          SetCurrentEffect(f-1);
+          SetParamVal(currentpatch,f-1,p+1,s.target.value);
+          DispPatch();
+          midiif.SendCurrentPatch();
+        }
+    }
+  }
+  var p=document.getElementById("efpanel0");
+  for(var id in effectlist){
+    var ef=effectlist[id];
+    var e=document.createElement("div");
+    e.innerHTML="<img src='./images/"+ef.name.replace(/ /g,"_")+".png' draggable='false'/><div>"+ef.name+"</div>";
+    e.setAttribute("class","efitem");
+    var div=document.getElementById("ef"+ef.group);
+    if(div){
+      div.appendChild(e);
+      e.id="e_"+id;
+      e.onclick=function(ev){
+        if(document.getElementById("effectpanelmsg").innerHTML!="Install Check"){
+          var id=ev.target.id;
+          if(!id)
+            id=ev.target.parentNode.id;
+          var ef=GetEffectFromId(id.substring(2));
+          SetEffect(currentpatch,currenteffect,ef);
+          SetCurrentEffect(currenteffect);
+          TrimEffectMax();
+          EffectPanelCancel();
+          midiif.SendCurrentPatchVerify(null,function(s){
+            alert("Effect "+s+" is not installed.");
+          });
+        }
+      }
+    }
+  }
+  ShowDoc(GetLang()=="ja"?"ja":"en");
+  inst=new InstallChecker();
+  document.addEventListener("click",function(ev){
+    PopupEffectCancel();
+    PopupPatchCancel();
+    PopupPatchCancel2();
+  });
+  document.addEventListener("keydown",function(ev){
+    if(ready){
+      var p;
+      if(document.getElementById("inputpanel").style.display=="block" || document.getElementById("confirmpanel").style.display=="block")
+        return;
+      if(ev.ctrlKey||ev.altKey)
+        return;
+      if(ev.key=="ArrowLeft" || ev.key=="ArrowRight"){
+        p=currentpatch;
+        if(ev.key=="ArrowLeft"){
+          if(--p<0)
+            p=49;
+        }
+        else{
+          if(++p>=50)
+            p=0;
+        }
+        SelectPatch(p);
+        ev.preventDefault();
+      }
+      var p=patchkeymap.indexOf(ev.key);
+      if(p>=0){
+        SelectPatch(p);
+        ev.preventDefault();
+      }
+      var e=effectkeymap.indexOf(ev.key);
+      if(e>=0){
+        SetCurrentEffect(e);
+        ToggleEffect(e);
+        ev.preventDefault();
+      }
+    }
+  });
+}
+function Scan(){
+  midiif.StartScan();
 }
 function StateChange(){
   console.log("StateChange");
@@ -1877,16 +1888,16 @@ function PopupEffectDelete(){
   document.getElementById("confirmok").onclick=function(ev){
     for(var j=currenteffect;j<5;++j){
       for(var i=0;i<11;++i){
-        SetParamVal(j,i,GetParamVal(j+1,i));
+        SetParamVal(currentpatch,j,i,GetParamVal(currentpatch,j+1,i));
       }
     }
-    SetParamVal(5,0,1);
+    SetParamVal(currentpatch,5,0,1);
     for(var i=1;i<10;++i)
-      SetParamVal(5,i,0);
+      SetParamVal(currentpatch,5,i,0);
     TrimEffectMax();
     SetCurrentEffect(currenteffect);
     DispPatch();
-    isdirty=true;
+    midiif.SendCurrentPatch();
     ev.target.parentNode.style.display="none";
   };
   var rc=tar.getBoundingClientRect();
@@ -1899,39 +1910,39 @@ function PopupEffectReplace(){
   document.getElementById("effectpanelbase").style.display="block";
 }
 function PopupEffectInsert(){
-  if(GetEffectId(5)!=0)
+  if(GetEffectId(currentpatch,5)!=0)
     return;
   for(var j=5;j>currenteffect;--j){
     for(var k=0;k<11;++k){
-      SetParamVal(j,k,GetParamVal(j-1,k));
+      SetParamVal(currentpatch,j,k,GetParamVal(currentpatch,j-1,k));
     }
   }
-  SetParamVal(currenteffect,0,1);
+  SetParamVal(currentpatch,currenteffect,0,1);
   for(var k=1;k<11;++k)
-    SetParamVal(currenteffect,k,0);
+    SetParamVal(currentpatch,currenteffect,k,0);
   TrimEffectMax();
   DispPatch();
   SetCurrentEffect(currenteffect);
-  isdirty=true;
+  midiif.SendCurrentPatch();
   PopupEffectCancel();
 }
 function PopupEffectUp(){
   if(currenteffect>0){
-    var e=GetEffect(currenteffect);
-    SetEffect(currenteffect,GetEffect(currenteffect-1));
-    SetEffect(currenteffect-1,e);
+    var e=GetEffect(currentpatch,currenteffect);
+    SetEffect(currentpatch,currenteffect,GetEffect(currentpatch,currenteffect-1));
+    SetEffect(currentpatch,currenteffect-1,e);
     TrimEffectMax();
-    isdirty=true;
+    midiif.SendCurrentPatch();
   }
   PopupEffectCancel();
 }
 function PopupEffectDown(){
   if(currenteffect<5){
-    var e=GetEffect(currenteffect);
-    SetEffect(currenteffect,GetEffect(currenteffect+1));
-    SetEffect(currenteffect+1,e);
+    var e=GetEffect(currentpatch,currenteffect);
+    SetEffect(currentpatch,currenteffect,GetEffect(currentpatch,currenteffect+1));
+    SetEffect(currentpatch,currenteffect+1,e);
     TrimEffectMax();
-    isdirty=true;
+    midiif.SendCurrentPatch();
   }
   PopupEffectCancel();
 }
@@ -1946,7 +1957,6 @@ function PopupPatchCancel2(){
   document.getElementById("popuppatch2").style.display="none";
 }
 function PopupPatchMenu(tar){
-//  tar.style.background="#aaf";
   var rc=tar.getBoundingClientRect();
   var e=document.getElementById("popuppatch");
   e.style.display="block";
@@ -1957,8 +1967,6 @@ function PopupPatchCancel(){
   var e=document.getElementById("popuppatch");
   e.style.display="none";
   if(dragtarget){
-//    dragtarget.style.background="#ccf";
-//    dragtarget.style.color="#000";
     dragtarget=null;
   }
 }
@@ -1993,7 +2001,7 @@ function PopupPatchPaste(){
     patches[currentpatch].name=MakeName(clipboard);
     document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
     DispPatch();
-    isdirty=true;
+    midiif.SendCurrentPatch();
   }
   PopupPatchCancel2();
 }
@@ -2007,7 +2015,7 @@ function PopupPatchDelete(){
       patches[currentpatch].name=MakeName(emptypatch);
       document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
       DispPatch();
-      isdirty=true;
+      midiif.SendCurrentPatch();
     }
   );
   var rc=tar.getBoundingClientRect();
@@ -2039,7 +2047,7 @@ function PopupPatchRename(){
     for(i=8;i<=9;++i)
       patches[p].data[134+i]=name.charCodeAt(i);
     document.getElementById((p+1)+"nam").innerHTML=name;
-    isdirty=true;
+    midiif.SendCurrentPatch();
     document.getElementById("inputpanel").style.display="none";
   };
 }
@@ -2047,8 +2055,8 @@ function SelectPort(){
   if(midioutputs.length>0)
     midiout=midioutputs[document.getElementById("midiport").selectedIndex];
 }
-function GetEffectId(n){
-  return GetParamVal(n,1);
+function GetEffectId(p,n){
+  return GetParamVal(p,n,1);
 }
 var bits=[
   [ //eff0
@@ -2130,8 +2138,8 @@ var bits=[
     [[127,0x7f,0],[125,0x20,2]],
   ]
 ];
-function GetParamVal(n,param){
-  var pat=patches[currentpatch];
+function GetParamVal(p,n,param){
+  var pat=patches[p];
   if(!pat)
     return 0;
   var b=bits[n][param];
@@ -2147,8 +2155,8 @@ function GetParamVal(n,param){
   }
   return val;
 }
-function SetParamVal(n,param,val){
-  var pat=patches[currentpatch];
+function SetParamVal(p,n,param,val){
+  var pat=patches[p];
   if(!pat)
     return 0;
   var b=bits[n][param];
@@ -2192,7 +2200,7 @@ function SetEffectMax(n){
 function TrimEffectMax(){
   var i;
   for(i=5;i>0;--i){
-    if(GetEffectId(i)!=0)
+    if(GetEffectId(currentpatch,i)!=0)
       break;
   }
   SetEffectMax(i+1);
@@ -2209,46 +2217,48 @@ function GetEffectFromId(id){
     ef.push(0);
   return ef;
 }
-function GetEffect(n){
+function GetEffect(p,n){
   var ef=[];
   for(var i=0;i<11;++i)
-    ef.push(GetParamVal(n,i));
+    ef.push(GetParamVal(p,n,i));
   return ef;
 }
-function SetEffect(n,ef){
+function SetEffect(p,n,ef){
   for(var i=0;i<11;++i){
-    SetParamVal(n,i,ef[i]);
+    SetParamVal(p,n,i,ef[i]);
   }
   DispPatch();
 }
-function GetEffectParams(n){
+function GetEffectParams(p,n){
   var r=[];
   for(var i=0;i<9;++i)
-    r.push(GetParamVal(n,i));
+    r.push(GetParamVal(p,n,i));
   return r;
 }
-function GetEffectState(n){
-  return GetParamVal(n,0);
+function GetEffectState(p,n){
+  return GetParamVal(p,n,0);
 }
-function SetEffectState(n,on){
-  SetParamVal(n,0,on?1:0);
-  var id=GetEffectId(n);
-  var ef=effectlist[id];
-  var c=document.getElementById("fnam"+(n+1));
-  if(ef && id!=0 && on)
-    c.classList.add("press");
-  else
-    c.classList.remove("press");
+function SetEffectState(p,n,on){
+  SetParamVal(p,n,0,on?1:0);
+  if(p==currentpatch){
+    var id=GetEffectId(p,n);
+    var ef=effectlist[id];
+    var c=document.getElementById("fnam"+(n+1));
+    if(ef && id!=0 && on)
+      c.classList.add("press");
+    else
+      c.classList.remove("press");
+  }
 }
 function ToggleEffect(n){
-  SetEffectState(n,GetEffectState(n)^1);
-  isdirty=true;
+  SetEffectState(currentpatch, n,GetEffectState(currentpatch,n)^1);
+  midiif.SendCurrentPatch();
 }
 function DispPatch(){
   var n,p,cell;
   var tab=document.getElementById("effects");
   for(n=0;n<6;++n){
-    var id=GetEffectId(n);
+    var id=GetEffectId(currentpatch,n);
     var ef=effectlist[id];
     var c=document.getElementById("fnam"+(n+1));
     var t=document.getElementById("ftxt"+(n+1));
@@ -2260,7 +2270,7 @@ function DispPatch(){
       t.innerHTML=ef.name;
     else
       t.innerHTML="unknown";
-    if(ef && id!=0 && GetEffectState(n))
+    if(ef && id!=0 && GetEffectState(currentpatch,n))
       c.classList.add("press");
     else
       c.classList.remove("press");
@@ -2282,7 +2292,7 @@ function DispPatch(){
           es.style.display="none";
           ek.style.display="block";
         }
-        var v=GetParamVal(n,p+2);
+        var v=GetParamVal(currentpatch,n,p+2);
         if(typeof(ef.param[p].max)=="object"){
           for(var k=ef.param[p].max.length-1;k>=0;--k){
             if(ef.param[p].max[k]==v){
@@ -2330,7 +2340,7 @@ function SelectPatch(p){
     return;
   SelPatchList(0);
   if(midiout)
-    midiout.send([0xc0,p]);
+    midiif.Send([0xc0,p]);
   currentpatch=p;
   SelPatchList(1);
   DispPatch();
@@ -2346,24 +2356,57 @@ function SelPatchList(f){
 }
 function SendPatch(p){
   p=parseInt(p);
-  if(midiout)
-    midiout.send(patches[p].data);
-}
-function DumpPatches(){
-  if(!midiout)
-    return;
-  midiout.send([0xc0,0]);
-  patches=[];
-  patchscan=0;
-  midiout.send([0xf0,0x52,0,0x58,0x29,0xf7]);
+  midiif.Send(patches[p].data);
 }
 function Edit(p){
   if(!midiout)
     return;
   if(p)
-    midiout.send([0xf0,0x52,0x00,0x58,0x50,0xf7]);
+    midiif.Send([0xf0,0x52,0x00,0x58,0x50,0xf7]);
   else
-    midiout.send([0xf0,0x52,0x00,0x58,0x51,0xf7]);
+    midiif.Send([0xf0,0x52,0x00,0x58,0x51,0xf7]);
+}
+function InstallChecker(){
+  this.list=[];
+  this.n=0;
+  this.norg=0;
+  this.porg=null;
+  this.Start=function(){
+    this.norg=currentpatch;
+    SelectPatch(49);
+    this.porg=patches[this.norg].data.slice(0);
+    this.n=0;
+    for(var id in effectlist){
+      if(effectlist[id].install==0)
+        this.list.push(parseInt(id));
+    }
+    if(this.list.length>0)
+    document.getElementById("instchk").style.display="block";
+  };
+  this.timer=function(){
+    if(this.list.length<=0)
+      return;
+    document.getElementById("instchkmsg").innerHTML="Effect Install Check...("+this.list.length+")";
+    while(this.n<5&&this.list.length>0){
+      SetEffect(currentpatch,this.n,GetEffectFromId(this.list.shift()));
+      ++this.n;
+    }
+    this.n=0;
+    midiif.SendCurrentPatchVerify(null);
+    if(this.list.length<=0){
+      setTimeout(function(){
+        midiif.Send(this.porg);
+        SelectPatch(this.norg);
+        document.getElementById("instchk").style.display="none";
+      }.bind(this),500);
+    }
+  };
+  setInterval(this.timer.bind(this),500);
+}
+function InstallCheck(){
+  document.getElementById("effectpanelmsg").innerHTML="Install Check";
+  document.getElementById("effectpanelbase").style.display="block";
+  inst.Start();
 }
 function Usage(){
   var e=document.getElementById("usage");
@@ -2396,12 +2439,7 @@ function LoadBank(){
     reader.readAsText(file[0]);
     reader.onload=function(ev){
       console.log(reader.result);
-/*      patches[p].data=MakeBin(reader.result);
-      patches[p].name=MakeName(patches[p].data);
-      document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
-      SelectPatch(p);
-      SendPatch(p);
-*/    }
+    }
   },false);
 }
 function Save(){
@@ -2711,7 +2749,7 @@ img{
   height:12px;
   margin:2px 0px 0px 0px;
   text-align: center;
-  font-size:10px;
+  font-size:11px;
   font-weight:normal;
   border-radius:3px;
 }
@@ -2763,7 +2801,7 @@ img{
 .pcell{
   display:flex;
   font-size:12px;
-  font-weight:normal;
+  font-weight:bold;
 }
 input{
   width:45%;
@@ -2832,6 +2870,12 @@ webaudio-switch{
   cursor:pointer;
   background:linear-gradient(#ddf,#cce);
 }
+.notinstall{
+  background:linear-gradient(#fdd,#ecc);
+}
+.install{
+  background:linear-gradient(#dfd,#cec);
+}
 .efitem img{
   display:block;
   width:64px;
@@ -2847,6 +2891,20 @@ webaudio-switch{
 .efitem div{
   padding:0px 4px;
 }
+#instchk{
+  display:none;
+  position:absolute;
+  left:300px;
+  top:250px;
+  width:400px;
+  height:100px;
+  padding:10px;
+  background:#ccf;
+  border:1px solid #000;
+  box-shadow:2px 2px 2px 2px rgba(0,0,0,0.4);
+  padding:10px;
+}
+
 #usage{
   display:none;
   position:absolute;
@@ -2880,6 +2938,54 @@ webaudio-switch{
   margin:10px auto;
   overflow-y:scroll;
 }
+#instchk{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.3);
+}
+#instchkpanel{
+  position:absolute;
+  top:0;
+  bottom:0;
+  right:0;
+  left:0;
+  margin:auto;
+  background:#ccf;
+  border:1px solid #000;
+  border-radius: 5px;
+  width:400px;
+  height:50px;
+  padding:5px;
+  text-align:center;
+  line-height:50px;
+}
+#scanning{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.3);
+}
+#scanningpanel{
+  position:absolute;
+  top:0;
+  bottom:0;
+  right:0;
+  left:0;
+  margin:auto;
+  background:#ccf;
+  border:1px solid #000;
+  border-radius: 5px;
+  width:400px;
+  height:50px;
+  padding:5px;
+  text-align:center;
+  line-height:50px;
+}
 #splash{
   position:absolute;
   left:0px;
@@ -2896,7 +3002,7 @@ webaudio-switch{
   left:0;
   margin:auto;
   background:#ccf;
-  border:1px solid:#000;
+  border:1px solid #000;
   border-radius: 5px;
   width:1060px;
   height:550px;
@@ -2916,9 +3022,10 @@ webaudio-switch{
     <div id="mainmenu">
       <ul>
         <li>MidiPort : <select id="midiport" onchange="SelectPort()"></select></li>
-        <li>Status : <span id="msg">Not Initialized</span></li>
+<!--        <li>Status : <span id="msg">Not Initialized</span></li>-->
         <li><hr/></li>
         <li><button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button></li>
+        <li><button class="menubtn" id="usagebtn" onclick="InstallCheck()">Install Check</button></li>
         <li><button class="menubtn" id="usagebtn" onclick="Usage()">How To Use</button></li>
       </ul>
     </div>
@@ -3142,6 +3249,7 @@ webaudio-switch{
         </div>
       </div>
       <button onclick="EffectPanelCancel()" style="width:120px;height:30px;margin:5px">Cancel</button>
+      <button onclick="inst.Start()" style="width:120px;height:30px;margin:5px">Install Check</button>
     </div>
   </div>
 
@@ -3227,6 +3335,18 @@ webaudio-switch{
         </div>
       </div>
       <button onclick="Usage()">close</button>
+    </div>
+  </div>
+
+  <div id="instchk">
+    <div id="instchkpanel">
+      <div id="instchkmsg">Install Checking...</div>
+    </div>
+  </div>
+
+  <div id="scanning">
+    <div id="scanningpanel">
+      <div id="scanningmsg">Scanning...</div>
     </div>
   </div>
 
