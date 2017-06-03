@@ -1454,7 +1454,7 @@ function MidiIf(ma){
       }
     }
     var cmd=midirecv.substr(0,2);
-    if(midirecv.substr(0,10)=="f052005831"){
+    if(midirecv.indexOf("f052005831")==0){
       if(ev.data[6]==0)
         SetEffectState(currentpatch,ev.data[5],0);
       if(ev.data[6]>=2){
@@ -1463,11 +1463,17 @@ function MidiIf(ma){
         DispPatch();
       }
     }
-    if(midirecv.substr(0,10)=="f052005828"){
+    else if(midirecv.indexOf("f07e0006025258")==0){
+      var v=String.fromCharCode(ev.data[10],ev.data[11],ev.data[12],ev.data[13]);
+      document.getElementById("firmver").innerHTML=v;
+    }
+    else if(midirecv.indexOf("f052005828")==0){
       var name=MakeName(ev.data);
       if(this.scan>=0){
         document.getElementById("scanningmsg").innerHTML="Scanning Patches...("+this.scan+"/50)";
-        patches[this.scan++]={name:name,data:ev.data};
+        patches[this.scan]={name:name,data:ev.data};
+        document.getElementById((this.scan+1)+"nam").innerHTML=patches[this.scan].name;
+        ++this.scan;
         if(this.scan>49){
           this.scan=-1;
           this.ready=1;
@@ -1501,64 +1507,6 @@ function MidiIf(ma){
               PopupEffectMenu(ev.target);
               ev.stopPropagation();
               ev.preventDefault();
-            };
-          }
-          for(i=0;i<50;++i){
-            for(var ii=0;ii<6;++ii){
-              var id=GetEffectId(i,ii);
-              if(id){
-                effectlist[id].install=1;
-                document.getElementById("e_"+id).classList.add("install");
-              }
-            }
-            var cell=document.getElementById((i+1)+"nam");
-            var btn=document.getElementById((i+1)+"btn");
-            cell.innerHTML=patches[i].name;
-            cell.oncontextmenu=function(ev){
-              PopupPatchMenu2(ev.target);
-              ev.preventDefault();
-            };
-            cell.onmousedown=function(ev){
-              document.getElementById("popuppatch").style.display="none";
-              SelectPatch(parseInt(ev.target.id)-1);
-            };
-            btn.onmousedown=function(ev){
-              document.getElementById("popuppatch").style.display="none";
-              SelectPatch(parseInt(ev.target.id)-1);
-            }
-            btn.onclick=btn.oncontextmenu=function(ev){
-              PopupPatchMenu2(ev.target);
-              ev.stopPropagation();
-              ev.preventDefault();
-            };
-            cell.draggable=true;
-            cell.ondragstart=function(ev){
-              ev.dataTransfer.setData("text",ev.target.id);
-              this.classList.add("drag");
-              for(var j=0;j<50;++j){
-                var c=document.getElementById((j+1)+"nam");
-                c.ondragenter=function(ev){this.classList.add("over");};
-                c.ondragleave=function(ev){this.classList.remove("over");};
-                c.ondragover=function(ev){ev.preventDefault();};
-                c.ondrop=function(ev){
-                  this.classList.remove("over");
-                  var s=parseInt(event.dataTransfer.getData("text"));
-                  var d=parseInt(ev.target.id);
-                  if(s!=d){
-                    PopupPatchMenu(ev.target);
-                    dragtarget=ev.target;
-                  }
-                  ev.preventDefault();
-                };
-                c.ondragend=function(ev){
-                  this.classList.remove("over");
-                  this.classList.remove("drag");
-                  for(var jj=0;jj<50;++jj){
-                    cc=document.getElementById((jj+1)+"nam");
-                    cc.ondragenter=cc.ondragleave=cc.ondragover=cc.ondrop=cc.ondragend=null;
-                  }
-                };
-              }
             };
           }
         }
@@ -1837,6 +1785,64 @@ function Init(){
           midiif.SendCurrentPatch();
         }
     }
+  }
+  for(i=0;i<50;++i){
+    for(var ii=0;ii<6;++ii){
+      var id=GetEffectId(i,ii);
+      if(id){
+        effectlist[id].install=1;
+        document.getElementById("e_"+id).classList.add("install");
+      }
+    }
+    var cell=document.getElementById((i+1)+"nam");
+    var btn=document.getElementById((i+1)+"btn");
+//    cell.innerHTML=patches[i].name;
+    cell.oncontextmenu=function(ev){
+      PopupPatchMenu2(ev.target);
+      ev.preventDefault();
+    };
+    cell.onmousedown=function(ev){
+      document.getElementById("popuppatch").style.display="none";
+      SelectPatch(parseInt(ev.target.id)-1);
+    };
+    btn.onmousedown=function(ev){
+      document.getElementById("popuppatch").style.display="none";
+      SelectPatch(parseInt(ev.target.id)-1);
+    }
+    btn.onclick=btn.oncontextmenu=function(ev){
+      PopupPatchMenu2(ev.target);
+      ev.stopPropagation();
+      ev.preventDefault();
+    };
+    cell.draggable=true;
+    cell.ondragstart=function(ev){
+      ev.dataTransfer.setData("text",ev.target.id);
+      this.classList.add("drag");
+      for(var j=0;j<50;++j){
+        var c=document.getElementById((j+1)+"nam");
+        c.ondragenter=function(ev){this.classList.add("over");};
+        c.ondragleave=function(ev){this.classList.remove("over");};
+        c.ondragover=function(ev){ev.preventDefault();};
+        c.ondrop=function(ev){
+          this.classList.remove("over");
+          var s=parseInt(event.dataTransfer.getData("text"));
+          var d=parseInt(ev.target.id);
+          if(s!=d){
+            PopupPatchMenu(ev.target);
+            dragtarget=ev.target;
+          }
+          ev.preventDefault();
+        };
+        c.ondragend=function(ev){
+          this.classList.remove("over");
+          this.classList.remove("drag");
+          for(var jj=0;jj<50;++jj){
+            cc=document.getElementById((jj+1)+"nam");
+            cc.ondragenter=cc.ondragleave=cc.ondragover=cc.ondrop=cc.ondragend=null;
+          }
+        };
+      }
+    };
   }
   var p=document.getElementById("efpanel0");
   for(var id in effectlist){
@@ -3157,6 +3163,7 @@ webaudio-switch{
       <ul>
         <li>MidiPort : <select id="midiport" onchange="SelectPort()"></select></li>
         <li>Status : <span id="msg">Not Initialized</span></li>
+        <li>Firmware : <span id="firmver"></span></li>
         <li><hr/></li>
         <li><button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button></li>
         <li><button class="menubtn" id="usagebtn" onclick="InstallCheck()">Install Check</button></li>
