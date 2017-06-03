@@ -43,7 +43,6 @@
 
 var midiif=null;
 var midioutputs=[];
-var midiout=null;
 var midiin=null;
 var midirecv="";
 var patches=[];
@@ -1427,12 +1426,14 @@ var effectlist={
 
 function MidiIf(ma){
   this.midiaccess=ma;
+  this.midiout=null;
   this.que=[];
   this.scan=-1;
   this.dump=1;
   this.supress=0;
   this.waitdata=null;
   this.callback=null;
+  this.ready=0;
   this.recv=function(ev){
     midirecv=MakeStr(ev.data);
     switch(this.dump){
@@ -1469,10 +1470,11 @@ function MidiIf(ma){
         patches[this.scan++]={name:name,data:ev.data};
         if(this.scan>49){
           this.scan=-1;
+          this.ready=1;
           SelectPatch(currentpatch);
           DispPatch();
           document.getElementById("scanning").style.display="none";
-//          document.getElementById("msg").innerHTML="Ready";
+          document.getElementById("msg").innerHTML="Ready";
           ready=true;
           for(i=0;i<6;++i){
             var cell=document.getElementById("fnam"+(i+1));
@@ -1587,7 +1589,12 @@ function MidiIf(ma){
     }
   };
   this.StartScan=function(){
+    console.log("StartScan")
+    if(!this.midiout)
+      return;
+    this.SendDirect([0xb0,0,0]);
     document.getElementById("scanning").style.display="block";
+    this.SendDirect([0xf0,0x52,0x00,0x58,0x50,0xf7]);
     this.scan=0;
     this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0",function(){
       this.que.push([0xf0,0x52,0x00,0x58,0x50,0xf7]);
@@ -1596,8 +1603,8 @@ function MidiIf(ma){
     }.bind(this));
   };
   this.SendDirect=function(d){
-//    console.log("senddirect",MakeStr(d))
-    midiout.send(d);
+    if(this.midiout)
+      this.midiout.send(d);
   };
   this.Send=function(d){
     this.que.push(d);
@@ -1635,6 +1642,8 @@ function MidiIf(ma){
     this.SendDirect(sd);
   };
   this.timer=function(){
+    if(!this.midiout)
+      return;
     if(this.supress){
       console.log("supress")
       return;
@@ -1650,29 +1659,45 @@ function MidiIf(ma){
       var d=this.que.shift();
       this.SendDirect(d);
     }
-    else
-      this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0");
-  };
-  var i=0;
-  var outputIterator=this.midiaccess.outputs.values();
-  for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
-      midioutputs[i]=o.value;
-      var op=new Option(o.value.name);
-      if(o.value.name=="ZOOM MS Series")
-        op.selected=true;
-      document.getElementById("midiport").options[i]=op;
-      i++;
-  }
-  SelectPort();
-  if(!midiout)
-    alert("MIDI port is not found.");
-  var inputIterator=this.midiaccess.inputs.values();
-  for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
-    if(ip.value.name==="ZOOM MS Series"){
-      console.log(ip.value);
-      ip.value.addEventListener("midimessage",this.recv.bind(this));
+    else{
+      if(this.ready)
+        this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0");
     }
-  }
+  };
+  this.PortScan=function(){
+    midioutputs=[];
+    document.getElementById("midiport").innerHTML="";
+    var i=0;
+    var outputIterator=this.midiaccess.outputs.values();
+    for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
+        midioutputs[i]=o.value;
+        var op=new Option(o.value.name);
+        if(o.value.name=="ZOOM MS Series")
+          op.selected=true;
+        else
+          op.disabled=true;
+        document.getElementById("midiport").options[i]=op;
+        i++;
+    }
+    var inputIterator=this.midiaccess.inputs.values();
+    for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
+      if(ip.value.name==="ZOOM MS Series"){
+        ip.value.addEventListener("midimessage",this.recv.bind(this));
+      }
+    }
+  };
+  this.SelectPort=function(){
+    var idx=document.getElementById("midiport").selectedIndex;
+    if(idx>=0 && midioutputs.length>0){
+      this.midiout=midioutputs[idx];
+      if(this.midiout.name!="ZOOM MS Series")
+        this.midiout=null;
+    }
+  };
+  this.PortScan();
+  this.SelectPort();
+  if(!this.midiout)
+    alert("MIDI port is not found.");
   this.timerid=setInterval(this.timer.bind(this),70);
 }
 
@@ -2119,8 +2144,9 @@ function PopupPatchRename(){
 }
 function SelectPort(){
   if(midioutputs.length>0){
-    midiout=midioutputs[document.getElementById("midiport").selectedIndex];
-    midiout.send([0xf0,0x52,0x00,0x58,0x50,0xf7]);
+    midiif.midiout=midioutputs[document.getElementById("midiport").selectedIndex];
+    if(midiif.midiout && midiif.midiout.name!="ZOOM MS Series")
+      midiif.midiout=null;
   }
 }
 function GetEffectId(p,n){
@@ -2407,7 +2433,7 @@ function SelectPatch(p){
   if(p<0)
     return;
   SelPatchList(0);
-  if(midiout)
+  if(midiif.midiout)
     midiif.Send([0xc0,p]);
   currentpatch=p;
   SelPatchList(1);
@@ -2427,7 +2453,7 @@ function SendPatch(p){
   midiif.Send(patches[p].data);
 }
 function Edit(p){
-  if(!midiout)
+  if(!midiif.midiout)
     return;
   if(p)
     midiif.Send([0xf0,0x52,0x00,0x58,0x50,0xf7]);
@@ -2596,9 +2622,9 @@ body{
   font-family: 'Open Sans', sans-serif;
   font-size:14px;
   font-weight:bold;
-  border-radius:10px;
+  border-radius:5px;
   width:1100px;
-  height:650px;
+  height:570px;
   margin:auto;
   padding:1px 20px 40px 20px;
   background:url(./images/bg.png);
@@ -2606,7 +2632,7 @@ body{
   border-bottom:3px solid #666;
   border-left:3px solid #fff;
   border-top:3px solid #fff;
-  box-shadow:3px 3px 3px 4px rgba(0,0,0,0.4);
+  box-shadow:3px 3px 3px 4px rgba(0,0,0,0.3);
 }
 #info{
   font-size:10px;
@@ -2717,7 +2743,7 @@ img{
 }
 #mainmenu{
   position:absolute;
-  width:190px;
+  width:220px;
   left:15px;
   top:80px;
 }
@@ -2733,9 +2759,9 @@ img{
 }
 #patchesbase{
   position:absolute;
-  left:230px;
-  top:105px;
-  width:830px;
+  left:280px;
+  top:90px;
+  width:800px;
   background:linear-gradient(#a0b0d0,#9caccc);
   border-top:5px solid #666;
   border-left:12px solid #888;
@@ -2747,24 +2773,33 @@ img{
   margin:0px 15px 0px auto;
 }
 #patches{
+  margin:0;
+  padding:0;
   border-collapse: collapse;
 }
+#patches tr{
+  margin:0;
+  padding:0;
+}
 #patches td{
-  background:none;
-  border:none;
+  margin:0;
+  padding:0;
 }
 #patches button{
   width:30px;
-  height:22px;
-  margin:0px 1px 0px 10px;
+  height:20px;
+  margin:0px 0px 0px 8px;
+  padding:0;
 }
 #patches div{
   display:inline-block;
-  padding:3px 3px 3px 8px;
+  margin:0;
+  padding:0;
+  padding:1px 3px 1px 8px;
   border:1px solid #8ab;
   background:linear-gradient(#b4c4e4,#b0c0e0);
   color:#124;
-  height:22px;
+  height:20px;
   width:120px;
   font-size:14px;
   line-height: 14px;
@@ -2787,18 +2822,18 @@ img{
 }
 #effects{
   position:absolute;
-  top:380px;
-  border-collapse:separate;
+  top:335px;
+  left:40px;
+  border-collapse:collapse;
   border-spacing:0px;
-  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.3);
 }
 #effects th {
   width:22px;
 }
 #effects td{
   width:100px;
-  height:42px;
-  border-spacing:12px;
+  height:32px;
   border:1px solid #888;
   cursor:default;
   background:url(./images/bg-grad.png);
@@ -2870,23 +2905,26 @@ img{
   display:flex;
   font-size:12px;
   font-weight:bold;
-  height:42px;
+  height:38px;
+  border:none;
+  padding:0;
+  margin:0;
   box-sizing: border-box;
 }
 .pfocus{
-  border:2px solid #c24;
+  border:1px solid #c88;
 }
 input{
   width:45%;
 }
 webaudio-knob{
   display:none;
-  width:32px;
+/*  width:32px;*/
   margin:4px 2px 0px 2px;
 }
 webaudio-switch{
   display:none;
-  width:32px;
+/*  width:32px;*/
 }
 #effectpanelbase{
   position:absolute;
@@ -2997,13 +3035,15 @@ webaudio-switch{
   height:500px;
   margin:auto;
   padding:10px;
-  border:0px solid #000;
-  background:#ccf;
   transition:0.5s;
   overflow:hidden;
   font-size:14px;
   font-weight: normal;
-  box-shadow:2px 2px 2px 2px rgba(0,0,0,0.4);
+  border:1px solid #006;
+  border-radius: 5px;
+  color:#006;
+  background:linear-gradient(#ccf,#b8b8e8);
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
 }
 #usagescr{
   width:850px;
@@ -3026,16 +3066,19 @@ webaudio-switch{
   right:0;
   left:0;
   margin:auto;
-  background:#ccf;
-  border:1px solid #000;
-  border-radius: 5px;
   width:400px;
-  height:50px;
-  padding:5px;
+  height:60px;
   text-align:center;
-  line-height:50px;
+  line-height:60px;
+  padding:5px;
+  border:1px solid #006;
+  border-radius: 5px;
+  color:#006;
+  background:linear-gradient(#ccf,#b8b8e8);
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
 }
 #scanning{
+  display:none;
   position:absolute;
   left:0;
   top:0;
@@ -3050,14 +3093,16 @@ webaudio-switch{
   right:0;
   left:0;
   margin:auto;
-  background:#ccf;
-  border:1px solid #000;
-  border-radius: 5px;
   width:400px;
-  height:50px;
-  padding:5px;
+  height:60px;
   text-align:center;
-  line-height:50px;
+  line-height:60px;
+  padding:5px;
+  border:1px solid #006;
+  border-radius: 5px;
+  color:#006;
+  background:linear-gradient(#ccf,#b8b8e8);
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
 }
 #splash{
   position:absolute;
@@ -3074,13 +3119,15 @@ webaudio-switch{
   right:0;
   left:0;
   margin:auto;
-  background:#ccf;
-  border:1px solid #000;
-  border-radius: 5px;
   width:1060px;
   height:550px;
-  padding:5px;
   text-align:center;
+  padding:5px;
+  border:1px solid #006;
+  border-radius: 5px;
+  color:#006;
+  background:linear-gradient(#ccf,#b8b8e8);
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
 }
 </style>
 </head>
@@ -3095,7 +3142,7 @@ webaudio-switch{
     <div id="mainmenu">
       <ul>
         <li>MidiPort : <select id="midiport" onchange="SelectPort()"></select></li>
-<!--        <li>Status : <span id="msg">Not Initialized</span></li>-->
+        <li>Status : <span id="msg">Not Initialized</span></li>
         <li><hr/></li>
         <li><button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button></li>
         <li><button class="menubtn" id="usagebtn" onclick="InstallCheck()">Install Check</button></li>
