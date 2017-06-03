@@ -2107,6 +2107,7 @@ function PopupPatchDelete(){
       document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
       DispPatch();
       midiif.SendCurrentPatch();
+      ev.target.parentNode.style.display="none";
     }
   );
   var rc=tar.getBoundingClientRect();
