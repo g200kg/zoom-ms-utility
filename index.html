@@ -1592,15 +1592,19 @@ function MidiIf(ma){
     console.log("StartScan")
     if(!this.midiout)
       return;
-    this.SendDirect([0xb0,0,0]);
-    document.getElementById("scanning").style.display="block";
-    this.SendDirect([0xf0,0x52,0x00,0x58,0x50,0xf7]);
-    this.scan=0;
-    this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0",function(){
-      this.que.push([0xf0,0x52,0x00,0x58,0x50,0xf7]);
-      this.que.push([0xc0,this.scan]);
-      this.que.push([0xf0,0x52,0,0x58,0x29,0xf7]);
-    }.bind(this));
+    this.SendDirect([0xf0,0x7e,0x00,0x06,0x01,0xf7]);
+    setTimeout(function(){
+      document.getElementById("scanning").style.display="block";
+      this.SendDirect([0xf0,0x52,0x00,0x58,0x50,0xf7]);
+      this.scan=0;
+      setTimeout(function(){
+        this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0",function(){
+          this.que.push([0xf0,0x52,0x00,0x58,0x50,0xf7]);
+          this.que.push([0xc0,this.scan]);
+          this.que.push([0xf0,0x52,0,0x58,0x29,0xf7]);
+        }.bind(this));
+      }.bind(this),100);
+    }.bind(this),100);
   };
   this.SendDirect=function(d){
     if(this.midiout)
