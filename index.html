@@ -2097,6 +2097,7 @@ function PopupPatchPaste(){
     document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
     DispPatch();
     midiif.SendCurrentPatch();
+    StorePatch(currentpatch);
   }
   PopupPatchCancel2();
 }
@@ -2111,6 +2112,7 @@ function PopupPatchDelete(){
       document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
       DispPatch();
       midiif.SendCurrentPatch();
+      StorePatch(currentpatch);
       ev.target.parentNode.style.display="none";
     }
   );
@@ -2144,6 +2146,7 @@ function PopupPatchRename(){
       patches[p].data[134+i]=name.charCodeAt(i);
     document.getElementById((p+1)+"nam").innerHTML=name;
     midiif.SendCurrentPatch();
+    StorePatch(currentpatch);
     document.getElementById("inputpanel").style.display="none";
   };
 }
@@ -2457,6 +2460,11 @@ function SendPatch(p){
   p=parseInt(p);
   midiif.Send(patches[p].data);
 }
+function StorePatch(p){
+  var cmd=[0xf0,0x52,0x00,0x58,0x32,0x01,0x00,0x00,0x2c,0x00,0x00,0x00,0x00,0x00,0xf7];
+  cmd[8]=p;
+  midiif.Send(cmd);
+}
 function Edit(p){
   if(!midiif.midiout)
     return;
@@ -2573,6 +2581,7 @@ function Load(){
       document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
       SelectPatch(p);
       SendPatch(p);
+      StorePatch(p);
     }
   },false);
 }
