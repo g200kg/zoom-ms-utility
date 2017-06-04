@@ -1449,7 +1449,7 @@ function MidiIf(ma){
       console.log(midirecv);
       break;
     }
-    if(ev.data[0]==0xc0){
+    if(!this.supress && ev.data[0]==0xc0){
       if(currentpatch!=ev.data[1]){
         SelPatchList(0);
         currentpatch=ev.data[1];
@@ -1457,7 +1457,6 @@ function MidiIf(ma){
         SelPatchList(1);
       }
     }
-    var cmd=midirecv.substr(0,2);
     if(midirecv.indexOf("f052005831")==0){
       if(ev.data[6]==0)
         SetEffectState(currentpatch,ev.data[5],0);
@@ -1533,10 +1532,12 @@ function MidiIf(ma){
     }
     if(this.waitdata){
       if(midirecv.indexOf(this.waitdata)==0){
+        console.log("waitdata:"+this.waitdata);
         this.supress=0;
         this.waitdata=null;
-        if(this.callback)
+        if(this.callback){
           this.callback();
+        }
       }
     }
   };
@@ -2472,6 +2473,7 @@ function SendPatch(p){
   midiif.Send(patches[p].data);
 }
 function StorePatch(p){
+  console.log("StorePatch");
   var cmd=[0xf0,0x52,0x00,0x58,0x32,0x01,0x00,0x00,0x2c,0x00,0x00,0x00,0x00,0x00,0xf7];
   cmd[8]=p;
   midiif.Send(cmd);
