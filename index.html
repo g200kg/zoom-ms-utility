@@ -1537,7 +1537,7 @@ function MidiIf(ma){
         this.supress=0;
         this.waitdata=null;
         if(this.callback){
-          this.callback();
+          this.callback(ev.data);
         }
       }
     }
@@ -1546,14 +1546,15 @@ function MidiIf(ma){
     console.log("StartScan")
     if(!this.midiout)
       return;
+    document.getElementById("waitmsg").innerHTML="";
+    document.getElementById("wait").style.display="block";
     this.SendDirect([0xf0,0x7e,0x00,0x06,0x01,0xf7]);
     setTimeout(function(){
-      document.getElementById("waitmsg").innerHTML="";
-      document.getElementById("wait").style.display="block";
       this.SendDirect([0xf0,0x52,0x00,0x58,0x50,0xf7]);
       this.scan=0;
       setTimeout(function(){
-        this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0",function(){
+        this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0",function(dat){
+          currentpatch=dat[1];
           this.que.push([0xf0,0x52,0x00,0x58,0x50,0xf7]);
           this.que.push([0xc0,this.scan]);
           this.que.push([0xf0,0x52,0,0x58,0x29,0xf7]);
