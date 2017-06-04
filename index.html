@@ -1475,7 +1475,8 @@ function MidiIf(ma){
       if(this.scan>=0){
         document.getElementById("waitmsg").innerHTML="Scanning Patches...("+this.scan+"/50)";
         patches[this.scan]={name:name,data:ev.data};
-        document.getElementById((this.scan+1)+"nam").innerHTML=patches[this.scan].name;
+//        document.getElementById((this.scan+1)+"nam").innerHTML=patches[this.scan].name;
+        DispPatchName(this.scan);
         ++this.scan;
         if(this.scan>49){
           this.scan=-1;
@@ -1801,9 +1802,15 @@ function Init(){
       }
     }
     var cell=document.getElementById((i+1)+"nam");
+    for(var f=0;f<6;++f){
+      var c=document.createElement("div");
+      c.setAttribute("style","right:"+(f*5)+"px");
+      c.id=(i+1)+"_"+(f+1);
+      c.setAttribute("class","eficon");
+      cell.parentNode.appendChild(c);
+    }
     var btn=document.getElementById((i+1)+"btn");
-//    cell.innerHTML=patches[i].name;
-    cell.oncontextmenu=function(ev){
+      cell.oncontextmenu=function(ev){
       PopupPatchMenu2(ev.target);
       ev.preventDefault();
     };
@@ -2090,7 +2097,8 @@ function PopupPatchExchange(){
   clipboard=patches[currentpatch].data.slice(0);
   patches[currentpatch].data=patches[dst].data.slice(0);
   patches[currentpatch].name=MakeName(patches[currentpatch].data);
-  document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
+//  document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
+  DispPatchName(currentpatch);
   SendPatch(currentpatch);
   SelectPatch(dst);
   PopupPatchPaste();
@@ -2106,7 +2114,8 @@ function PopupPatchPaste(){
   if(clipboard){
     patches[currentpatch].data=clipboard.slice(0);
     patches[currentpatch].name=MakeName(clipboard);
-    document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
+//    document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
+    DispPatchName(currentpatch);
     DispPatch();
     midiif.SendCurrentPatch();
     StorePatch(currentpatch);
@@ -2121,7 +2130,8 @@ function PopupPatchDelete(){
     function(ev){
       patches[currentpatch].data=emptypatch.slice(0);
       patches[currentpatch].name=MakeName(emptypatch);
-      document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
+      DispPatchName(currentpatch);
+//      document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
       DispPatch();
       midiif.SendCurrentPatch();
       StorePatch(currentpatch);
@@ -2156,7 +2166,8 @@ function PopupPatchRename(){
       patches[p].data[133+i]=name.charCodeAt(i);
     for(i=8;i<=9;++i)
       patches[p].data[134+i]=name.charCodeAt(i);
-    document.getElementById((p+1)+"nam").innerHTML=name;
+  //  document.getElementById((p+1)+"nam").innerHTML=name;
+    DispPatchName(p);
     midiif.SendCurrentPatch();
     StorePatch(currentpatch);
     document.getElementById("inputpanel").style.display="none";
@@ -2367,6 +2378,17 @@ function SetEffectState(p,n,on){
 function ToggleEffect(n){
   SetEffectState(currentpatch, n,GetEffectState(currentpatch,n)^1);
   midiif.SendCurrentPatch();
+}
+function DispPatchName(p){
+  document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
+  for(var i=0;i<6;++i){
+    var id=GetParamVal(p,i,1);
+    var icon=document.getElementById((p+1)+"_"+(i+1));
+    if(id)
+      icon.classList.add("exist");
+    else
+      icon.classList.remove("exist");
+  }
 }
 function DispPatch(){
   var n,p,cell;
@@ -2582,14 +2604,19 @@ function LoadBank(){
     var reader=new FileReader();
     reader.readAsText(file[0]);
     reader.onload=function(ev){
+      if(reader.result.indexOf("1:f052005828")!=0){
+        alert("Bank file error");
+        return;
+      }
+      var s=reader.result.split("\n");
       document.getElementById("waitmsg").innerHTML="Storing...";
       document.getElementById("wait").style.display="block";
-      var s=reader.result.split("\n");
       for(var i=0;i<50;++i){
         s[i]=s[i].split(":");
         patches[i].data=MakeBin(s[i][1],146);
         patches[i].name=MakeName(patches[i].data);
-        document.getElementById((i+1)+"nam").innerHTML=patches[i].name;
+//        document.getElementById((i+1)+"nam").innerHTML=patches[i].name;
+        DispPatchName(i);
       }
       new StoreAll(function(){
         document.getElementById("wait").style.display="none";
@@ -2623,10 +2650,14 @@ function LoadPatch(){
     var reader=new FileReader();
     reader.readAsText(file[0]);
     reader.onload=function(ev){
-      console.log(reader.result);
+      if(reader.result.indexOf("f052005828")!=0){
+        alert("Patch file error");
+        return;
+      }
       patches[p].data=MakeBin(reader.result,146);
       patches[p].name=MakeName(patches[p].data);
-      document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
+//      document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
+      DispPatchName(p);
       SelectPatch(p);
       SendPatch(p);
       StorePatch(p);
@@ -2846,6 +2877,7 @@ img{
 #patches td{
   margin:0;
   padding:0;
+  position:relative;
 }
 #patches button{
   width:30px;
@@ -2853,7 +2885,7 @@ img{
   margin:0px 0px 0px 8px;
   padding:0;
 }
-#patches div{
+.pnam{
   display:inline-block;
   margin:0;
   padding:0;
@@ -2868,6 +2900,19 @@ img{
   vertical-align: middle;
   font-weight: bold;
   box-sizing:border-box
+}
+.eficon{
+  border:none;
+  width:3px;
+  padding:0px;
+  height:5px;
+  background:#88a;
+  position:absolute;
+  right:0px;
+  bottom:0px
+}
+.eficon.exist{
+  background:#f66;
 }
 #patches div:hover{
   background:linear-gradient(#cde,#bcd);
@@ -3179,74 +3224,74 @@ webaudio-switch{
     <div id="patchesbase">
       <table id="patches">
         <tr>
-          <td id="1"><button id="1btn">1</button><div id="1nam"></div></td>
-          <td id="11"><button id="11btn">11</button><div id="11nam"></div></td>
-          <td id="21"><button id="21btn">21</button><div id="21nam"></div></td>
-          <td id="31"><button id="31btn">31</button><div id="31nam"></div></td>
-          <td id="41"><button id="41btn">41</button><div id="41nam"></div></td>
+          <td id="1"><button id="1btn">1</button><div id="1nam" class="pnam"></div></td>
+          <td id="11"><button id="11btn">11</button><div id="11nam" class="pnam"></div></td>
+          <td id="21"><button id="21btn">21</button><div id="21nam" class="pnam"></div></td>
+          <td id="31"><button id="31btn">31</button><div id="31nam" class="pnam"></div></td>
+          <td id="41"><button id="41btn">41</button><div id="41nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="2"><button id="2btn">2</button><div id="2nam"></div></td>
-          <td id="12"><button id="12btn">12</button><div id="12nam"></div></td>
-          <td id="22"><button id="22btn">22</button><div id="22nam"></div></td>
-          <td id="32"><button id="32btn">32</button><div id="32nam"></div></td>
-          <td id="42"><button id="42btn">42</button><div id="42nam"></div></td>
+          <td id="2"><button id="2btn">2</button><div id="2nam" class="pnam"></div></td>
+          <td id="12"><button id="12btn">12</button><div id="12nam" class="pnam"></div></td>
+          <td id="22"><button id="22btn">22</button><div id="22nam" class="pnam"></div></td>
+          <td id="32"><button id="32btn">32</button><div id="32nam" class="pnam"></div></td>
+          <td id="42"><button id="42btn">42</button><div id="42nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="3"><button id="3btn">3</button><div id="3nam"></div></td>
-          <td id="13"><button id="13btn">13</button><div id="13nam"></div></td>
-          <td id="23"><button id="23btn">23</button><div id="23nam"></div></td>
-          <td id="33"><button id="33btn">33</button><div id="33nam"></div></td>
-          <td id="43"><button id="43btn">43</button><div id="43nam"></div></td>
+          <td id="3"><button id="3btn">3</button><div id="3nam" class="pnam"></div></td>
+          <td id="13"><button id="13btn">13</button><div id="13nam" class="pnam"></div></td>
+          <td id="23"><button id="23btn">23</button><div id="23nam" class="pnam"></div></td>
+          <td id="33"><button id="33btn">33</button><div id="33nam" class="pnam"></div></td>
+          <td id="43"><button id="43btn">43</button><div id="43nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="4"><button id="4btn">4</button><div id="4nam"></div></td>
-          <td id="14"><button id="14btn">14</button><div id="14nam"></div></td>
-          <td id="24"><button id="24btn">24</button><div id="24nam"></div></td>
-          <td id="34"><button id="34btn">34</button><div id="34nam"></div></td>
-          <td id="44"><button id="44btn">44</button><div id="44nam"></div></td>
+          <td id="4"><button id="4btn">4</button><div id="4nam" class="pnam"></div></td>
+          <td id="14"><button id="14btn">14</button><div id="14nam" class="pnam"></div></td>
+          <td id="24"><button id="24btn">24</button><div id="24nam" class="pnam"></div></td>
+          <td id="34"><button id="34btn">34</button><div id="34nam" class="pnam"></div></td>
+          <td id="44"><button id="44btn">44</button><div id="44nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="5"><button id="5btn">5</button><div id="5nam"></div></td>
-          <td id="15"><button id="15btn">15</button><div id="15nam"></div></td>
-          <td id="25"><button id="25btn">25</button><div id="25nam"></div></td>
-          <td id="35"><button id="35btn">35</button><div id="35nam"></div></td>
-          <td id="45"><button id="45btn">45</button><div id="45nam"></div></td>
+          <td id="5"><button id="5btn">5</button><div id="5nam" class="pnam"></div></td>
+          <td id="15"><button id="15btn">15</button><div id="15nam" class="pnam"></div></td>
+          <td id="25"><button id="25btn">25</button><div id="25nam" class="pnam"></div></td>
+          <td id="35"><button id="35btn">35</button><div id="35nam" class="pnam"></div></td>
+          <td id="45"><button id="45btn">45</button><div id="45nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="6"><button id="6btn">6</button><div id="6nam"></div></td>
-          <td id="16"><button id="16btn">16</button><div id="16nam"></div></td>
-          <td id="26"><button id="26btn">26</button><div id="26nam"></div></td>
-          <td id="36"><button id="36btn">36</button><div id="36nam"></div></td>
-          <td id="46"><button id="46btn">46</button><div id="46nam"></div></td>
+          <td id="6"><button id="6btn">6</button><div id="6nam" class="pnam"></div></td>
+          <td id="16"><button id="16btn">16</button><div id="16nam" class="pnam"></div></td>
+          <td id="26"><button id="26btn">26</button><div id="26nam" class="pnam"></div></td>
+          <td id="36"><button id="36btn">36</button><div id="36nam" class="pnam"></div></td>
+          <td id="46"><button id="46btn">46</button><div id="46nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="7"><button id="7btn">7</button><div id="7nam"></div></td>
-          <td id="17"><button id="17btn">17</button><div id="17nam"></div></td>
-          <td id="27"><button id="27btn">27</button><div id="27nam"></div></td>
-          <td id="37"><button id="37btn">37</button><div id="37nam"></div></td>
-          <td id="47"><button id="47btn">47</button><div id="47nam"></div></td>
+          <td id="7"><button id="7btn">7</button><div id="7nam" class="pnam"></div></td>
+          <td id="17"><button id="17btn">17</button><div id="17nam" class="pnam"></div></td>
+          <td id="27"><button id="27btn">27</button><div id="27nam" class="pnam"></div></td>
+          <td id="37"><button id="37btn">37</button><div id="37nam" class="pnam"></div></td>
+          <td id="47"><button id="47btn">47</button><div id="47nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="8"><button id="8btn">8</button><div id="8nam"></div></td>
-          <td id="18"><button id="18btn">18</button><div id="18nam"></div></td>
-          <td id="28"><button id="28btn">28</button><div id="28nam"></div></td>
-          <td id="38"><button id="38btn">38</button><div id="38nam"></div></td>
-          <td id="48"><button id="48btn">48</button><div id="48nam"></div></td>
+          <td id="8"><button id="8btn">8</button><div id="8nam" class="pnam"></div></td>
+          <td id="18"><button id="18btn">18</button><div id="18nam" class="pnam"></div></td>
+          <td id="28"><button id="28btn">28</button><div id="28nam" class="pnam"></div></td>
+          <td id="38"><button id="38btn">38</button><div id="38nam" class="pnam"></div></td>
+          <td id="48"><button id="48btn">48</button><div id="48nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="9"><button id="9btn">9</button><div id="9nam"></div></td>
-          <td id="19"><button id="19btn">19</button><div id="19nam"></div></td>
-          <td id="29"><button id="29btn">29</button><div id="29nam"></div></td>
-          <td id="39"><button id="39btn">39</button><div id="39nam"></div></td>
-          <td id="49"><button id="49btn">49</button><div id="49nam"></div></td>
+          <td id="9"><button id="9btn">9</button><div id="9nam" class="pnam"></div></td>
+          <td id="19"><button id="19btn">19</button><div id="19nam" class="pnam"></div></td>
+          <td id="29"><button id="29btn">29</button><div id="29nam" class="pnam"></div></td>
+          <td id="39"><button id="39btn">39</button><div id="39nam" class="pnam"></div></td>
+          <td id="49"><button id="49btn">49</button><div id="49nam" class="pnam"></div></td>
         </tr>
         <tr>
-          <td id="10"><button id="10btn">10</button><div id="10nam"></div></td>
-          <td id="20"><button id="20btn">20</button><div id="20nam"></div></td>
-          <td id="30"><button id="30btn">30</button><div id="30nam"></div></td>
-          <td id="40"><button id="40btn">40</button><div id="40nam"></div></td>
-          <td id="50"><button id="50btn">50</button><div id="50nam"></div></td>
+          <td id="10"><button id="10btn">10</button><div id="10nam" class="pnam"></div></td>
+          <td id="20"><button id="20btn">20</button><div id="20nam" class="pnam"></div></td>
+          <td id="30"><button id="30btn">30</button><div id="30nam" class="pnam"></div></td>
+          <td id="40"><button id="40btn">40</button><div id="40nam" class="pnam"></div></td>
+          <td id="50"><button id="50btn">50</button><div id="50nam" class="pnam"></div></td>
         </tr>
       </table>
     </div>
@@ -3410,7 +3455,7 @@ webaudio-switch{
             <li>Launch<br/>
               <ul>
                 <li>Connect PC/Mac to MS-50G via USB</li>
-                <li>Launch this page. You should use Latest Chrome. On Windows, unplugging the USB while running may cause freeze (under investigation). Once close all Chrome window if you have MidiPort detection problem.</li>
+                <li>Launch this page. You should use Latest Chrome. On Windows, unplugging the USB while running may cause freeze (this will be fixed on Chrome 60). Once close all Chrome window if you have MidiPort detection problem.</li>
                 <li>Press accept if 'MIDI device' permission dialog is displayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
                 <li>After splash screen, all patches and effects with parameters are displayed</li>
               </ul>
@@ -3448,7 +3493,7 @@ webaudio-switch{
             <li>起動<br/>
               <ul>
                 <li>PC または Mac と MS-50G を USB で接続します</li>
-                <li>最新版の Chrome を使用してこのページを起動します。Windows では動作中に USB ケーブルを抜くとフリーズする事があります(調査中)。MIDIポートの検出関係で問題がある場合には一度 Chrome の全てのウィンドウを閉じてください</li>
+                <li>最新版の Chrome を使用してこのページを起動します。Windows では動作中に USB ケーブルを抜くとフリーズする事があります(Chrome60で修正される模様です)。MIDIポートの検出関係で問題がある場合には一度 Chrome の全てのウィンドウを閉じてください</li>
                 <li>"MIDIデバイス" のアクセスに関するダイアログが出た場合は、許可してください。(やり直す場合はアドレスバーの右端にあるキーボードのアイコンをクリックします)</li>
                 <li>スプラッシュスクリーンの後、パッチの一覧とエフェクトパラメータが表示されます。</li>
               </ul>
