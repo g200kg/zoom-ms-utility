@@ -7,6 +7,7 @@
 <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
 <script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
 <link rel="import" href="bower_components/polymer/polymer.html">
+<script>UseWebAudioControlsMidi=0</script>
 <link rel="import" href="bower_components/webaudio-controls/webaudio-controls.html" >
 <script>
 //
@@ -1434,6 +1435,9 @@ function MidiIf(ma){
   this.waitdata=null;
   this.callback=null;
   this.ready=0;
+  this.midiaccess.onstatechange=function(ev){
+    console.log("StateChange",ev)
+  };
   this.recv=function(ev){
     midirecv=MakeStr(ev.data);
     switch(this.dump){
@@ -1470,7 +1474,7 @@ function MidiIf(ma){
     else if(midirecv.indexOf("f052005828")==0){
       var name=MakeName(ev.data);
       if(this.scan>=0){
-        document.getElementById("scanningmsg").innerHTML="Scanning Patches...("+this.scan+"/50)";
+        document.getElementById("waitmsg").innerHTML="Scanning Patches...("+this.scan+"/50)";
         patches[this.scan]={name:name,data:ev.data};
         document.getElementById((this.scan+1)+"nam").innerHTML=patches[this.scan].name;
         ++this.scan;
@@ -1479,7 +1483,7 @@ function MidiIf(ma){
           this.ready=1;
           SelectPatch(currentpatch);
           DispPatch();
-          document.getElementById("scanning").style.display="none";
+          document.getElementById("wait").style.display="none";
           document.getElementById("msg").innerHTML="Ready";
           ready=true;
           for(i=0;i<6;++i){
@@ -1542,7 +1546,8 @@ function MidiIf(ma){
       return;
     this.SendDirect([0xf0,0x7e,0x00,0x06,0x01,0xf7]);
     setTimeout(function(){
-      document.getElementById("scanning").style.display="block";
+      document.getElementById("waitmsg").innerHTML="";
+      document.getElementById("wait").style.display="block";
       this.SendDirect([0xf0,0x52,0x00,0x58,0x50,0xf7]);
       this.scan=0;
       setTimeout(function(){
@@ -1668,9 +1673,9 @@ function MakeName(b){
   }
   return name;
 }
-function MakeBin(s){
+function MakeBin(s,len){
   var bin=[];
-  for(var j=0;j<s.length;j+=2)
+  for(var j=0;j<s.length&&j<len*2;j+=2)
     bin.push(parseInt(s.substr(j,2),16));
   return bin;
 }
@@ -2487,19 +2492,20 @@ function InstallChecker(){
   this.Start=function(){
     this.norg=currentpatch;
     SelectPatch(49);
-    this.porg=patches[this.norg].data.slice(0);
+    this.porg=patches[49].data.slice(0);
     this.n=0;
     for(var id in effectlist){
       if(effectlist[id].install==0)
         this.list.push(parseInt(id));
     }
     if(this.list.length>0)
-    document.getElementById("instchk").style.display="block";
+    document.getElementById("waitmsg").innerHTML="";
+    document.getElementById("wait").style.display="block";
   };
   this.timer=function(){
     if(this.list.length<=0)
       return;
-    document.getElementById("instchkmsg").innerHTML="Effect Install Check...("+this.list.length+")";
+    document.getElementById("waitmsg").innerHTML="Effect Install Check...("+this.list.length+")";
     while(this.n<5&&this.list.length>0){
       SetEffect(currentpatch,this.n,GetEffectFromId(this.list.shift()));
       ++this.n;
@@ -2509,8 +2515,10 @@ function InstallChecker(){
     if(this.list.length<=0){
       setTimeout(function(){
         midiif.Send(this.porg);
+        patches[49].data=this.porg;
+        DispPatch();
         SelectPatch(this.norg);
-        document.getElementById("instchk").style.display="none";
+        document.getElementById("wait").style.display="none";
       }.bind(this),500);
     }
   };
@@ -2542,6 +2550,27 @@ function SaveBank(){
   a.download="newbank.bank";
   a.click();
 }
+function StoreAll(callback){
+  this.res=[];
+  this.cnt=0;
+  this.ready=0;
+  this.cb=callback;
+  this.Next=function(){
+    if(this.cnt>=50){
+      this.ready=1;
+      if(this.cb)
+        this.cb();
+      return;
+    }
+    document.getElementById("waitmsg").innerHTML="Storing...("+this.cnt+"/50)";
+    SelectPatch(this.cnt++);
+    midiif.SendCurrentPatchVerify(
+      this.Next.bind(this),
+      function(){console.log("ng");}
+    )
+  };
+  this.Next();
+}
 function LoadBank(){
   var i=document.createElement("input");
   i.type="file";
@@ -2551,11 +2580,22 @@ function LoadBank(){
     var reader=new FileReader();
     reader.readAsText(file[0]);
     reader.onload=function(ev){
-      console.log(reader.result);
+      document.getElementById("waitmsg").innerHTML="Storing...";
+      document.getElementById("wait").style.display="block";
+      var s=reader.result.split("\n");
+      for(var i=0;i<50;++i){
+        s[i]=s[i].split(":");
+        patches[i].data=MakeBin(s[i][1],146);
+        patches[i].name=MakeName(patches[i].data);
+        document.getElementById((i+1)+"nam").innerHTML=patches[i].name;
+      }
+      new StoreAll(function(){
+        document.getElementById("wait").style.display="none";
+      });
     }
   },false);
 }
-function Save(){
+function SavePatch(){
   var p=currentpatch;
   if(p<0)
     return;
@@ -2569,7 +2609,7 @@ function Save(){
   a.download=fname+".txt";
   a.click();
 }
-function Load(){
+function LoadPatch(){
   var p=currentpatch;
   if(p<0)
     return;
@@ -2582,7 +2622,7 @@ function Load(){
     reader.readAsText(file[0]);
     reader.onload=function(ev){
       console.log(reader.result);
-      patches[p].data=MakeBin(reader.result);
+      patches[p].data=MakeBin(reader.result,146);
       patches[p].name=MakeName(patches[p].data);
       document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
       SelectPatch(p);
@@ -2735,7 +2775,7 @@ img{
 }
 .menubtn{
   width:120px;
-  height:30px;
+  height:23px;
 }
 .menubtn[disabled]{
   color:#aaa;
@@ -3002,9 +3042,15 @@ webaudio-switch{
   background:linear-gradient(#ddf,#cce);
 }
 .notinstall{
-  background:linear-gradient(#fdd,#ecc);
+  background:linear-gradient(#fcc,#ebb);
 }
 .install{
+  background:linear-gradient(#cfc,#beb);
+}
+.notinstall:hover{
+  background:linear-gradient(#fdd,#ecc);
+}
+.install:hover{
   background:linear-gradient(#dfd,#cec);
 }
 .efitem img{
@@ -3016,26 +3062,9 @@ webaudio-switch{
 .efitem div{
   text-align: center;
 }
-.efitem:hover{
-  background:linear-gradient(#eef,#ddf);
-}
 .efitem div{
   padding:0px 4px;
 }
-#instchk{
-  display:none;
-  position:absolute;
-  left:300px;
-  top:250px;
-  width:400px;
-  height:100px;
-  padding:10px;
-  background:#ccf;
-  border:1px solid #000;
-  box-shadow:2px 2px 2px 2px rgba(0,0,0,0.4);
-  padding:10px;
-}
-
 #usage{
   display:none;
   position:absolute;
@@ -3071,7 +3100,7 @@ webaudio-switch{
   margin:10px auto;
   overflow-y:scroll;
 }
-#instchk{
+#wait{
   position:absolute;
   left:0;
   top:0;
@@ -3079,34 +3108,7 @@ webaudio-switch{
   height:100%;
   background:rgba(0,0,0,0.3);
 }
-#instchkpanel{
-  position:absolute;
-  top:0;
-  bottom:0;
-  right:0;
-  left:0;
-  margin:auto;
-  width:400px;
-  height:60px;
-  text-align:center;
-  line-height:60px;
-  padding:5px;
-  border:1px solid #006;
-  border-radius: 5px;
-  color:#006;
-  background:linear-gradient(#ccf,#b8b8e8);
-  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
-}
-#scanning{
-  display:none;
-  position:absolute;
-  left:0;
-  top:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.3);
-}
-#scanningpanel{
+#waitpanel{
   position:absolute;
   top:0;
   bottom:0;
@@ -3167,6 +3169,8 @@ webaudio-switch{
         <li><hr/></li>
         <li><button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button></li>
         <li><button class="menubtn" id="usagebtn" onclick="InstallCheck()">Install Check</button></li>
+        <li><button class="menubtn" id="usagebtn" onclick="SaveBank()">Save Bank</button></li>
+        <li><button class="menubtn" id="usagebtn" onclick="LoadBank()">Load Bank</button></li>
         <li><button class="menubtn" id="usagebtn" onclick="Usage()">How To Use</button></li>
       </ul>
     </div>
@@ -3331,8 +3335,8 @@ webaudio-switch{
     <li><a onclick="PopupPatchPaste()">Paste</a></li>
     <li><a onclick="PopupPatchDelete()">Delete</a></li>
     <li><a onclick="PopupPatchRename()">Rename</a></li>
-    <li><a onclick="Save()">Save To File</a></li>
-    <li><a onclick="Load()">Load From File</a></li>
+    <li><a onclick="SavePatch()">Save Patch</a></li>
+    <li><a onclick="LoadPatch()">Load Patch</a></li>
     <li><a onclick="PopupPatchCancel2()">Cancel</a></li>
   </ul>
 
@@ -3479,15 +3483,9 @@ webaudio-switch{
     </div>
   </div>
 
-  <div id="instchk">
-    <div id="instchkpanel">
-      <div id="instchkmsg">Install Checking...</div>
-    </div>
-  </div>
-
-  <div id="scanning">
-    <div id="scanningpanel">
-      <div id="scanningmsg">Scanning...</div>
+  <div id="wait">
+    <div id="waitpanel">
+      <div id="waitmsg"></div>
     </div>
   </div>
 

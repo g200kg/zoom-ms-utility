@@ -2045,7 +2045,8 @@
 </dom-module>
 
 <script>
-//  var webAudioControlsMidiManager = new WebAudioControlsManager();
+if(window.UseWebAudioControlsMidi)
+  var webAudioControlsMidiManager = new WebAudioControlsManager();
 
   // FOR MIDI LEARN
   function WebAudioControlsManager() {
@@ -2082,7 +2083,7 @@
   	function midiConnectionStateChange(e) {
   		  console.log("connection: " + e.port.name + " " + e.port.connection + " " + e.port.state );
 
-  		  enableInputs();
+//  		  enableInputs();
   	}
 
  	function onMIDIStarted(midi) {
@@ -2108,6 +2109,7 @@
     }
 
   	function handleMIDIMessage(event){
+      console.log(event);
   		// External hooks, we do not filter event types
     	listOfExternalMidiListeners.forEach(function(externalListener) {
       		externalListener(event);
