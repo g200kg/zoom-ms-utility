@@ -9,6 +9,7 @@
 <link rel="import" href="bower_components/polymer/polymer.html">
 <script>UseWebAudioControlsMidi=0</script>
 <link rel="import" href="bower_components/webaudio-controls/webaudio-controls.html" >
+<script src="./bower_components/jszip/dist/jszip.min.js"></script>
 <script>
 //
 // Zoom MS-50G Utility
@@ -1450,7 +1451,7 @@ function MidiIf(ma){
       break;
     }
     if(!this.supress && ev.data[0]==0xc0){
-      if(currentpatch!=ev.data[1]){
+      if(currentpatch!=ev.data[1] && this.scan<0){
         SelPatchList(0);
         currentpatch=ev.data[1];
         DispPatch();
@@ -1533,7 +1534,7 @@ function MidiIf(ma){
     }
     if(this.waitdata){
       if(midirecv.indexOf(this.waitdata)==0){
-        console.log("waitdata:"+this.waitdata);
+//        console.log("waitdata:"+this.waitdata);
         this.supress=0;
         this.waitdata=null;
         if(this.callback){
@@ -1554,7 +1555,7 @@ function MidiIf(ma){
       this.scan=0;
       setTimeout(function(){
         this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0",function(dat){
-          currentpatch=dat[1];
+          this.norg=currentpatch=dat[1];
           this.que.push([0xf0,0x52,0x00,0x58,0x50,0xf7]);
           this.que.push([0xc0,this.scan]);
           this.que.push([0xf0,0x52,0,0x58,0x29,0xf7]);
@@ -2542,7 +2543,7 @@ function InstallChecker(){
         midiif.Send(this.porg);
         patches[49].data=this.porg;
         DispPatch();
-        SelectPatch(this.norg);
+        SelectPatch(currentpatch);
         document.getElementById("wait").style.display="none";
       }.bind(this),500);
     }
@@ -2564,6 +2565,21 @@ function Usage(){
   }
 }
 function SaveBank(){
+  var p;
+  var zip=new JSZip();
+  for(p=0;p<50;++p){
+    var s=MakeStr(patches[p].data)+"\r\n";
+    var n=("0"+(p+1)).substr(-2)+"@"+(patches[p].name.replace(/ +/g,"").replace(/ /g,"_"));
+    zip.file(n,s);
+  }
+  zip.generateAsync({type:"blob"}).then(function (blob) {
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.target="_blank";
+    a.download="newbank.zip";
+    a.click();
+  });
+  return;
   var d="";
   for(p=0;p<50;++p){
     d+=(p+1)+":"+MakeStr(patches[p].data)+"\r\n";
@@ -2576,6 +2592,8 @@ function SaveBank(){
   a.click();
 }
 function StoreAll(callback){
+  document.getElementById("waitmsg").innerHTML="Storing...";
+  document.getElementById("wait").style.display="block";
   this.res=[];
   this.cnt=0;
   this.ready=0;
@@ -2603,25 +2621,49 @@ function LoadBank(){
   i.addEventListener("change",function(ev){
     var file=ev.target.files;
     var reader=new FileReader();
-    reader.readAsText(file[0]);
-    reader.onload=function(ev){
-      if(reader.result.indexOf("1:f052005828")!=0){
-        alert("Bank file error");
-        return;
+    var zip=new JSZip();
+    var cnt=0;
+    if(file[0].name.substr(-4)==".zip"){
+      reader.onload=function(ev){
+        zip.loadAsync(reader.result).then(
+          function(zip){
+            zip.forEach(function(name,c){
+              zip.file(name).async("string").then(function(txt){
+                var n=parseInt(name.substr(0,2))-1;
+                patches[n].data=MakeBin(txt,146);
+                patches[n].name=MakeName(patches[n].data);
+                DispPatchName(n);
+                if(++cnt>=50){
+                  new StoreAll(function(){
+                    document.getElementById("wait").style.display="none";
+                  });
+                }
+                console.log(n);
+              });
+            });
+          }
+        )
+      };
+      reader.readAsArrayBuffer(file[0]);
+    }
+    else{
+      reader.readAsText(file[0]);
+      reader.onload=function(ev){
+        if(reader.result.indexOf("1:f052005828")!=0){
+          alert("Bank file error");
+          return;
+        }
+        var s=reader.result.split("\n");
+        for(var i=0;i<50;++i){
+          s[i]=s[i].split(":");
+          patches[i].data=MakeBin(s[i][1],146);
+          patches[i].name=MakeName(patches[i].data);
+          DispPatchName(i);
+        }
+        new StoreAll(function(){
+          document.getElementById("wait").style.display="none";
+        });
       }
-      var s=reader.result.split("\n");
-      document.getElementById("waitmsg").innerHTML="Storing...";
-      document.getElementById("wait").style.display="block";
-      for(var i=0;i<50;++i){
-        s[i]=s[i].split(":");
-        patches[i].data=MakeBin(s[i][1],146);
-        patches[i].name=MakeName(patches[i].data);
-//        document.getElementById((i+1)+"nam").innerHTML=patches[i].name;
-        DispPatchName(i);
-      }
-      new StoreAll(function(){
-        document.getElementById("wait").style.display="none";
-      });
     }
   },false);
 }
@@ -2648,6 +2690,42 @@ function LoadPatch(){
   i.click();
   i.addEventListener("change",function(ev){
     var file=ev.target.files;
+    if(file[0].name.substr(-4)==".zip"){
+      document.getElementById("patchenum").style.display="block";
+      var reader=new FileReader();
+      var zip=new JSZip();
+      var cnt=0;
+      reader.onload=function(ev){
+        zip.loadAsync(reader.result).then(
+          function(zip){
+            document.getElementById("patchenumlist").innerHTML="";
+              zip.forEach(function(name,c){
+              zip.file(name).async("string").then(function(txt){
+                var n=parseInt(name.substr(0,2))-1;
+                var e=document.createElement("button");
+                e.setAttribute("class","patchbtn");
+                e.data=MakeBin(txt,146);
+                e.innerHTML=name;
+                document.getElementById("patchenumlist").appendChild(e);
+                e.onclick=function(){
+                  console.log(this,this.data)
+                  patches[currentpatch].data=this.data;
+                  patches[currentpatch].name=MakeName(patches[currentpatch].data);
+                  DispPatchName(currentpatch);
+                  SelectPatch(currentpatch);
+                  SendPatch(currentpatch);
+                  StorePatch(currentpatch);
+                  document.getElementById("patchenum").style.display="none";
+                }
+//                console.log(n,name,e.data)
+              });
+            });
+          }
+        )
+      };
+      reader.readAsArrayBuffer(file[0]);
+      return;
+    }
     var reader=new FileReader();
     reader.readAsText(file[0]);
     reader.onload=function(ev){
@@ -2657,7 +2735,6 @@ function LoadPatch(){
       }
       patches[p].data=MakeBin(reader.result,146);
       patches[p].name=MakeName(patches[p].data);
-//      document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
       DispPatchName(p);
       SelectPatch(p);
       SendPatch(p);
@@ -3174,6 +3251,39 @@ webaudio-switch{
   background:linear-gradient(#ccf,#b8b8e8);
   box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
 }
+#patchenum{
+  display:none;
+  position:absolute;
+  left:0px;
+  top:0px;
+  width:100%;
+  height:100%;
+  background:rbga(0,0,0,0.3);
+}
+#patchenumpanel{
+  position:absolute;
+  top:0;
+  bottom:0;
+  right:0;
+  left:0;
+  margin:auto;
+  width:700px;
+  height:500px;
+  padding:5px;
+  border:1px solid #006;
+  border-radius: 5px;
+  color:#006;
+  background:linear-gradient(#ccf,#b8b8e8);
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
+}
+#patchenumpanel .patchbtn{
+  width:150px;
+  text-align: left;
+}
+#patchenumscr{
+  overflow-y:scroll;
+  height:450px;
+}
 #splash{
   position:absolute;
   left:0px;
@@ -3408,6 +3518,15 @@ webaudio-switch{
     <button id="confirmcancel" onclick="this.parentNode.style.display='none'">Cancel</button> <button id="confirmok">Ok</button>
   </div>
 
+  <div id="patchenum">
+    <div id="patchenumpanel">
+      <div id="patchenumscr">
+        <div id="patchenumlist"></div>
+      </div>
+      <button onclick="this.parentNode.parentNode.style.display='none'">Close</button>
+    </div>
+  </div>
+
   <div id="effectpanelbase">
     <div id="effectpanel">
       <div id="effectpanelmsg">Add/Replace Effect</div>
@@ -3466,9 +3585,9 @@ webaudio-switch{
                 <li>Click patch name to select</li>
                 <li>Right-click (ctrl+click for Mac) or patch number button will show Context-menu.</li>
                 <li>From context-menu, Copy/Paste/Rename/etc patches</li>
+                <li>Patches are draggable to another position for overwrite/exchange</li>
                 <li>By SaveToFile/LoadFromFile, each patch can be backup/restore to local file</li>
                 <li>If you want to choose save directory when 'SaveToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
-                <li>Patches are draggable to another position for overwrite/exchange</li>
               </ul>
             </li>
             <li>Effects<br/>
@@ -3478,6 +3597,13 @@ webaudio-switch{
                 <li>Each parameter can be edit by drag(coarse)/shift-drag(fine)</li>
                 <li>Mouse wheel and Shift+wheel are also available to value edit</li>
                 <li>Effects are draggable to another position to change order</li>
+              </ul>
+            </li>
+            <li>Bank<br/>
+              <ul>
+                <li>by SaveBank/LoadBank buttons, all 50 patches can be save/load as one file.</li>
+                <li>bank file is a .zip file that contains 50 patch files. It can be edit as normal .zip file if you need.</li>
+                <li>When a bank file is selected when patch file loading, a list in the bank file is displayed, and one patch can be selected from among them.</li>
               </ul>
             </li>
             <li>Keyboard<br/>
@@ -3504,9 +3630,9 @@ webaudio-switch{
                 <li>パッチ名をクリックすると選択されます</li>
                 <li>右クリック(MacではCtrl+クリック) またはパッチ番号のボタンを押すとコンテキストメニューが表示されます</li>
                 <li>コンテキストメニューからはパッチの Copy / Paste / Rename 等が実行できます</li>
-                <li>コンテキストメニューの SaveToFile / LoadFromFile はパッチをローカルファイルに保存/読み込みを行います</li>
-                <li>SaveToFile で保存されるフォルダを毎回選択するには Chrome のダウンロードの詳細設定を変更してください</li>
                 <li>パッチのポジションを変更するにはパッチ名をドラッグしてください。ドロップした際に上書きか交換を選択できます</li>
+                <li>コンテキストメニューの SaveToFile / LoadFromFile はパッチをローカルファイルに保存/読込を行います</li>
+                <li>SaveToFile で保存されるフォルダを毎回選択するには Chrome のダウンロードの詳細設定を変更してください</li>
               </ul>
             </li>
             <li>エフェクト<br/>
@@ -3516,6 +3642,13 @@ webaudio-switch{
                 <li>エフェクトの各パラメータの調整はドラッグ(微調整はShift + ドラッグ)で行います。</li>
                 <li>また、マウスホイールの操作でパラメータ調整を行う事もできます。微調整は (Shift + マウスホイール)で行います</li>
                 <li>エフェクト名をドラッグする事で順番を入れ替える事ができます</li>
+              </ul>
+            </li>
+            <li>バンク<br/>
+              <ul>
+                <li>SaveBank/LoadBankのボタンで50個のパッチをまとめてファイルへの保存/読込ができます</li>
+                <li>バンクファイルはパッチファイルを.zipにまとめたものです。zipファイルの中身として入っているパッチファイルを入れ替える等の編集をしても構いません</li>
+                <li>パッチファイルロード時にバンクファイルを選択した場合はバンクファイル内の一覧が表示され、その中から選択する事ができます</li>
               </ul>
             </li>
             <li>キーボード<br/>
