@@ -2404,8 +2404,13 @@ function DispPatch(){
     var imgnam=ef.name.replace(/ /g,"_");
     if(img)
       img.src="./images/"+imgnam+".png"
-    if(ef)
+    if(ef){
+      if(ef.name=="THRU")
+        c.classList.add("thru");
+      else
+        c.classList.remove("thru");
       t.innerHTML=ef.name;
+    }
     else
       t.innerHTML="unknown";
     if(ef && id!=0 && GetEffectState(currentpatch,n))
@@ -2524,9 +2529,10 @@ function InstallChecker(){
       if(effectlist[id].install==0)
         this.list.push(parseInt(id));
     }
-    if(this.list.length>0)
-    document.getElementById("waitmsg").innerHTML="";
-    document.getElementById("wait").style.display="block";
+    if(this.list.length>0){
+      document.getElementById("waitmsg").innerHTML="";
+      document.getElementById("wait").style.display="block";
+    }
   };
   this.timer=function(){
     if(this.list.length<=0)
@@ -3082,6 +3088,12 @@ img{
 #effects .fnam.press:hover{
   background:linear-gradient(#d22 0%,#f99 25%,#f22 50%,#d22 100%);
   color:#fff;
+}
+#effects .fnam.thru{
+  background:linear-gradient(#706868,#403838);
+}
+#effects .fnam.thru .ftxt{
+  color:#a09898;
 }
 .fnum{
   height:40px;
