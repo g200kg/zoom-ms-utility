@@ -1439,6 +1439,7 @@ function MidiIf(ma){
   this.waitdata=null;
   this.callback=null;
   this.ready=0;
+  this.pcnt=0;
   this.midiinport=null;
   this.midiaccess.onstatechange=function(ev){
     console.log("StateChange",ev)
@@ -1456,9 +1457,8 @@ function MidiIf(ma){
       console.log(midirecv);
       break;
     }
-    if(!this.supress && ev.data[0]==0xc0){
+    if((!this.supress ||this.waitdata=="c0") && ev.data[0]==0xc0){
       if(currentpatch!=ev.data[1] && this.scan<0){
-        console.log(midirecv);
         SetPatchFocus(0);
         currentpatch=ev.data[1];
         DispPatch();
@@ -1644,8 +1644,14 @@ function MidiIf(ma){
       this.SendDirect(d);
     }
     else{
-      if(this.ready)
-        this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0");
+      if(this.ready){
+        if(++this.pcnt>=15){
+          this.pcnt=0;
+          this.SendWait([0xf0,0x52,0x00,0x58,0x29,0xf7],"f052005828");
+        }
+        else
+          this.SendWait([0xf0,0x52,0x00,0x58,0x33,0xf7],"c0");
+      }
     }
   };
   this.PortScan=function(){
@@ -2239,6 +2245,9 @@ function SelectPort(){
 function GetEffectId(p,n){
   return GetParamVal(p,n,1);
 }
+function GetDspState(p,n){
+  return (patches[p].data[129]>>n)&1;
+}
 var bits=[
   [ //eff0
     [[6,1,0]],  //State
@@ -2362,7 +2371,8 @@ function SetCurrentEffect(n){
   if(!pat)
     return 0;
   n=5-n;
-  pat.data[129]=(pat.data[129]&~0x40)+((n&1)<<6);
+//  pat.data[129]=(pat.data[129]&~0x40)+((n&1)<<6);
+  pat.data[129]=((n&1)<<6);
   pat.data[125]=(pat.data[125]&~8)+((n&2)<<2);
   pat.data[130]=(pat.data[130]&~1)+((n&4)>>2);
 }
@@ -2462,9 +2472,10 @@ function DispPatch(patch){
     var c=document.getElementById("fnam"+(n+1));
     var t=document.getElementById("ftxt"+(n+1));
     var img=document.getElementById("fimg"+(n+1));
+    var full=document.getElementById("full"+(n+1));
     var imgnam=ef.name.replace(/ /g,"_");
-    if(img)
-      img.src="./images/"+imgnam+".png"
+    img.src="./images/"+imgnam+".png";
+    full.src=GetDspState(patch,n)?"./images/dspfull.png":"./images/THRU.png";
     if(ef){
       if(ef.name=="THRU")
         c.classList.add("thru");
@@ -3152,10 +3163,14 @@ img{
   border-radius:3px;
 }
 #effects .fimg{
-  width:40px;
-  height:40px;
+  position:absolute;
+  left:0px;
+  top:1px;
+  width:50px;
+  height:50px;
   margin:-5px 0px 0px -2px;
   float:left;
+  border:none;
 }
 #effects .fnam{
   text-align: center;
@@ -3441,10 +3456,10 @@ webaudio-switch{
         <li>Status : <span id="msg">Not Initialized</span></li>
         <li>Firmware : <span id="firmver"></span></li>
         <li><hr/></li>
-        <li><button class="menubtn" id="scanbtn" onclick="Scan()">Scan MS-50G</button></li>
-        <li><button class="menubtn" id="usagebtn" onclick="InstallCheck()">Install Check</button></li>
-        <li><button class="menubtn" id="usagebtn" onclick="SaveBank()">Save Bank</button></li>
-        <li><button class="menubtn" id="usagebtn" onclick="LoadBank()">Load Bank</button></li>
+        <li><button class="menubtn" id="scanbtn" onclick="Scan()" title="Re-scan all patches on MS-50G">Scan MS-50G</button></li>
+        <li><button class="menubtn" id="usagebtn" onclick="InstallCheck()" title="List the effects installed on MS-50G">Install Check</button></li>
+        <li><button class="menubtn" id="usagebtn" onclick="SaveBank()" title="Save all patches as a bank file (.zip)">Save Bank</button></li>
+        <li><button class="menubtn" id="usagebtn" onclick="LoadBank()" title="Read all patches from the bank file (.zip)">Load Bank</button></li>
         <li><button class="menubtn" id="usagebtn" onclick="Usage()">How To Use</button></li>
       </ul>
     </div>
@@ -3524,7 +3539,7 @@ webaudio-switch{
     </div>
     <table id="effects">
       <tr>
-        <th><button class="fnum" id="fnum1">1</button></th><td id="fnam1" class="fnam"><img id="fimg1" class="fimg"/><div id="ftxt1" class="ftxt"></div></td>
+        <th><button class="fnum" id="fnum1">1</button></th><td id="fnam1" class="fnam"><img id="fimg1" class="fimg"/><img id="full1" class="fimg"/><div id="ftxt1" class="ftxt"></div></td>
         <td><div class="pcell pfocus" id="f1p1"><webaudio-knob id="f1p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p1v" disabled/></div><div id="f1p1l"></div></div></div></td>
         <td><div class="pcell" id="f1p2"><webaudio-knob id="f1p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p2v" disabled/></div><div id="f1p2l"></div></div></div></td>
         <td><div class="pcell" id="f1p3"><webaudio-knob id="f1p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p3v" disabled/></div><div id="f1p3l"></div></div></div></td>
@@ -3536,7 +3551,7 @@ webaudio-switch{
         <td><div class="pcell" id="f1p9"><webaudio-knob id="f1p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p9v" disabled/></div><div id="f1p9l"></div></div></div></td>
       </tr>
       <tr>
-        <th><button class="fnum" id="fnum2">2</button></th><td id="fnam2" class="fnam"><img id="fimg2" class="fimg"/><div id="ftxt2" class="ftxt"></div></td>
+        <th><button class="fnum" id="fnum2">2</button></th><td id="fnam2" class="fnam"><img id="fimg2" class="fimg"/><img id="full2" class="fimg"/><div id="ftxt2" class="ftxt"></div></td>
         <td><div class="pcell" id="f2p1"><webaudio-knob id="f2p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p1v" disabled/></div><div id="f2p1l"></div></div></div></td>
         <td><div class="pcell" id="f2p2"><webaudio-knob id="f2p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p2v" disabled/></div><div id="f2p2l"></div></div></div></td>
         <td><div class="pcell" id="f2p3"><webaudio-knob id="f2p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p3v" disabled/></div><div id="f2p3l"></div></div></div></td>
@@ -3548,7 +3563,7 @@ webaudio-switch{
         <td><div class="pcell" id="f2p9"><webaudio-knob id="f2p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p9v" disabled/></div><div id="f2p9l"></div></div></div></td>
       </tr>
       <tr>
-        <th><button class="fnum" id="fnum3">3</button></th><td id="fnam3" class="fnam"><img id="fimg3" class="fimg"/><div id="ftxt3" class="ftxt"></div></td>
+        <th><button class="fnum" id="fnum3">3</button></th><td id="fnam3" class="fnam"><img id="fimg3" class="fimg"/><img id="full3" class="fimg"/><div id="ftxt3" class="ftxt"></div></td>
         <td><div class="pcell" id="f3p1"><webaudio-knob id="f3p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p1v" disabled/></div><div id="f3p1l"></div></div></div></td>
         <td><div class="pcell" id="f3p2"><webaudio-knob id="f3p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p2v" disabled/></div><div id="f3p2l"></div></div></div></td>
         <td><div class="pcell" id="f3p3"><webaudio-knob id="f3p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p3v" disabled/></div><div id="f3p3l"></div></div></div></td>
@@ -3560,7 +3575,7 @@ webaudio-switch{
         <td><div class="pcell" id="f3p9"><webaudio-knob id="f3p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p9v" disabled/></div><div id="f3p9l"></div></div></div></td>
       </tr>
       <tr>
-        <th><button class="fnum" id="fnum4">4</button></th><td id="fnam4" class="fnam"><img id="fimg4" class="fimg"/><div id="ftxt4" class="ftxt"></div></td>
+        <th><button class="fnum" id="fnum4">4</button></th><td id="fnam4" class="fnam"><img id="fimg4" class="fimg"/><img id="full4" class="fimg"/><div id="ftxt4" class="ftxt"></div></td>
         <td><div class="pcell" id="f4p1"><webaudio-knob id="f4p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p1v" disabled/></div><div id="f4p1l"></div></div></div></td>
         <td><div class="pcell" id="f4p2"><webaudio-knob id="f4p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p2v" disabled/></div><div id="f4p2l"></div></div></div></td>
         <td><div class="pcell" id="f4p3"><webaudio-knob id="f4p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p3v" disabled/></div><div id="f4p3l"></div></div></div></td>
@@ -3572,7 +3587,7 @@ webaudio-switch{
         <td><div class="pcell" id="f4p9"><webaudio-knob id="f4p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p9v" disabled/></div><div id="f4p9l"></div></div></div></td>
       </tr>
       <tr>
-        <th><button class="fnum" id="fnum5">5</button></th><td id="fnam5" class="fnam"><img id="fimg5" class="fimg"/><div id="ftxt5" class="ftxt"></div></td>
+        <th><button class="fnum" id="fnum5">5</button></th><td id="fnam5" class="fnam"><img id="fimg5" class="fimg"/><img id="full5" class="fimg"/><div id="ftxt5" class="ftxt"></div></td>
         <td><div class="pcell" id="f5p1"><webaudio-knob id="f5p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p1v" disabled/></div><div id="f5p1l"></div></div></div></td>
         <td><div class="pcell" id="f5p2"><webaudio-knob id="f5p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p2v" disabled/></div><div id="f5p2l"></div></div></div></td>
         <td><div class="pcell" id="f5p3"><webaudio-knob id="f5p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p3v" disabled/></div><div id="f5p3l"></div></div></div></td>
@@ -3584,7 +3599,7 @@ webaudio-switch{
         <td><div class="pcell" id="f5p9"><webaudio-knob id="f5p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p9v" disabled/></div><div id="f5p9l"></div></div></div></td>
       </tr>
       <tr>
-        <th><button class="fnum" id="fnum6">6</button></th><td id="fnam6" class="fnam"><img id="fimg6" class="fimg"/><div id="ftxt6" class="ftxt"></div></td>
+        <th><button class="fnum" id="fnum6">6</button></th><td id="fnam6" class="fnam"><img id="fimg6" class="fimg"/><img id="full6" class="fimg"/><div id="ftxt6" class="ftxt"></div></td>
         <td><div class="pcell" id="f6p1"><webaudio-knob id="f6p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p1v" disabled/></div><div id="f6p1l"></div></div></div></td>
         <td><div class="pcell" id="f6p2"><webaudio-knob id="f6p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p2v" disabled/></div><div id="f6p2l"></div></div></div></td>
         <td><div class="pcell" id="f6p3"><webaudio-knob id="f6p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p3v" disabled/></div><div id="f6p3l"></div></div></div></td>
@@ -3810,7 +3825,7 @@ webaudio-switch{
         If you are interested in MS-50G MIDI related function, check GitHub repository<br/>
         <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
       </p>
-      <button onclick="document.getElementById('splash').style.display='none';Scan()" style="width:150px;height:40px">START</button>
+      <button onclick="document.getElementById('splash').style.display='none';Scan()" style="width:150px;height:40px" title="Start Patch Editor">START</button>
     </div>
   </div>
 

@@ -94,6 +94,7 @@ Other notation means :
 0EfOn ... Effect1 On/Off  
 c0    ... Current Effect Focus 6-n => 0-5  
 n0    ... Max Effect Number  
+df0   ... DSP full bits
 N0-N9 ... Patch Name (max 10char)  
 
 |Offset| Data |       |       |       |       |       |       |       |
@@ -228,7 +229,7 @@ N0-N9 ... Patch Name (max 10char)
 | 126  |   0  |       |       |       |       |       |       |       |
 | 127  |   0  | 5p8b6 | 5p8b5 | 5p8b4 | 5p8b3 | 5p8b2 | 5p8b1 | 5p8b0 |
 | 128  |   0  |       |       |       |       |       |       |       |
-| 129  |   0  |       |       |       |       |  c2   |       |       |
+| 129  |   0  |  c2   |  df5  |  df4  |  df3  |  df2  |  df1  |  df0  |
 | 130  |   0  |       |       |  n2   |  n1   |  n0   |       |  c0   |
 | 131  |   0  |       |       |       |       |       |       |       |
 | 132  |  N0  |       |       |       |       |       |       |       |
