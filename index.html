@@ -1452,10 +1452,11 @@ function MidiIf(ma){
     }
     if(!this.supress && ev.data[0]==0xc0){
       if(currentpatch!=ev.data[1] && this.scan<0){
-        SelPatchList(0);
+        console.log(midirecv);
+        SetPatchFocus(0);
         currentpatch=ev.data[1];
         DispPatch();
-        SelPatchList(1);
+        SetPatchFocus(1);
       }
     }
     if(midirecv.indexOf("f052005831")==0){
@@ -1505,6 +1506,7 @@ function MidiIf(ma){
               SetCurrentEffect(currenteffect);
               ToggleEffect(currenteffect);
               UpdateFocus();
+              DispPatchName(currentpatch);
               ev.preventDefault();
             };
             cell2.onclick=cell2.oncontextmenu=function(ev){
@@ -1532,11 +1534,11 @@ function MidiIf(ma){
           }
         }
         DispPatch();
+        DispPatchName(currentpatch);
       }
     }
     if(this.waitdata){
       if(midirecv.indexOf(this.waitdata)==0){
-//        console.log("waitdata:"+this.waitdata);
         this.supress=0;
         this.waitdata=null;
         if(this.callback){
@@ -1575,6 +1577,11 @@ function MidiIf(ma){
   this.SendCurrentPatch=function(){
     this.Send(patches[currentpatch].data);
   };
+  this.SenPatch=function(p){
+    if(typeof(p)=="undefined")
+      p=currentpatch;
+    this.Send(patches[p].data);
+  };
   this.SendCurrentPatchVerify=function(success,fail){
     var o=[];
     for(var i=0;i<6;++i){
@@ -1607,10 +1614,8 @@ function MidiIf(ma){
   this.timer=function(){
     if(!this.midiout)
       return;
-    if(this.supress){
-      console.log("supress")
+    if(this.supress)
       return;
-    }
     if(this.scan>=0){
       if(this.que.length>0){
         var d=this.que.shift();
@@ -1742,6 +1747,7 @@ function Init(){
               SetEffect(currentpatch,d,e);
               SetCurrentEffect(d);
               TrimEffectMax();
+              DispPatchName(currentpatch);
               midiif.SendCurrentPatch();
             }
             else{
@@ -1751,6 +1757,7 @@ function Init(){
               SetEffect(currentpatch,d,e);
               SetCurrentEffect(d);
               TrimEffectMax();
+              DispPatchName(currentpatch);
               midiif.SendCurrentPatch();
             }
           }
@@ -1821,15 +1828,23 @@ function Init(){
       PopupPatchMenu2(ev.target);
       ev.preventDefault();
     };
+    cell.onclick=function(ev){
+      document.getElementById("popuppatch").style.display="none";
+//      SelectPatch(parseInt(ev.target.id)-1);
+    };
     cell.onmousedown=function(ev){
       document.getElementById("popuppatch").style.display="none";
-      SelectPatch(parseInt(ev.target.id)-1);
+      midiif.Send([0xc0,parseInt(ev.target.id)-1]);
+//      SelectPatch(parseInt(ev.target.id)-1);
     };
     btn.onmousedown=function(ev){
       document.getElementById("popuppatch").style.display="none";
-      SelectPatch(parseInt(ev.target.id)-1);
+      midiif.Send([0xc0,parseInt(ev.target.id)-1]);
+//      SelectPatch(parseInt(ev.target.id)-1);
     }
     btn.onclick=btn.oncontextmenu=function(ev){
+      midiif.Send([0xc0,parseInt(ev.target.id)-1]);
+//      SelectPatch(parseInt(ev.target.id)-1);
       PopupPatchMenu2(ev.target);
       ev.stopPropagation();
       ev.preventDefault();
@@ -2018,6 +2033,7 @@ function PopupEffectDelete(){
     TrimEffectMax();
     SetCurrentEffect(currenteffect);
     DispPatch();
+    DispPatchName(currentpatch);
     midiif.SendCurrentPatch();
     ev.target.parentNode.style.display="none";
   };
@@ -2043,6 +2059,7 @@ function PopupEffectInsert(){
     SetParamVal(currentpatch,currenteffect,k,0);
   TrimEffectMax();
   DispPatch();
+  DispPatchName(currentpatch);
   SetCurrentEffect(currenteffect);
   midiif.SendCurrentPatch();
   PopupEffectCancel();
@@ -2053,6 +2070,7 @@ function PopupEffectUp(){
     SetEffect(currentpatch,currenteffect,GetEffect(currentpatch,currenteffect-1));
     SetEffect(currentpatch,currenteffect-1,e);
     TrimEffectMax();
+    DispPatchName(currentpatch);
     midiif.SendCurrentPatch();
   }
   PopupEffectCancel();
@@ -2063,6 +2081,7 @@ function PopupEffectDown(){
     SetEffect(currentpatch,currenteffect,GetEffect(currentpatch,currenteffect+1));
     SetEffect(currentpatch,currenteffect+1,e);
     TrimEffectMax();
+    DispPatchName(currentpatch);
     midiif.SendCurrentPatch();
   }
   PopupEffectCancel();
@@ -2092,23 +2111,24 @@ function PopupPatchCancel(){
   }
 }
 function PopupPatchOverwrite(){
-  var e=document.getElementById("popuppatch");
-  e.style.display="none";
+  var t=(parseInt(dragtarget.id)-1);
+  console.log("overwrite:"+currentpatch+","+t);
+  document.getElementById("popuppatch").style.display="none";
   clipboard=patches[currentpatch].data.slice(0);
-  SelectPatch(parseInt(dragtarget.id)-1);
-  PopupPatchPaste();
+  SelectPatch(t);
+  PopupPatchPaste(t);
   dragtarget=null;
 }
 function PopupPatchExchange(){
   var dst=parseInt(dragtarget.id)-1;
+  console.log("excahnge:"+currentpatch+","+dst);
   clipboard=patches[currentpatch].data.slice(0);
   patches[currentpatch].data=patches[dst].data.slice(0);
   patches[currentpatch].name=MakeName(patches[currentpatch].data);
-//  document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
   DispPatchName(currentpatch);
   SendPatch(currentpatch);
-  SelectPatch(dst);
-  PopupPatchPaste();
+//  SelectPatch(dst);
+  PopupPatchPaste(dst);
   dragtarget=null;
   var e=document.getElementById("popuppatch");
   e.style.display="none";
@@ -2117,15 +2137,18 @@ function PopupPatchCopy(){
   clipboard=patches[currentpatch].data.slice(0);
   PopupPatchCancel2();
 }
-function PopupPatchPaste(){
+function PopupPatchPaste(t){
   if(clipboard){
-    patches[currentpatch].data=clipboard.slice(0);
-    patches[currentpatch].name=MakeName(clipboard);
-//    document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
-    DispPatchName(currentpatch);
-    DispPatch();
-    midiif.SendCurrentPatch();
-    StorePatch(currentpatch);
+    if(typeof(t)=="undefined")
+      t=currentpatch;
+    patches[t].data=clipboard.slice(0);
+    patches[t].name=MakeName(clipboard);
+    DispPatchName(t);
+    if(t!=currentpatch)
+      SelectPatch(t);
+//    DispPatch();
+    SendPatch(t);
+    StorePatch(t);
   }
   PopupPatchCancel2();
 }
@@ -2133,22 +2156,19 @@ function PopupPatchDelete(){
   var tar=document.getElementById((currentpatch+1)+"nam");
   var panel=document.getElementById("confirmpanel");
   document.getElementById("confirmmsg").innerHTML="Delete Patch ?";
-  document.getElementById("confirmok").addEventListener("click",
-    function(ev){
+  document.getElementById("confirmok").onclick=function(ev){
       patches[currentpatch].data=emptypatch.slice(0);
       patches[currentpatch].name=MakeName(emptypatch);
       DispPatchName(currentpatch);
-//      document.getElementById((currentpatch+1)+"nam").innerHTML=patches[currentpatch].name;
       DispPatch();
       midiif.SendCurrentPatch();
       StorePatch(currentpatch);
       ev.target.parentNode.style.display="none";
-    }
-  );
+    };
   var rc=tar.getBoundingClientRect();
   panel.style.display="block";
-  panel.style.left=(rc.left-20+window.pageXOffset)+"px";
-  panel.style.top=(rc.top+20+window.pageYOffset)+"px";
+  panel.style.left=(rc.left-55+window.pageXOffset)+"px";
+  panel.style.top=(rc.top+24+window.pageYOffset)+"px";
   PopupPatchCancel2();
 }
 function PopupPatchRename(){
@@ -2173,7 +2193,6 @@ function PopupPatchRename(){
       patches[p].data[133+i]=name.charCodeAt(i);
     for(i=8;i<=9;++i)
       patches[p].data[134+i]=name.charCodeAt(i);
-  //  document.getElementById((p+1)+"nam").innerHTML=name;
     DispPatchName(p);
     midiif.SendCurrentPatch();
     StorePatch(currentpatch);
@@ -2390,18 +2409,25 @@ function DispPatchName(p){
   document.getElementById((p+1)+"nam").innerHTML=patches[p].name;
   for(var i=0;i<6;++i){
     var id=GetParamVal(p,i,1);
+    var on=GetParamVal(p,i,0);
     var icon=document.getElementById((p+1)+"_"+(i+1));
     if(id)
       icon.classList.add("exist");
     else
       icon.classList.remove("exist");
+    if(on)
+      icon.classList.add("on");
+    else
+      icon.classList.remove("on");
   }
 }
-function DispPatch(){
+function DispPatch(patch){
   var n,p,cell;
   var tab=document.getElementById("effects");
+  if(typeof(patch)=="undefined")
+    patch=currentpatch;
   for(n=0;n<6;++n){
-    var id=GetEffectId(currentpatch,n);
+    var id=GetEffectId(patch,n);
     var ef=effectlist[id];
     var c=document.getElementById("fnam"+(n+1));
     var t=document.getElementById("ftxt"+(n+1));
@@ -2418,7 +2444,7 @@ function DispPatch(){
     }
     else
       t.innerHTML="unknown";
-    if(ef && id!=0 && GetEffectState(currentpatch,n))
+    if(ef && id!=0 && GetEffectState(patch,n))
       c.classList.add("press");
     else
       c.classList.remove("press");
@@ -2440,7 +2466,7 @@ function DispPatch(){
           es.style.display="none";
           ek.style.display="block";
         }
-        var v=GetParamVal(currentpatch,n,p+2);
+        var v=GetParamVal(patch,n,p+2);
         if(typeof(ef.param[p].max)=="object"){
           for(var k=ef.param[p].max.length-1;k>=0;--k){
             if(ef.param[p].max[k]==v){
@@ -2486,14 +2512,16 @@ function SelectPatch(p){
   p=parseInt(p);
   if(p<0)
     return;
-  SelPatchList(0);
+  midiif.Send([0xc0,p]);
+/*  SetPatchFocus(0);
   if(midiif.midiout)
     midiif.Send([0xc0,p]);
   currentpatch=p;
-  SelPatchList(1);
+  SetPatchFocus(1);
   DispPatch();
+  */
 }
-function SelPatchList(f){
+function SetPatchFocus(f){
   if(currentpatch<0)
     return;
   c=document.getElementById((currentpatch+1)+"nam");
@@ -2507,7 +2535,7 @@ function SendPatch(p){
   midiif.Send(patches[p].data);
 }
 function StorePatch(p){
-  console.log("StorePatch");
+  console.log("store:"+p);
   var cmd=[0xf0,0x52,0x00,0x58,0x32,0x01,0x00,0x00,0x2c,0x00,0x00,0x00,0x00,0x00,0xf7];
   cmd[8]=p;
   midiif.Send(cmd);
@@ -2709,30 +2737,33 @@ function LoadPatch(){
       reader.onload=function(ev){
         zip.loadAsync(reader.result).then(
           function(zip){
-            document.getElementById("patchenumlist").innerHTML="";
-              zip.forEach(function(name,c){
+//          document.getElementById("patchenumlist").innerHTML="";
+            for(var i=0;i<50;++i)
+              document.getElementById("patchenumlist").rows[i%10].cells[(i/10)|0].innerHTML="";
+            zip.forEach(function(name,c){
               zip.file(name).async("string").then(function(txt){
                 var n=parseInt(name.substr(0,2))-1;
                 var e=document.createElement("button");
                 e.setAttribute("class","patchbtn");
                 e.data=MakeBin(txt,146);
                 e.innerHTML=name;
-                document.getElementById("patchenumlist").appendChild(e);
+                document.getElementById("patchenumlist").rows[n%10].cells[(n/10)|0].appendChild(e);
+//                console.log(n,document.getElementById("patchenumlist").rows);
                 e.onclick=function(){
-                  console.log(this,this.data)
+                  console.log("LoadPatch-Click:"+currentpatch);
                   patches[currentpatch].data=this.data;
                   patches[currentpatch].name=MakeName(patches[currentpatch].data);
                   DispPatchName(currentpatch);
+                  DispPatch(currentpatch);
                   SelectPatch(currentpatch);
                   SendPatch(currentpatch);
                   StorePatch(currentpatch);
                   document.getElementById("patchenum").style.display="none";
                 }
-//                console.log(n,name,e.data)
               });
             });
           }
-        )
+        );
       };
       reader.readAsArrayBuffer(file[0]);
       return;
@@ -2747,6 +2778,7 @@ function LoadPatch(){
       patches[p].data=MakeBin(reader.result,146);
       patches[p].name=MakeName(patches[p].data);
       DispPatchName(p);
+      DispPatch(p);
       SelectPatch(p);
       SendPatch(p);
       StorePatch(p);
@@ -2995,13 +3027,16 @@ img{
   width:3px;
   padding:0px;
   height:5px;
-  background:#88a;
+  background:#668;
   position:absolute;
   right:0px;
   bottom:0px
 }
 .eficon.exist{
-  background:#f66;
+  background:#c33;
+}
+.eficon.exist.on{
+  background:#faa;
 }
 #patches div:hover{
   background:linear-gradient(#cde,#bcd);
@@ -3146,8 +3181,8 @@ webaudio-switch{
   background:url(./images/bg.png);
   border:3px solid #333;
   border-radius: 4px;
-  width:1060px;
-  height:650px;
+  width:1050px;
+  height:580px;
   margin:auto;
   padding:5px;
   cursor:default;
@@ -3155,7 +3190,7 @@ webaudio-switch{
 }
 #effectpanelscr{
   width:990px;
-  height:550px;
+  height:500px;
   margin:4px auto;
   overflow-y:scroll;
   background:#888;
@@ -3285,7 +3320,7 @@ webaudio-switch{
   left:0;
   margin:auto;
   width:700px;
-  height:500px;
+  height:350px;
   padding:5px;
   border:1px solid #006;
   border-radius: 5px;
@@ -3294,7 +3329,7 @@ webaudio-switch{
   box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
 }
 #patchenumpanel .patchbtn{
-  width:150px;
+  width:130px;
   text-align: left;
 }
 #patchenumscr{
@@ -3537,10 +3572,20 @@ webaudio-switch{
 
   <div id="patchenum">
     <div id="patchenumpanel">
-      <div id="patchenumscr">
-        <div id="patchenumlist"></div>
-      </div>
-      <button onclick="this.parentNode.parentNode.style.display='none'">Close</button>
+      Load Patch Select from Bank:
+      <table id="patchenumlist">
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+      <button onclick="this.parentNode.parentNode.style.display='none'" style="width:120px">Cancel</button>
     </div>
   </div>
 
