@@ -1708,6 +1708,7 @@ function Init(){
     ef.ondragstart=function(ev){
       ev.dataTransfer.setData("text",ev.target.id);
       this.classList.add("drag");
+      currenteffect=parseInt(this.id[4])-1;
       for(var j=0;j<6;++j){
         var ef=document.getElementById("fnam"+(j+1));
         ef.ondragend=function(ev){
@@ -1718,11 +1719,13 @@ function Init(){
           }
         };
         ef.ondragenter=function(ev){
+          console.log(currenteffect)
           var d=parseInt(ev.target.id[4])-1;
           if(d>currenteffect)
             this.classList.toggle("overdown");
-          else if(d<currenteffect)
+          else if(d<currenteffect){
             this.classList.toggle("overup");
+          }
         };
         ef.ondragleave=function(ev){
           var d=parseInt(ev.target.id[4])-1;
