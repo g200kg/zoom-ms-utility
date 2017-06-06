@@ -56,6 +56,9 @@ var currentparam=0;
 var timer,timerprg;
 var dragtarget=null;
 var ready=false;
+var instanceid=null;
+var abort=false;
+var url;
 
 var patchkeymap=[
   "a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t",
@@ -1436,10 +1439,13 @@ function MidiIf(ma){
   this.waitdata=null;
   this.callback=null;
   this.ready=0;
+  this.midiinport=null;
   this.midiaccess.onstatechange=function(ev){
     console.log("StateChange",ev)
   };
   this.recv=function(ev){
+    if(abort)
+      return;
     midirecv=MakeStr(ev.data);
     switch(this.dump){
     case 1:
@@ -1612,6 +1618,16 @@ function MidiIf(ma){
     this.SendDirect(sd);
   };
   this.timer=function(){
+    if(abort)
+      return;
+    var id=parseInt(document.cookie.substr(document.cookie.indexOf("patcheditor=")+12));
+    if(id!=instanceid){
+      AlertMsg("Another Patch Editor is launched.<br/> This instance is no more effective. <br/>Reload?",function(){
+        window.location.href=url;
+      });
+      abort=true;
+      return;
+    }
     if(!this.midiout)
       return;
     if(this.supress)
@@ -1649,8 +1665,11 @@ function MidiIf(ma){
     }
     var inputIterator=this.midiaccess.inputs.values();
     for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
-      if(ip.value.name==="ZOOM MS Series"){
-        ip.value.addEventListener("midimessage",this.recv.bind(this));
+      if(ip.value.name==="ZOOM MS Series" && this.midiinport==null){
+        this.midiinport=ip.value;
+        this.recvhander=this.recv.bind(this);
+        this.midiinport.onmidimessage=this.recvhander;
+//        ip.value.addEventListener("midimessage",this.recv.bind(this));
       }
     }
   };
@@ -1665,7 +1684,7 @@ function MidiIf(ma){
   this.PortScan();
   this.SelectPort();
   if(!this.midiout)
-    alert("MIDI port is not found.");
+    AlertMsg("MIDI port is not found.");
   this.timerid=setInterval(this.timer.bind(this),70);
 }
 
@@ -1693,12 +1712,15 @@ function MakeBin(s,len){
 function Init(){
   var i;
   if(!navigator.requestMIDIAccess){
-    alert("This browser does not support Web MIDI API. Please use latest Chrome.");
+    AlertMsg("This browser does not support Web MIDI API. Please use latest Chrome.");
     return;
   }
+  url=location.href;
+  instanceid=""+(Math.random()*1000000)|0;
+  document.cookie="patcheditor="+instanceid;
   navigator.requestMIDIAccess({sysex:true}).then(
       function(ma){midiif=new MidiIf(ma);},
-      function(e){alert("requestMIDIAccess Error");},
+      function(e){AlertMsg("requestMIDIAccess Error");},
     );
   for(var i=0;i<6;++i){
     var ef=document.getElementById("fnam"+(i+1));
@@ -1900,7 +1922,7 @@ function Init(){
           TrimEffectMax();
           EffectPanelCancel();
           midiif.SendCurrentPatchVerify(null,function(s){
-            alert("Effect "+s+" is not installed.");
+            AlertMsg("Effect "+s+" is not installed.");
           });
         }
       }
@@ -2001,6 +2023,14 @@ function UpdateFocus(){
         cell.classList.remove("pfocus");
     }
   }
+}
+function AlertMsg(msg,callback){
+  document.getElementById("alertmsg").innerHTML=msg;
+  if(callback)
+    document.getElementById("alertok").onclick=callback;
+  else
+    document.getElementById("alertok").onclick=function(){document.getElementById("alertbase").style.display="none"};
+  document.getElementById("alertbase").style.display="block";
 }
 function PopupEffectMenu(tar){
   currenteffect=parseInt(tar.id[4])-1;
@@ -2686,7 +2716,7 @@ function LoadBank(){
       reader.readAsText(file[0]);
       reader.onload=function(ev){
         if(reader.result.indexOf("1:f052005828")!=0){
-          alert("Bank file error");
+          AlertMsg("Bank file error");
           return;
         }
         var s=reader.result.split("\n");
@@ -2770,7 +2800,7 @@ function LoadPatch(){
     reader.readAsText(file[0]);
     reader.onload=function(ev){
       if(reader.result.indexOf("f052005828")!=0){
-        alert("Patch file error");
+        AlertMsg("Patch file error");
         return;
       }
       patches[p].data=MakeBin(reader.result,146);
@@ -2931,6 +2961,42 @@ img{
 }
 .menubtn[disabled]{
   color:#aaa;
+}
+#alertbase{
+  position:absolute;
+  display:none;
+  left:0;
+  top:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.3);
+}
+#alertpanel{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:0;
+  right:0;
+  width:300px;
+  height:150px;
+  margin:auto;
+  padding:10px;
+  transition:0.5s;
+  overflow:hidden;
+  font-size:14px;
+  font-weight: normal;
+  border:1px solid #006;
+  border-radius: 5px;
+  color:#006;
+  text-align:center;
+  background:linear-gradient(#ccf,#b8b8e8);
+  box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
+}
+#alertmsg{
+  display: table-cell;
+  width: 350px;
+  height: 100px;
+  text-align: center;
 }
 #confirmpanel{
   width:200px;
@@ -3745,6 +3811,13 @@ webaudio-switch{
         <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
       </p>
       <button onclick="document.getElementById('splash').style.display='none';Scan()" style="width:150px;height:40px">START</button>
+    </div>
+  </div>
+
+  <div id="alertbase">
+    <div id="alertpanel">
+      <div id="alertmsg"></div>
+      <button id="alertok">Ok</button>
     </div>
   </div>
 
