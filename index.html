@@ -1834,17 +1834,14 @@ function Init(){
     };
     cell.onmousedown=function(ev){
       document.getElementById("popuppatch").style.display="none";
-      midiif.Send([0xc0,parseInt(ev.target.id)-1]);
-//      SelectPatch(parseInt(ev.target.id)-1);
+      SelectPatch(parseInt(ev.target.id)-1);
     };
     btn.onmousedown=function(ev){
       document.getElementById("popuppatch").style.display="none";
-      midiif.Send([0xc0,parseInt(ev.target.id)-1]);
-//      SelectPatch(parseInt(ev.target.id)-1);
+      SelectPatch(parseInt(ev.target.id)-1);
     }
     btn.onclick=btn.oncontextmenu=function(ev){
-      midiif.Send([0xc0,parseInt(ev.target.id)-1]);
-//      SelectPatch(parseInt(ev.target.id)-1);
+      SelectPatch(parseInt(ev.target.id)-1);
       PopupPatchMenu2(ev.target);
       ev.stopPropagation();
       ev.preventDefault();
@@ -2513,13 +2510,10 @@ function SelectPatch(p){
   if(p<0)
     return;
   midiif.Send([0xc0,p]);
-/*  SetPatchFocus(0);
-  if(midiif.midiout)
-    midiif.Send([0xc0,p]);
+  SetPatchFocus(0);
   currentpatch=p;
   SetPatchFocus(1);
   DispPatch();
-  */
 }
 function SetPatchFocus(f){
   if(currentpatch<0)
@@ -2695,6 +2689,7 @@ function LoadBank(){
         var s=reader.result.split("\n");
         for(var i=0;i<50;++i){
           s[i]=s[i].split(":");
+          console.log(s[i][0])
           patches[i].data=MakeBin(s[i][1],146);
           patches[i].name=MakeName(patches[i].data);
           DispPatchName(i);
