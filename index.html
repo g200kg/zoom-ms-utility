@@ -65,6 +65,7 @@ var patchkeymap=[
   "A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T",
   "1","2","3","4","5","6","7","8","9","0"];
 var effectkeymap=["F1","F2","F3","F4","F5","F6"];
+var tunerkey="F9";
 
 var emptypatch=[
   0xf0,0x52,0x00,0x58,0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -1919,7 +1920,6 @@ function Init(){
           }
         };
         ef.ondragenter=function(ev){
-          console.log(currenteffect)
           var d=parseInt(ev.target.id[4])-1;
           if(d>currenteffect)
             this.classList.toggle("overdown");
@@ -2117,7 +2117,9 @@ function Init(){
   document.addEventListener("keydown",function(ev){
     if(ready){
       var p;
-      if(document.getElementById("inputpanel").style.display=="block" || document.getElementById("confirmpanel").style.display=="block")
+      if(document.getElementById("inputpanel").style.display=="block"
+        || document.getElementById("confirmpanel").style.display=="block"
+        || document.getElementById("textareapanel").style.display=="block")
         return;
       if(ev.ctrlKey||ev.altKey)
         return;
@@ -2170,6 +2172,9 @@ function Init(){
         }
         SelectPatch(p);
         ev.preventDefault();
+      }
+      if(ev.key==tunerkey){
+        document.getElementById("tunerbtn").click();
       }
       var p=patchkeymap.indexOf(ev.key);
       if(p>=0){
@@ -2321,7 +2326,6 @@ function PopupPatchCancel(){
 }
 function PopupPatchOverwrite(){
   var t=(parseInt(dragtarget.id)-1);
-  console.log("overwrite:"+currentpatch+","+t);
   document.getElementById("popuppatch").style.display="none";
   clipboard=patches[currentpatch].data.slice(0);
   SelectPatch(t);
@@ -2330,7 +2334,6 @@ function PopupPatchOverwrite(){
 }
 function PopupPatchExchange(){
   var dst=parseInt(dragtarget.id)-1;
-  console.log("excahnge:"+currentpatch+","+dst);
   clipboard=patches[currentpatch].data.slice(0);
   patches[currentpatch].data=patches[dst].data.slice(0);
   patches[currentpatch].name=MakeName(patches[currentpatch].data);
@@ -2380,6 +2383,16 @@ function PopupPatchDelete(){
   panel.style.top=(rc.top+24+window.pageYOffset)+"px";
   PopupPatchCancel2();
 }
+function SetPatchName(p,name){
+  if(name.length>10)
+    name=name.substr(0,10);
+  patches[p].name=name;
+  patches[p].data[132]=name.charCodeAt(0);
+  for(i=1;i<=7;++i)
+    patches[p].data[133+i]=name.charCodeAt(i);
+  for(i=8;i<=9;++i)
+    patches[p].data[134+i]=name.charCodeAt(i);
+}
 function PopupPatchRename(){
   document.getElementById("inputtext").value="";
   var tar=document.getElementById((currentpatch+1)+"nam");
@@ -2393,15 +2406,8 @@ function PopupPatchRename(){
   document.getElementById("inputok").onclick=function(ev){
     var i;
     var name=document.getElementById("inputtext").value;
-    if(name.length>10)
-      name=name.substr(0,10);
     var p=currentpatch;
-    patches[p].name=name;
-    patches[p].data[132]=name.charCodeAt(0);
-    for(i=1;i<=7;++i)
-      patches[p].data[133+i]=name.charCodeAt(i);
-    for(i=8;i<=9;++i)
-      patches[p].data[134+i]=name.charCodeAt(i);
+    SetPatchName(p,name);
     DispPatchName(p);
     midiif.SendCurrentPatch();
     StorePatch(currentpatch);
@@ -2432,7 +2438,7 @@ var bits=[
     [[16,0x70,-4],[13,0x10,-1],[17,0x0f,4]],
     [[17,0x70,-4],[13,0x08,0],[18,0x0f,4]],
     [[18,0x70,-4],[13,0x04,1],[19,0x0f,4]],
-    [[19,0x70,-4],[13,0x02,2],[20,0x1f,4]],
+    [[19,0x70,-4],[13,0x02,2],[20,0x1f,4],[23,0x40,"NZ"]],
     [[24,0x7f,0],[21,0x10,3]],
   ],
   [ //eff1
@@ -2445,7 +2451,7 @@ var bits=[
     [[36,0x70,-4],[29,0x1,3],[38,0x0f,4]],
     [[38,0x70,-4],[37,0x40,-3],[39,0x0f,4]],
     [[39,0x70,-4],[37,0x20,-2],[40,0x0f,4]],
-    [[40,0x70,-4],[37,0x10,-1],[41,0x1f,4]],
+    [[40,0x70,-4],[37,0x10,-1],[41,0x1f,4],[43,0x40,"NZ"]],
     [[44,0x7f,0],[37,0x1,7]],
   ],
   [ //eff2
@@ -2458,7 +2464,7 @@ var bits=[
     [[57,0x70,-4],[53,0x8,0],[58,0x0f,4]],
     [[58,0x70,-4],[53,0x4,1],[59,0x0f,4]],
     [[59,0x70,-4],[53,0x2,2],[60,0x0f,4]],
-    [[60,0x70,-4],[53,0x1,3],[62,0x1f,4]],
+    [[60,0x70,-4],[53,0x1,3],[62,0x1f,4],[64,0x40,"NZ"]],
     [[65,0x7f,0],[61,0x8,4]],
   ],
   [ //eff3
@@ -2471,7 +2477,7 @@ var bits=[
     [[78,0x70,-4],[77,0x40,-3],[79,0x0f,4]],
     [[79,0x70,-4],[77,0x20,-2],[80,0x0f,4]],
     [[80,0x70,-4],[77,0x10,-1],[81,0x0f,4]],
-    [[81,0x70,-4],[77,0x8,0],[82,0x1f,4]],
+    [[81,0x70,-4],[77,0x8,0],[82,0x1f,4],[84,0x40,"NZ"]],
     [[86,0x7f,0],[85,0x40,1]],
   ],
   [ //eff4
@@ -2484,7 +2490,7 @@ var bits=[
     [[98,0x70,-4],[93,0x4,1],[99,0x0f,4]],
     [[99,0x70,-4],[93,0x2,2],[100,0x0f,4]],
     [[100,0x70,-4],[93,0x1,3],[102,0x0f,4]],
-    [[102,0x70,-4],[101,0x40,-3],[103,0x1f,4]],
+    [[102,0x70,-4],[101,0x40,-3],[103,0x1f,4],[105,0x40,"NZ"]],
     [[106,0x7f,0],[106,0x4,5]],
   ],
   [ //eff5
@@ -2497,7 +2503,7 @@ var bits=[
     [[119,0x70,-4],[117,0x20,-2],[120,0x0f,4]],
     [[120,0x70,-4],[117,0x10,-1],[121,0x0f,4]],
     [[121,0x70,-4],[117,0x8,0],[122,0x0f,4]],
-    [[122,0x70,-4],[117,0x4,1],[123,0x1f,4]],
+    [[122,0x70,-4],[117,0x4,1],[123,0x1f,4],[126,0x40,"NZ"]],
     [[127,0x7f,0],[125,0x20,2]],
   ]
 ];
@@ -2509,12 +2515,14 @@ function GetParamVal(p,n,param){
   var val=0;
   for(var i=0;i<b.length;++i){
     var b0=b[i];
-    var v=pat.data[b0[0]]&b0[1];
-    if(b0[2]>=0)
-      v<<=b0[2];
-    else
-      v>>=-b0[2];
-    val|=v;
+    if(b0[2]!=="NZ"){
+      var v=pat.data[b0[0]]&b0[1];
+      if(b0[2]>=0)
+        v<<=b0[2];
+      else
+        v>>=-b0[2];
+      val|=v;
+    }
   }
   return val;
 }
@@ -2526,11 +2534,16 @@ function SetParamVal(p,n,param,val){
   for(var i=0;i<b.length;++i){
     var b0=b[i];
     var bb,v;
-    if(b0[2]>=0)
-      v=val>>b0[2];
-    else
-      v=val<<-b0[2];
-    pat.data[b0[0]]=(pat.data[b0[0]]&~b0[1])+(v&b0[1]);
+    if(b0[2]==="NZ"){
+      pat.data[b0[0]]=(pat.data[b0[0]]&~b0[1])+(val!=0?b0[1]:0);
+    }
+    else{
+      if(b0[2]>=0)
+        v=val>>b0[2];
+      else
+        v=val<<-b0[2];
+      pat.data[b0[0]]=(pat.data[b0[0]]&~b0[1])+(v&b0[1]);
+    }
   }
 }
 function GetCurrentEffect(){
@@ -2708,6 +2721,7 @@ function DispPatch(patch){
         }
         else{
           ek.max=ef.param[p].max;
+          ek.tab=null;
           ek.defvalue=ef.param[p].def;
           es.defvalue=ef.param[p].def;
           ek.setValue(v);
@@ -2806,6 +2820,19 @@ function InstallCheck(){
   document.getElementById("effectpanelbase").style.display="block";
   inst.Start();
 }
+function Tuner(){
+  var btn=document.getElementById("tunerbtn");
+  if(btn.style.background==""){
+      btn.style.background="linear-gradient(#c33,#b22)";
+      btn.style.color="#fff";
+      midiif.Send([0xb0,0x4a,0x7f]);
+  }
+  else{
+    btn.style.background="";
+    btn.style.color="#000";
+    midiif.Send([0xb0,0x4a,0x00]);
+  }
+}
 function Usage(){
   var e=document.getElementById("usage");
   if(e.style.display!="block"){
@@ -2889,7 +2916,6 @@ function LoadBank(){
                     document.getElementById("wait").style.display="none";
                   });
                 }
-                console.log(n);
               });
             });
           }
@@ -2907,7 +2933,6 @@ function LoadBank(){
         var s=reader.result.split("\n");
         for(var i=0;i<50;++i){
           s[i]=s[i].split(":");
-          console.log(s[i][0])
           patches[i].data=MakeBin(s[i][1],146);
           patches[i].name=MakeName(patches[i].data);
           DispPatchName(i);
@@ -2950,7 +2975,6 @@ function LoadPatch(){
       reader.onload=function(ev){
         zip.loadAsync(reader.result).then(
           function(zip){
-//          document.getElementById("patchenumlist").innerHTML="";
             for(var i=0;i<50;++i)
               document.getElementById("patchenumlist").rows[i%10].cells[(i/10)|0].innerHTML="";
             zip.forEach(function(name,c){
@@ -2961,9 +2985,7 @@ function LoadPatch(){
                 e.data=MakeBin(txt,146);
                 e.innerHTML=name;
                 document.getElementById("patchenumlist").rows[n%10].cells[(n/10)|0].appendChild(e);
-//                console.log(n,document.getElementById("patchenumlist").rows);
                 e.onclick=function(){
-                  console.log("LoadPatch-Click:"+currentpatch);
                   patches[currentpatch].data=this.data;
                   patches[currentpatch].name=MakeName(patches[currentpatch].data);
                   DispPatchName(currentpatch);
@@ -3000,22 +3022,69 @@ function LoadPatch(){
 }
 function LoadText(){
   var tar=document.getElementById((currentpatch+1)+"nam");
-  var panel=document.getElementById("inputpanel");
-  document.getElementById("inputmsg").innerHTML="Load from URL";
+  var panel=document.getElementById("textareapanel");
+  document.getElementById("textareamsg").innerHTML="*TENTATIVE* : Load from Text : Copy/Pate here the guitarpatches.com's zoom MS-50G patch page texts.";
+  document.getElementById("textareatext").value="";
   var rc=tar.getBoundingClientRect();
   panel.style.display="block";
-  panel.style.left=(rc.left+20+window.pageXOffset)+"px";
-  panel.style.top=(rc.top+20+window.pageYOffset)+"px";
   PopupPatchCancel2();
-  document.getElementById("inputok").onclick=function(ev){
-    var url=document.getElementById("inputtext").value;
-    console.log(url);
-    fetch(url).then(function(res){
-      return res.text();
-    }).then(function(body){
-      console.log(body);
-    })
-    document.getElementById("inputpanel").style.display="none";
+  document.getElementById("textareaok").onclick=function(ev){
+    var tx=document.getElementById("textareatext").value.split("\n");
+    var param=0;
+    var id=0;
+    for(var l=0,m=tx.length;l<m;++l){
+      if(tx[l].indexOf("Description")==0 && l>0){
+        for(var ll=l-1;ll>=0&&ll>=l-2;--ll)
+          if(tx[ll].length>0)
+            SetPatchName(currentpatch,tx[ll]);
+      }
+      if(tx[l].indexOf("EFFECT")==0){
+        var n=parseInt(tx[l][7])-1;
+        if(n>=0 && n<6){
+          var enam=tx[l].split(":")[1].substr(1);
+          if(enam=="OFF")
+            enam="THRU";
+          for(id in effectlist){
+            if(effectlist[id].name==enam){
+              SetEffect(currentpatch,n,GetEffectFromId(id));
+              break;
+            }
+          }
+        }
+      }
+      if(param>=2&&param<11){
+        var v=parseInt(tx[l]);
+        var pm=effectlist[id].param[param-2];
+        if(pm){
+          if(typeof(pm.disp)=="number"){
+            v-=pm.disp;
+          }
+          else if(typeof(pm.disp)=="object"){
+            console.log(":"+tx[l].toLowerCase())
+            for(v=0;v<pm.disp.length;++v){
+              console.log("="+pm.disp[v].toLowerCase())
+              if(pm.disp[v].toLowerCase().indexOf(tx[l].toLowerCase())==0){
+                break;
+              }
+            }
+            if(v==pm.disp.length)
+              v=0;
+            if(typeof(pm.max)=="object")
+              v=pm.max[v];
+          }
+          SetParamVal(currentpatch,n,param,v);
+        }
+        param=0;
+      }
+      if(tx[l].indexOf("Page")==0){
+        var t=tx[l].split("-");
+        param=parseInt(t[0].substr(4))*3+parseInt(t[1].substr(4))-2;
+      }
+    }
+    TrimEffectMax();
+    DispPatchName(currentpatch);
+    midiif.SendCurrentPatch();
+    document.getElementById("textareapanel").style.display="none";
   };
 }
 function ShowDoc(x) {
@@ -3142,7 +3211,7 @@ img{
 }
 .menubtn{
   width:120px;
-  height:23px;
+  height:24px;
 }
 .menubtn[disabled]{
   color:#aaa;
@@ -3204,9 +3273,27 @@ img{
 #inputpanel input{
   width:200px;
 }
+#textareapanel{
+  width:800px;
+  height:150px;
+  padding:10px;
+  margin:auto;
+  left:0;
+  right:0;
+  top:0;
+  bottom:0;
+}
+#textareapanel textarea{
+  width:700px;
+  height:100px;
+}
+#textareapanel button{
+  width:70px;
+  margin:5px;
+}
 #mainmenu{
   position:absolute;
-  width:220px;
+  width:260px;
   left:15px;
   top:80px;
 }
@@ -3218,7 +3305,8 @@ img{
   list-style: none;
 }
 #mainmenu ul li{
-  margin:4px;
+  margin:2px 2px;
+  width:260px;
 }
 #patchesbase{
   position:absolute;
@@ -3627,13 +3715,13 @@ webaudio-switch{
     <div id="mainmenu">
       <ul>
         <li>MidiPort : <select id="midiport" onchange="SelectPort()"></select></li>
-        <li>Status : <span id="msg">Not Initialized</span></li>
-        <li>Firmware : <span id="firmver"></span></li>
+        <li><div style="display:inline-block:width:160px">Status : <span id="msg">Not Initialized</span></div><div>Firmware : <span id="firmver"></span></div></li>
         <li><hr/></li>
         <li><button class="menubtn" id="scanbtn" onclick="Scan()" title="Re-scan all patches on MS-50G">Scan MS-50G</button></li>
-        <li><button class="menubtn" id="usagebtn" onclick="InstallCheck()" title="List the effects installed on MS-50G">Install Check</button></li>
-        <li><button class="menubtn" id="usagebtn" onclick="SaveBank()" title="Save all patches as a bank file (.zip)">Save Bank</button></li>
-        <li><button class="menubtn" id="usagebtn" onclick="LoadBank()" title="Read all patches from the bank file (.zip)">Load Bank</button></li>
+        <li><button class="menubtn" id="instchbtn" onclick="InstallCheck()" title="List the effects installed on MS-50G">Install Check</button></li>
+        <li><button class="menubtn" id="loadbankbtn" onclick="LoadBank()" title="Read all patches from the bank file (.zip)">Load Bank</button></li>
+        <li><button class="menubtn" id="savebankbtn" onclick="SaveBank()" title="Save all patches as a bank file (.zip)">Save Bank</button> </li>
+        <li><button class="menubtn" id="tunerbtn" onclick="Tuner()" title="Tuner Mode On/Off">Tuner</button></li>
         <li><button class="menubtn" id="usagebtn" onclick="Usage()">How To Use</button></li>
       </ul>
     </div>
@@ -3800,6 +3888,7 @@ webaudio-switch{
     <li><a onclick="PopupPatchRename()">Rename</a></li>
     <li><a onclick="SavePatch()">Save Patch</a></li>
     <li><a onclick="LoadPatch()">Load Patch</a></li>
+    <li><a onclick="LoadText()">Load from Text</a><li>
     <li><a onclick="PopupPatchCancel2()">Cancel</a></li>
   </ul>
 
@@ -3811,6 +3900,12 @@ webaudio-switch{
     <li><a onclick="PopupEffectDelete()">Delete</a></li>
     <li><a onclick="PopupEffectCancel()">Cancel</a></li>
   </ul>
+
+  <div id="textareapanel" class="popup">
+    <div id="textareamsg"></div>
+    <textarea id="textareatext"></textarea><br/>
+    <button id="texareacancel" onclick="this.parentNode.style.display='none'">Cancel</button> <button id="textareaok">Ok</button>
+  </div>
 
   <div id="inputpanel" class="popup">
     <div id="inputmsg"></div>
@@ -3925,6 +4020,7 @@ webaudio-switch{
               <ul>
                 <li>Keyboard Left/Right is assigned to patch Down/Up, 'a'-'t':patch1-patch20, 'A'-'T':patch21-patch40 '1'-'9','0':patch41-patch50</li>
                 <li>Keyboard 'F1'-'F6' is assigned to On/Off each effect.</li>
+                <li>Keybeard 'F9' is assigned to Tuner mode On/Off.</li>
               </ul>
             </li>
           </ul>
@@ -3970,6 +4066,7 @@ webaudio-switch{
               <ul>
                 <li>左右キーはパッチの上下に割り当てられています。またキーの 'a'～'t'はパッチ1～20、'A'～'T'はパッチ21～40、'1'～'9','0'はパッチ41～50に割り当てられています</li>
                 <li>キーボードの 'F1' ～ 'F6' はエフェクトの1～6のオン/オフを切り替えます</li>
+                <li>キーボードの'F9'はチューナーのオン/オフを切り替えます</li>
               </ul>
             </li>
           </ul>

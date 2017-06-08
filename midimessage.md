@@ -89,6 +89,8 @@ eff1 to eff6 include the on/off state, type of each effect, parameter values. bi
 
 In the following table, the notation like '1p2b3' means
 [Effect number(0-5)] p [Parameter number(0-8)] b [bit].  
+0p7nz ... Seems a special bit used in AMP cabinet model, means the parameter is non-zero (not OFF).
+
 Other notation means :   
 0t    ... Effect1 Type Bits  
 0EfOn ... Effect1 On/Off  
@@ -123,7 +125,7 @@ N0-N9 ... Patch Name (max 10char)
 |  20  |   0  |       |       | 0p7b8 | 0p7b7 | 0p7b6 | 0p7b5 | 0p7b4 |
 |  21  |   0  |       |       | 0p8b7 |       |   1t  |       |       |
 |  22  |   0  |       |       |       |       |       |       |       |
-|  23  |   0  |       |       |       |       |       |       |       |
+|  23  |   0  | 0p7nz |       |       |       |       |       |       |
 |  24  |   0  | 0p8b6 | 0p8b5 | 0p8b4 | 0p8b3 | 0p8b2 | 0p8b1 | 0p8b0 |
 |  25  |   0  |       |       |       |       |       |       |       |
 |  26  |   0  |  1t   |  1t   |  1t   |  1t   |  1t   |  1t   | 1EfOn |
@@ -144,7 +146,7 @@ N0-N9 ... Patch Name (max 10char)
 |  41  |   0  |       |       | 1p7b8 | 1p7b7 | 1p7b6 | 1p7b5 | 1p7b4 |
 |  42  |   0  |       |       |       |       |       |       |       |
 |  44  |   0  | 1p8b6 | 1p8b5 | 1p8b4 | 1p8b3 | 1p8b2 | 1p8b1 | 1p8b0 |
-|  43  |   0  |       |       |       |       |       |       |       |
+|  43  |   0  | 1p7nz |       |       |       |       |       |       |
 |  45  |   0  |       |  2t   |       |       | 2p0b2 | 2p010 | 2p1b5 |
 |  46  |   0  |       |       |       |       |       |       |       |
 |  47  |   0  |       |  2t   |  2t   |  2t   |  2t   |  2t   | 2EfOn |
@@ -164,7 +166,7 @@ N0-N9 ... Patch Name (max 10char)
 |  61  |   0  |       |       |  3t   | 2p8b7 |       |       |       |
 |  62  |   0  |       |       | 2p7b8 | 2p7b7 | 2p7b6 | 2p7b5 | 2p7b4 |
 |  63  |   0  |       |       |       |       |       |       |       |
-|  64  |   0  |       |       |       |       |       |       |       |
+|  64  |   0  | 2p7nz |       |       |       |       |       |       |
 |  65  |   0  | 2p8b6 | 2p8b5 | 2p8b4 | 2p8b3 | 2p8b2 | 2p8b1 | 2p8b0 |
 |  67  |   0  |  3t   |  3t   |  3t   |  3t   |  3t   |  3t   | 3EfOn |
 |  66  |   0  |       |       |       |       |       |       |       |
@@ -184,7 +186,7 @@ N0-N9 ... Patch Name (max 10char)
 |  81  |   0  | 3p7b2 | 3p7b1 | 3p7b0 | 3p6b7 | 3p6b6 | 3p6b5 | 3p6b4 |
 |  82  |   0  |       |       | 3p7b8 | 3p7b7 | 3p7b6 | 3p7b5 | 3p7b4 |
 |  83  |   0  |       |       |       |       |       |       |       |
-|  84  |   0  |       |       |       |       |       |       |       |
+|  84  |   0  | 3p7nz |       |       |       |       |       |       |
 |  85  |   0  | 3p8b7 |  4t   |       |       |       | 4p0b2 | 4p0b10|
 |  86  |   0  | 3p8b6 | 3p8b5 | 3p8b4 | 3p8b3 | 3p8b2 | 3p8b1 | 3p8b0 |
 |  87  |   0  |       |       |       |       |       |       |       |
@@ -205,7 +207,7 @@ N0-N9 ... Patch Name (max 10char)
 | 102  |   0  | 4p7b2 | 4p7b1 | 4p7b0 | 4p6b7 | 4p6b6 | 4p6b5 | 4p6b4 |
 | 103  |   0  |       |       | 4p7b8 | 4p7b7 | 4p7b6 | 4p7b5 | 4p7b4 |
 | 104  |   0  |       |       |       |       |       |       |       |
-| 105  |   0  |       |       |       |       |       |       |       |
+| 105  |   0  | 4p7nz |       |       |       |       |       |       |
 | 106  |   0  | 4p8b6 | 4p8b5 | 4p8b4 | 4p8b3 | 4p8b2 | 4p8b1 | 4p8b0 |
 | 107  |   0  |       |       |       |       |       |       |       |
 | 108  |   0  |  5t   |  5t   |  5t   |  5t   |  5t   |  5t   | 5EfOn |
@@ -226,7 +228,7 @@ N0-N9 ... Patch Name (max 10char)
 | 123  |   0  |       |       | 5p7b8 | 5p7b7 | 5p7b6 | 5p7b5 | 5p7b4 |
 | 124  |   0  |       |       |       |       |       |       |       |
 | 125  |   0  |       | 5p8b7 |       |  c1   |       |       |       |
-| 126  |   0  |       |       |       |       |       |       |       |
+| 126  |   0  | 5p7nz |       |       |       |       |       |       |
 | 127  |   0  | 5p8b6 | 5p8b5 | 5p8b4 | 5p8b3 | 5p8b2 | 5p8b1 | 5p8b0 |
 | 128  |   0  |       |       |       |       |       |       |       |
 | 129  |   0  |  c2   |  df5  |  df4  |  df3  |  df2  |  df1  |  df0  |
