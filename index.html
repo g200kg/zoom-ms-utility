@@ -3083,7 +3083,9 @@ function LoadText(){
     }
     TrimEffectMax();
     DispPatchName(currentpatch);
-    midiif.SendCurrentPatch();
+    SelectPatch(currentpatch);
+    SendPatch(currentpatch);
+    StorePatch(currentpatch);
     document.getElementById("textareapanel").style.display="none";
   };
 }
