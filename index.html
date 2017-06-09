@@ -2033,7 +2033,7 @@ function Init(){
     };
     cell.onclick=function(ev){
       document.getElementById("popuppatch").style.display="none";
-//      SelectPatch(parseInt(ev.target.id)-1);
+      SelectPatch(parseInt(ev.target.id)-1);
     };
     cell.onmousedown=function(ev){
       document.getElementById("popuppatch").style.display="none";
@@ -2100,9 +2100,11 @@ function Init(){
           SetCurrentEffect(currenteffect);
           TrimEffectMax();
           EffectPanelCancel();
-          midiif.SendCurrentPatchVerify(null,function(s){
-            AlertMsg("Effect "+s+" is not installed.");
-          });
+          midiif.SendCurrentPatch();
+//?
+//          midiif.SendCurrentPatchVerify(null,function(s){
+//            AlertMsg("Effect "+s+" is not installed.");
+//          });
         }
       }
     }
