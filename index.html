@@ -32,8 +32,8 @@
 //     Effect On/Off. It seems effective only for effect1-3.  nn=effect#(0-2) mm=0:off mm=1:on
 //  ParameterEdit :       [0xf0,0x52,0x00,0x58,0x31,nn,pp,vvLSB,vvMSB,0xf7]
 //     Parameter value edit. nn=effect# pp=param#+2 vv=value. value range is depends on each effect.
-//  Patch Store??? :      [0xf0,0x52,0x00,0x58,0x32,0x01,0x00,0x00,0x2c,0x00,0x00,0x00,0x00,0x00,0xf7]
-//     Message (Storing...)?
+//  Patch Store :      [0xf0,0x52,0x00,0x58,0x32,0x01,0x00,0x00,pp,0x00,0x00,0x00,0x00,0x00,0xf7]
+//     Message (Storing...)
 //  RequestCurrentProgram : [0xf0,0x52,0x00,0x58,0x33,0xf7]
 //     Request current bank&program. It returns [0xb0,0x00,0x00, 0xb0,0x20,0x00, 0xc0,pp] pp=program#(0-49) bank is always 0
 //  ParameterEditEnable : [0xf0,0x52,0x00,0x58,0x50,0xf7]
@@ -1754,6 +1754,7 @@ function MidiIf(ma){
     this.que.push(d);
   };
   this.SendCurrentPatch=function(){
+//    this.Send([0xc0,currentpatch]);
     this.Send(patches[currentpatch].data);
   };
   this.SenPatch=function(p){
@@ -2742,6 +2743,8 @@ function DispPatch(patch){
 function SelectPatch(p){
   p=parseInt(p);
   if(p<0)
+    return;
+  if(p==currentpatch)
     return;
   midiif.Send([0xc0,p]);
   SetPatchFocus(0);
