@@ -107,11 +107,11 @@ eff1 to eff6 include the on/off state, type of each effect, parameter values. bi
 
 In the following table, the notation like '1p2b3' means :  
 `[Effect number(0-5)] p [Parameter number(0-8)] b [bit(0-7)]`.  
-0cab ... Seems a special byte used in AMP cabinet model
-         0x00 if "OFF"
-         0x50 v1 B-AMP SVT - MarkB
-         0x51 v2 B-AMP SMR - Heaven
-         0x40 G-AMP
+0cab ... Seems a special byte used in AMP cabinet model  
+         0x00 if "OFF"  
+         0x50 v1 B-AMP SVT - MarkB  
+         0x51 v2 B-AMP SMR - Heaven  
+         0x40 G-AMP  
 
 Other notation means :   
 0t    ... Effect1 Type Bits  
