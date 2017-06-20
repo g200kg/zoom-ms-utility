@@ -25,11 +25,11 @@ returns ID code and version number,
 Bytes 10-13 represents firmware version.
 
 MS-50G   : [0xf0,0x7e,0x00,0x06,0x02,0x52,0x58,0x00,0x00,0x00,0x33,0x2e,0x30,0x30,0xf7]
-  productID = 0x58, version="3.00"
+  productID = 0x58, version="3.00"  
 MS-60B   : [0xf0,0x7e,0x00,0x06,0x02,0x52,0x5f,0x00,0x00,0x00,0x31,0x2e,0x30,0x30,0xf7]
-  productID = 0x5f, version="1.00"
+  productID = 0x5f, version="1.00"  
 MS-70CDR : [0xf0,0x7e,0x00,0x06,0x02,0x52,0x61,0x00,0x00,0x00,0x31,0x2e,0x30,0x30,0xf7]
-  productID = 0x61, version="1.00"
+  productID = 0x61, version="1.00"  
 
 In following exclusive messages, 4th byte (0x58) is for MS-50G. it should be (0x61) or (0x5f) for MS-70CDR/MS-60B.
 
@@ -70,7 +70,7 @@ value range is depends on each effect.
   Request current bank &amp; program.
   The device returns bank select and program change :  
   [0xb0,0x00,0x00, 0xb0,0x20,0x00, 0xc0,pp]  
-  here the pp=program#(0-49). This is MIDI bank select (bank = always 0) and program change.
+  here the pp=program#(0-49). This is MIDI bank select and program change messages (bank = always 0) .
 
 ### Parameter Edit Enable
 > [0xf0,0x52,0x00,0x58,0x50,0xf7]
@@ -92,21 +92,21 @@ Not yet sure
 Patch-data is MIDI system exclusive data.
 It starts with F0 and ends with F7
 
-146bytes MS-50G/MS-70CDR
-105bytes MS-60B
+146bytes MS-50G/MS-70CDR  
+105bytes MS-60B  
 
 consist of :
 >  F0 52 00 (devid) 28.. eff1 eff2,...   (eff5 eff6) patchName F7
 
-here the devid :
-0x58 MS-50G
-0x5F MS-60B, (eff5,eff6) is not exist
-0x61 MS-70CDR
+here the devid is:  
+0x58 MS-50G  
+0x5F MS-60B, (eff5,eff6) is not exist  
+0x61 MS-70CDR  
 
-eff1 to eff6 include the on/off state, type of each effect, parameter values. bit arrangement is scrambled rather than fixed format
+eff1 to eff6 include the on/off state, type of each effect, parameter values. bit arrangement is scrambled rather than fixed format.
 
-In the following table, the notation like '1p2b3' means
-[Effect number(0-5)] p [Parameter number(0-8)] b [bit].  
+In the following table, the notation like '1p2b3' means :  
+`[Effect number(0-5)] p [Parameter number(0-8)] b [bit(0-7)]`.  
 0p7nz ... Seems a special bit used in AMP cabinet model, means the parameter is non-zero (not OFF).
 
 Other notation means :   
@@ -114,7 +114,7 @@ Other notation means :
 0EfOn ... Effect1 On/Off  
 c0    ... Current Effect Focus 6-n => 0-5  
 n0    ... Max Effect Number  
-df0   ... DSP full bits
+df0   ... DSP full bits  
 N0-N9 ... Patch Name (max 10char)  
 
 |Offset| Data |       |       |       |       |       |       |       | MS60B|
