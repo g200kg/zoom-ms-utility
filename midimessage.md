@@ -1,4 +1,4 @@
-# ZOOM MS-50G MIDI Mesasges
+# ZOOM MS-50G/60B/70CDR MIDI Mesasges
 
 This is a non-official document based on a personal and non-strict experiments.
 
@@ -26,21 +26,23 @@ Bytes 10-13 represents firmware version.
 
 MS-50G   : [0xf0,0x7e,0x00,0x06,0x02,0x52,0x58,0x00,0x00,0x00,0x33,0x2e,0x30,0x30,0xf7]
   productID = 0x58, version="3.00"
+MS-60B   : [0xf0,0x7e,0x00,0x06,0x02,0x52,0x5f,0x00,0x00,0x00,0x31,0x2e,0x30,0x30,0xf7]
+  productID = 0x5f, version="1.00"
 MS-70CDR : [0xf0,0x7e,0x00,0x06,0x02,0x52,0x61,0x00,0x00,0x00,0x31,0x2e,0x30,0x30,0xf7]
   productID = 0x61, version="1.00"
 
-In following exclusive messages, 4th byte (0x58) is for MS-50G. it should be (0x61) for MS-70CDR.
+In following exclusive messages, 4th byte (0x58) is for MS-50G. it should be (0x61) or (0x5f) for MS-70CDR/MS-60B.
 
 ### Send Patch
-> [0xf0,0x52,0x00,0x58,0x28,effect1,effect2,...effect6,patch-name,0xf7] (146bytes)
+> [0xf0,0x52,0x00,0x58,0x28,effect1,effect2,...,(effect5),(effect6), patch-name,0xf7] (50G/70CDR:146bytes, 60B:105bytes)
 
-Write 146bytes patch-data to current program.
-It consist of effect1-6 parameters and patch-name. Details are described later.
+Write 146bytes/105bytes patch-data to current program.
+It consist of effect1-6 or effect1-4 parameters and patch-name. Details are described later.
 
 ### Request Patch
 > [0xf0,0x52,0x00,0x58,0x29,0xf7]
 
-Request patch-data of current program. it returns 146 bytes patch-data (same as Send Patch command)
+Request patch-data of current program. it returns 146/105 bytes patch-data (same as Send Patch command)
 
 ### Parameter Edit
 > [0xf0,0x52,0x00,0x58,0x31,nn,pp,vvLSB,vvMSB,0xf7]
@@ -66,9 +68,9 @@ value range is depends on each effect.
 > [0xf0,0x52,0x00,0x58,0x33,0xf7]
 
   Request current bank &amp; program.
-  MS-50G returns bank select and program change :  
+  The device returns bank select and program change :  
   [0xb0,0x00,0x00, 0xb0,0x20,0x00, 0xc0,pp]  
-  here the pp=program#(0-49), bank is always 0
+  here the pp=program#(0-49). This is MIDI bank select (bank = always 0) and program change.
 
 ### Parameter Edit Enable
 > [0xf0,0x52,0x00,0x58,0x50,0xf7]
@@ -89,8 +91,17 @@ Not yet sure
 
 Patch-data is MIDI system exclusive data.
 It starts with F0 and ends with F7
+
+146bytes MS-50G/MS-70CDR
+105bytes MS-60B
+
 consist of :
->  F0 52 00 58 28.. eff1 eff2,...   eff5 eff6 patchName F7
+>  F0 52 00 (devid) 28.. eff1 eff2,...   (eff5 eff6) patchName F7
+
+here the devid :
+0x58 MS-50G
+0x5F MS-60B, (eff5,eff6) is not exist
+0x61 MS-70CDR
 
 eff1 to eff6 include the on/off state, type of each effect, parameter values. bit arrangement is scrambled rather than fixed format
 
@@ -106,8 +117,8 @@ n0    ... Max Effect Number
 df0   ... DSP full bits
 N0-N9 ... Patch Name (max 10char)  
 
-|Offset| Data |       |       |       |       |       |       |       |
-|:----:|:----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|
+|Offset| Data |       |       |       |       |       |       |       | MS60B|
+|:----:|:----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:-----:|:----:|
 |   0  | 0xF0 |       |       |       |       |       |       |       |
 |   1  | 0x52 |       |       |       |       |       |       |       |
 |   2  | 0x00 |       |       |       |       |       |       |       |
@@ -194,26 +205,26 @@ N0-N9 ... Patch Name (max 10char)
 |  82  |   0  |       |       | 3p7b8 | 3p7b7 | 3p7b6 | 3p7b5 | 3p7b4 |
 |  83  |   0  |       |       |       |       |       |       |       |
 |  84  |   0  | 3p7nz |       |       |       |       |       |       |
-|  85  |   0  | 3p8b7 |  4t   |       |       |       | 4p0b2 | 4p0b10|
+|  85  |   0  | 3p8b7 |  4t   |       |       |       | 4p0b2 | 4p0b10|0|  |  |  |c1|  |  |  |
 |  86  |   0  | 3p8b6 | 3p8b5 | 3p8b4 | 3p8b3 | 3p8b2 | 3p8b1 | 3p8b0 |
 |  87  |   0  |       |       |       |       |       |       |       |
-|  88  |   0  |  4t   |  4t   |  4t   |  4t   |  4t   |  4t   | 4EfOn |
-|  89  |   0  |       |       |       |       |  4t   |  4t   |  4t   |
+|  88  |   0  |  4t   |  4t   |  4t   |  4t   |  4t   |  4t   | 4EfOn |0|c0|  |  |df3|df2|df1|df0|
+|  89  |   0  |       |       |       |       |  4t   |  4t   |  4t   |0|  |  |n2|n1 |n0 |   |   |
 |  90  |   0  |       |       |       |       |       |       |       |
-|  91  |   0  | 4p0b1 | 4p0b0 |  4t   |  4t   |  4t   |  4t   |  4t   |
-|  92  |   0  | 4p0b9 | 4p0b8 | 4p0b7 | 4p0b6 | 4p0b5 | 4p0b4 | 4p0b3 |
-|  93  |   0  | 4p1b5 | 4p2b0 | 4p2b8 | 4p3b3 | 4p4b3 | 4p5b3 | 4p6b3 |
-|  94  |   0  | 4p1b4 | 4p1b3 | 4p1b2 | 4p1b1 | 4p1b0 |       | 4p0b11|
-|  95  |   0  |       |       | 4p1b10| 4p1b9 | 4p1b8 | 4p1b7 | 4p1b6 |
-|  96  |   0  | 4p2b7 | 4p2b6 | 4p2b5 | 4p2b4 | 4p2b3 | 4p2b2 | 4p2b1 |
-|  97  |   0  | 4p3b2 | 4p3b1 | 4p3b0 |       |       | 4p2b10| 4p2b9 |
-|  98  |   0  | 4p4b2 | 4p4b1 | 4p4b0 | 4p3b7 | 4p3b6 | 4p3b5 | 4p3b4 |
-|  99  |   0  | 4p5b2 | 4p5b1 | 4p5b0 | 4p4b7 | 4p4b6 | 4p4b5 | 4p4b4 |
-| 100  |   0  | 4p6b2 | 4p6b1 | 4p6b0 | 4p5b7 | 4p5b6 | 4p5b5 | 4p5b4 |
-| 101  |   0  | 4p7b3 |       |       |       | 4p8b7 |       |  5t   |
-| 102  |   0  | 4p7b2 | 4p7b1 | 4p7b0 | 4p6b7 | 4p6b6 | 4p6b5 | 4p6b4 |
-| 103  |   0  |       |       | 4p7b8 | 4p7b7 | 4p7b6 | 4p7b5 | 4p7b4 |
-| 104  |   0  |       |       |       |       |       |       |       |
+|  91  |   0  | 4p0b1 | 4p0b0 |  4t   |  4t   |  4t   |  4t   |  4t   |  N0   |
+|  92  |   0  | 4p0b9 | 4p0b8 | 4p0b7 | 4p0b6 | 4p0b5 | 4p0b4 | 4p0b3 |  N1   |
+|  93  |   0  | 4p1b5 | 4p2b0 | 4p2b8 | 4p3b3 | 4p4b3 | 4p5b3 | 4p6b3 |  0x00 |
+|  94  |   0  | 4p1b4 | 4p1b3 | 4p1b2 | 4p1b1 | 4p1b0 |       | 4p0b11|  N2   |
+|  95  |   0  |       |       | 4p1b10| 4p1b9 | 4p1b8 | 4p1b7 | 4p1b6 |  N3   |
+|  96  |   0  | 4p2b7 | 4p2b6 | 4p2b5 | 4p2b4 | 4p2b3 | 4p2b2 | 4p2b1 |  N4   |
+|  97  |   0  | 4p3b2 | 4p3b1 | 4p3b0 |       |       | 4p2b10| 4p2b9 |  N5   |
+|  98  |   0  | 4p4b2 | 4p4b1 | 4p4b0 | 4p3b7 | 4p3b6 | 4p3b5 | 4p3b4 |  N6   |
+|  99  |   0  | 4p5b2 | 4p5b1 | 4p5b0 | 4p4b7 | 4p4b6 | 4p4b5 | 4p4b4 |  N7   |
+| 100  |   0  | 4p6b2 | 4p6b1 | 4p6b0 | 4p5b7 | 4p5b6 | 4p5b5 | 4p5b4 |  N8   |
+| 101  |   0  | 4p7b3 |       |       |       | 4p8b7 |       |  5t   |  0x00 |
+| 102  |   0  | 4p7b2 | 4p7b1 | 4p7b0 | 4p6b7 | 4p6b6 | 4p6b5 | 4p6b4 |  N9   |
+| 103  |   0  |       |       | 4p7b8 | 4p7b7 | 4p7b6 | 4p7b5 | 4p7b4 |  0x00 |
+| 104  |   0  |       |       |       |       |       |       |       |  0xF7 |
 | 105  |   0  | 4p7nz |       |       |       |       |       |       |
 | 106  |   0  | 4p8b6 | 4p8b5 | 4p8b4 | 4p8b3 | 4p8b2 | 4p8b1 | 4p8b0 |
 | 107  |   0  |       |       |       |       |       |       |       |
