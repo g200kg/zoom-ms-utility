@@ -109,9 +109,13 @@ In the following table, the notation like '1p2b3' means :
 `[Effect number(0-5)] p [Parameter number(0-8)] b [bit(0-7)]`.  
 0cab ... Seems a special byte used in AMP cabinet model  
          0x00 if "OFF"  
-         0x50 v1 B-AMP SVT - MarkB  
-         0x51 v2 B-AMP SMR - Heaven  
+         0x50 v1 B-AMP (SVT - MarkB)  
+         0x51 v2 B-AMP (SMR - Heaven)  
          0x40 G-AMP  
+         (this is depends on CAB setting, not for effect type)  
+
+0v   ... Also a special bit for B-AMP? it is ON if the effect is ver2 B-AMP  
+         (this is for effect type, not for CAB setting)
 
 Other notation means :   
 0t    ... Effect1 Type Bits  
@@ -132,7 +136,7 @@ N0-N9 ... Patch Name (max 10char)
 |   5  |   0  |  0t   |       |       | 0p0b2 | 0p0b10| 0p1b5 | 0p2b0 |
 |   6  |   0  |  0t   |  0t   |  0t   |  0t   |  0t   |   0t  | 0EfOn |
 |   7  |   0  |       |       |       |       |  0t   |   0t  |  0t   |
-|   8  |   0  |       |       |       |       |       |       |       |
+|   8  |   0  |       |  0v   |       |       |       |       |       |
 |   9  |   0  | 0p0b1 | 0p0b0 | 0t    |   0t  |   0t  |   0t  |   0t  |
 |  10  |   0  | 0p0b9 | 0p0b8 | 0p0b7 | 0p0b6 | 0p0b5 | 0p0b4 | 0p0b3 |
 |  11  |   0  | 0p1b4 | 0p1b3 | 0p1b2 | 0p1b1 | 0p1b0 |       | 0p0b11|
@@ -152,7 +156,7 @@ N0-N9 ... Patch Name (max 10char)
 |  25  |   0  |       |       |       |       |       |       |       |
 |  26  |   0  |  1t   |  1t   |  1t   |  1t   |  1t   |  1t   | 1EfOn |
 |  27  |   0  |       |       |       |       |  1t   |  1t   |  1t   |
-|  28  |      |       |       |       |       |       |       |       |
+|  28  |   0  |       |  1v   |       |       |       |       |       |
 |  29  |   0  | 1p0b2 | 1p0b10| 1p1b5 | 1p2b0 | 1p2b8 | 1p3b3 | 1p4b3 |
 |  30  |   0  | 1p0b1 | 1p0b0 |  1t   |  1t   |  1t   |  1t   |  1t   |
 |  31  |   0  | 1p0b9 | 1p0b8 | 1p0b7 | 1p0b6 | 1p0b5 | 1p0b4 | 1p0b3 |
@@ -173,7 +177,7 @@ N0-N9 ... Patch Name (max 10char)
 |  46  |   0  |       |       |       |       |       |       |       |
 |  47  |   0  |       |  2t   |  2t   |  2t   |  2t   |  2t   | 2EfOn |
 |  48  |   0  |       |       |       |       |  2t   |  2t   |  2t   |
-|  49  |   0  |       |       |       |       |       |       |       |
+|  49  |   0  |       |  2v   |       |       |       |       |       |
 |  50  |   0  | 2p0b1 | 2p0b0 |  2t   |  2t   |  2t   |  2t   |  2t   |
 |  51  |   0  | 2p0b9 | 2p0b8 | 2p0b7 | 2p0b6 | 2p0b5 | 2p0b4 | 2p0b3 |
 |  52  |   0  | 2p1b4 | 2p1b3 | 2p1b2 | 2p1b1 | 2p1b0 |       | 2p0b11|
@@ -194,7 +198,7 @@ N0-N9 ... Patch Name (max 10char)
 |  66  |   0  |       |       |       |       |       |       |       |
 |  68  |   0  |       |       |       |       |  3t   |  3t   |  3t   |
 |  69  |   0  |       | 3p0b2 | 3p0b10| 3p1b5 | 3p2b0 | 3p2b8 | 3p3b3 |
-|  70  |   0  |       |       |       |       |       |       |       |
+|  70  |   0  |       |  3v   |       |       |       |       |       |
 |  71  |   0  | 3p0b1 | 3p0b0 |  3t   |  3t   |  3t   |  3t   |  3t   |
 |  72  |   0  | 3p0b9 | 3p0b8 | 3p0b7 | 3p0b6 | 3p0b5 | 3p0b4 | 3p0b3 |
 |  73  |   0  | 3p1b4 | 3p1b3 | 3p1b2 | 3p1b1 | 3p1b0 |       | 3p0b11|
