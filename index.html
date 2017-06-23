@@ -2867,7 +2867,6 @@ function Init(){
   }
   for(i=0;i<50;++i){
     for(var ii=0;ii<6;++ii){
-//      var id=GetEffectId(i,ii);
       var id=patches[i].GetEffectId(ii);
       if(id){
         effectlist[id].install=1;
@@ -2942,9 +2941,12 @@ function Init(){
     var im1="./images/50v"+(ef.ver&0xf)+".png";
     var im2="./images/60v"+((ef.ver>>4)&0xf)+".png";
     var im3="./images/70v"+((ef.ver>>8)&0xf)+".png";
-    e.innerHTML="<img src='./images/"+ef.name.replace(/ /g,"_")+".png' draggable='false'/><div>"+ef.name+"</div><img class='mk50' src='"+im1+"'/><img class='mk60' src='"+im2+"'/><img class='mk70' src='"+im3+"'/>";
+    e.innerHTML="<div class='dspbar'></div><img src='./images/"+ef.name.replace(/ /g,"_")+".png' draggable='false'/><div>"+ef.name+"</div><img class='mk50' src='"+im1+"'/><img class='mk60' src='"+im2+"'/><img class='mk70' src='"+im3+"'/>";
     e.setAttribute("class","efitem");
     e.setAttribute("title",ef.title);
+    var b=e.childNodes[0];
+    b.style.height=ef.dspmax*40+"px";
+    b.style.borderTop=((40-ef.dspmax*40)|0)+"px solid #000";
     var div=document.getElementById("ef"+ef.group);
     if(div){
       div.appendChild(e);
@@ -3137,9 +3139,10 @@ function PopupEffectReplace(){
   document.getElementById("effectpanelbase").style.display="block";
 }
 function PopupEffectInsert(){
-  if(patches[currentpatch].maxfx==6)
+  var efmax=(midiif.devid==0x5f)?4:6;
+  if(patches[currentpatch].fx[efmax-1][1]!=0)
     return;
-  for(var j=5;j>currenteffect;--j){
+  for(var j=efmax-1;j>currenteffect;--j){
     for(var k=0;k<11;++k){
       SetParamVal(currentpatch,j,k,GetParamVal(currentpatch,j-1,k));
     }
@@ -3859,13 +3862,17 @@ function DispPatchName(p){
   }
 }
 function DispPatch(patch){
-  var n,p,cell;
+  var efmax,n,p,cell,dsp;
   var tab=document.getElementById("effects");
   if(typeof(patch)=="undefined")
     patch=currentpatch;
-  for(n=0;n<6;++n){
+  dsp=0;
+  efmax=(midiif.devid==0x5f)?4:6;
+  for(n=0;n<efmax;++n){
     var id=patches[patch].GetEffectId(n);
     var ef=effectlist[id];
+    if(ef && ef.dspmax)
+      dsp+=ef.dspmax;
     var c=document.getElementById("fnam"+(n+1));
     var t=document.getElementById("ftxt"+(n+1));
     var img=document.getElementById("fimg"+(n+1));
@@ -3960,6 +3967,10 @@ function DispPatch(patch){
       }
     }
   }
+  var b=document.getElementById("dspgraph");
+  if(dsp>1) dsp=1;
+  b.style.height=dsp*42*efmax+"px";
+  b.style.borderBottom=(1-dsp)*42*efmax+"px";
 }
 function SelectPatch(p){
   p=parseInt(p);
@@ -4727,6 +4738,16 @@ img{
 #patches div.drag{
   opacity: 0.5;
 }
+#dspgraph{
+  position:absolute;
+  left:30px;
+  top:337px;
+  width:5px;
+  height:0px;
+  display:inline-block;
+  background:#f00;
+  border:1px solid #000;
+}
 #effects{
   position:absolute;
   top:335px;
@@ -4935,6 +4956,17 @@ webaudio-switch{
   height:9px;
   width:19px;
 }
+.efitem .dspbar{
+  position:absolute;
+  left:5px;
+  bottom:30px;
+  height:30px;
+  width:2px;
+  background:#f00;
+  border:1px solid #000;
+  padding:0;
+  margin:0;
+}
 #usagepanel{
   position:absolute;
   top:85px;
@@ -5119,6 +5151,7 @@ webaudio-switch{
         </tr>
       </table>
     </div>
+    <div id="dspgraph"></div>
     <table id="effects">
       <tr>
         <th><button class="fnum" id="fnum1">1</button></th><td id="fnam1" class="fnam"><img id="fimg1" class="fimg"/><img id="full1" class="fimg"/><div id="ftxt1" class="ftxt"></div></td>
