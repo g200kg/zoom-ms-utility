@@ -68,6 +68,7 @@ var patchkeymap=[
 var effectkeymap=["F1","F2","F3","F4","F5","F6"];
 var tunerkey="F9";
 var dirty=0;
+var dspmax,dspmin;
 
 var emptypatch=[
   0xf0,0x52,0x00,0x58,0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -3862,17 +3863,19 @@ function DispPatchName(p){
   }
 }
 function DispPatch(patch){
-  var efmax,n,p,cell,dsp;
+  var efmax,n,p,cell;
   var tab=document.getElementById("effects");
   if(typeof(patch)=="undefined")
     patch=currentpatch;
-  dsp=0;
+  dspmax=dspmin=0;
   efmax=(midiif.devid==0x5f)?4:6;
   for(n=0;n<efmax;++n){
     var id=patches[patch].GetEffectId(n);
     var ef=effectlist[id];
-    if(ef && ef.dspmax)
-      dsp+=ef.dspmax;
+    if(ef && ef.dspmax){
+      dspmax+=ef.dspmax;
+      dspmin+=ef.dspmin;
+    }
     var c=document.getElementById("fnam"+(n+1));
     var t=document.getElementById("ftxt"+(n+1));
     var img=document.getElementById("fimg"+(n+1));
@@ -3968,9 +3971,11 @@ function DispPatch(patch){
     }
   }
   var b=document.getElementById("dspgraph");
-  if(dsp>1) dsp=1;
-  b.style.height=dsp*42*efmax+"px";
-  b.style.borderBottom=(1-dsp)*42*efmax+"px";
+  if(dspmax>1) dspmax=1;
+  if(dspmin>1) dspmin=1;
+  var d=(dspmax+dspmin)*.5;
+  b.style.height=d*42*efmax+"px";
+  b.style.borderBottom=(1-d)*42*efmax+"px solid #000";
 }
 function SelectPatch(p){
   p=parseInt(p);
