@@ -175,6 +175,7 @@ var effectlist={
     {name:"Bal",max:100},
   ]},
   0x40000118:{name:"BaFzSmile",group:"DRIVE",order:2008,install:0,ver:0x0020,title:"FUZZ FACE emulation with added parameter",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Gain",max:100},
     {name:"Tone",max:100},
@@ -182,6 +183,7 @@ var effectlist={
     {name:"Bal",max:100},
   ]},
   0x0020001a:{name:"BassDrive",group:"DRIVE",order:2009,install:0,ver:0x0010,title:"SansAmp BASS DRIVER DI simulation",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Bass",def:11,max:20,disp:-10},
     {name:"Trebl",def:11,max:20,disp:-10},
@@ -204,6 +206,7 @@ var effectlist={
     {name:"CHAN",def:1,max:1,disp:["CLN","DIST"]},
   ]},
   0x0060001a:{name:"Bass BB",group:"DRIVE",order:2011,install:0,ver:0x0010,title:"Xotic Bass BB Preamp simulation",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Gain",def:84,max:100},
     {name:"Bass",def:13,max:20,disp:-10},
@@ -212,6 +215,7 @@ var effectlist={
     {name:"Level",def:70,max:150},
   ]},
   0x4000001a:{name:"DI5",group:"DRIVE",order:2012,install:0,ver:0x0010,title:"AVALON DESIGN U5 preamp simulation",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Gain",def:60,max:100},
     {name:"Tone",def:0,max:6,disp:["OFF","1","2","3","4","5","6"]},
@@ -219,6 +223,7 @@ var effectlist={
     {name:"HiCut",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x4020001a:{name:"Bass Pre",group:"DRIVE",order:2013,install:0,ver:0x0010,title:"Preamp with semi-parametric EQ",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Bass",def:3,max:10},
     {name:"Treble",def:3,max:10},
@@ -227,6 +232,7 @@ var effectlist={
     {name:"Freq",def:7,max:23,disp:["100Hz","120Hz","140Hz","150Hz","160Hz","180Hz","200Hz","250Hz","300Hz","350Hz","400Hz","450Hz","500Hz","630Hz","800Hz","1.0kHz","1.2kHz","1.6kHz","2.0kHz","2.5kHz","3.0kHz","3.6kHz","4.0kHz","4.5kHz",]},
   ]},
   0x4040001a:{name:"AC Bs Pre",group:"DRIVE",order:2014,install:0,ver:0x0010,title:"Preamp with graphic EQ",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Gain",def:60,max:100},
     {name:"Depth",def:10,max:10},
@@ -253,6 +259,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x0040000a:{name:"B-Man",group:"AMP",order:2101,install:0,ver:0x0010,title:"Fender BASSMAN 100 simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:15,max:20,disp:-10},
     {name:"Mid",def:16,max:20,disp:-10},
@@ -266,6 +273,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x0060000a:{name:"HRT3500",group:"AMP",order:2102,install:0,ver:0x0010,title:" Hartke HA3500 simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:12,max:20,disp:-10},
     {name:"Mid",def:14,max:20,disp:-10},
@@ -279,6 +287,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x4040000a:{name:"acoustic",group:"AMP",order:2103,install:0,ver:0x0010,title:"acoustic 360 simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:15,max:20,disp:-10},
     {name:"Mid",def:15,max:20,disp:-10},
@@ -292,6 +301,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x4060000a:{name:"Ag Amp",group:"AMP",order:2104,install:0,ver:0x0010,title:"Aguilar DB750 simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:13,max:20,disp:-10},
     {name:"Mid",def:14,max:20,disp:-10},
@@ -305,6 +315,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x4000010a:{name:"Mark B",group:"AMP",order:2105,install:0,ver:0x0010,title:"Markbass Little Mark III simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:16,max:20,disp:-10},
     {name:"Mid",def:13,max:20,disp:-10},
@@ -318,6 +329,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x4000000a:{name:"SMR",group:"AMP",order:2106,install:0,ver:0x0020,title:"SWR SM-900 simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:13,max:20,disp:-10},
     {name:"Mid",def:17,max:20,disp:-10},
@@ -331,6 +343,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x4020000a:{name:"Flip Top",group:"AMP",order:2107,install:0,ver:0x0020,title:"Ampeg B-15 simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:12,max:20,disp:-10},
     {name:"Mid",def:18,max:20,disp:-10},
@@ -344,6 +357,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x0000010a:{name:"Monotone",group:"AMP",order:2108,install:0,ver:0x0020,title:"POLYTONE MINI-BRUTE III simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:13,max:20,disp:-10},
     {name:"Mid",def:18,max:20,disp:-10},
@@ -357,6 +371,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x0020010a:{name:"SuperB",group:"AMP",order:2109,install:0,ver:0x0020,title:"Marshall Super Bass I simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:15,max:20,disp:-10},
     {name:"Mid",def:17,max:20,disp:-10},
@@ -370,6 +385,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x0040010a:{name:"G-Krueger",group:"AMP",order:2110,install:0,ver:0x0020,title:"Gallien-Krueger 800RB simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:18,max:20,disp:-10},
     {name:"Mid",def:14,max:20,disp:-10},
@@ -383,6 +399,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x0060010a:{name:"Heaven",group:"AMP",order:2111,install:0,ver:0x0020,title:"Eden WT-800 simulation",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Bass",def:15,max:20,disp:-10},
     {name:"Mid",def:13,max:20,disp:-10},
@@ -396,6 +413,7 @@ var effectlist={
     {name:"Mix",def:50,max:100},
   ]},
   0x0070000e:{name:"Ba Synth",group:"SFX",order:2200,install:0,ver:0x0010,title:"Monophonic bass synth sound",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Decay",def:36,max:100},
     {name:"Wave",def:2,max:2,disp:["Saw","Pulse","PWM"]},
@@ -405,6 +423,7 @@ var effectlist={
     {name:"Level",def:135,max:150},
   ]},
   0x4060000e:{name:"StdSyn",group:"SFX",order:2201,install:0,ver:0x0010,title:"ZOOM original bass synth sound",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Sense",def:10,max:100},
     {name:"Sound",def:0,max:3,disp:1},
@@ -414,6 +433,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0000010e:{name:"SynTlk",group:"SFX",order:2202,install:0,ver:0x0010,title:"Talking modulator like sound",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Decay",def:40,max:100},
     {name:"Type",def:1,max:3,disp:["iA","UE","UA","oA"]},
@@ -423,6 +443,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0020010e:{name:"Z-Syn",group:"SFX",order:2203,install:0,ver:0x0010,title:"analog bass synth sound",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Wave",def:0,max:1,disp:["Saw","Sqr"]},
     {name:"Decay",def:72,max:100},
@@ -435,6 +456,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0040010e:{name:"Defret",group:"SFX",order:2204,install:0,ver:0x0010,title:"Fretless bass sound",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Sense",def:11,max:30},
     {name:"Color",def:7,max:9,disp:1},
@@ -442,6 +464,7 @@ var effectlist={
     {name:"Tone",def:36,max:49,disp:1},
   ]},
   0x4000010e:{name:"V-Syn",group:"SFX",order:2205,install:0,ver:0x0020,title:"Vintage bass synth sound",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"Decay",def:24,max:100},
     {name:"Sense",def:11,max:30},
@@ -451,6 +474,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4020010e:{name:"4VoiceSyn",group:"SFX",order:2205,install:0,ver:0x0020,title:"Add synth harmony effect",
+    dspmax:1/4,dspmin:0,
     param:[
     {name:"ATTCK",def:0,max:10},
     {name:"Mode",def:3,max:8,disp:1},
@@ -463,6 +487,7 @@ var effectlist={
 
 //MS-70CDR
   0x4070000c:{name:"Ba Chorus",group:"MOD",order:1000,install:0,ver:0x0110,title:"Chorus effect for bass",
+    dspmax:1/6,dspmin:2/25,
     param:[
     {name:"Depth",def:42,max:100},
     {name:"Rate",def:22,max:49,disp:1},
@@ -472,6 +497,7 @@ var effectlist={
     {name:"PreD",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x0010010c:{name:"Ba Detune",group:"MOD",order:1001,install:0,ver:0x0110,title:"Mix a small amount of the pitch-shift",
+    dspmax:1/6,dspmin:2/15,
     param:[
     {name:"Cent",def:35,max:50,disp:-50,dispr:2},
     {name:"PreD",def:0,max:50,disp:0},
@@ -481,6 +507,7 @@ var effectlist={
     {name:"LoCut",def:1,max:10,disp:["OFF","60Hz","120Hz","180Hz","200Hz","280Hz","340Hz","400Hz","500Hz","630Hz","800Hz"]},
   ]},
   0x0070010c:{name:"Ba Ensmbl",group:"MOD",order:1002,install:0,ver:0x0110,title:"Bass chorus with 3D movement",
+    dspmax:1/6,dspmin:2/20,
     param:[
     {name:"Depth",def:48,max:100},
     {name:"Rate",def:22,max:49,disp:1},
@@ -489,6 +516,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4050010c:{name:"BaFlanger",group:"MOD",order:1003,install:0,ver:0x0110,title:"ADA Flanger modeling",
+    dspmax:1/6,dspmin:2/20,
     param:[
     {name:"Depth",def:76,max:100},
     {name:"Rate",def:40,max:78},
@@ -499,6 +527,7 @@ var effectlist={
     {name:"LoCut",def:1,max:10,disp:["OFF","60Hz","120Hz","180Hz","200Hz","280Hz","340Hz","400Hz","500Hz","630Hz","800Hz"]},
   ]},
   0x0030020c:{name:"Ba Octave",group:"MOD",order:1004,install:0,ver:0x0210,title:"Adds sound one octave below",
+    dspmax:1/6,dspmin:2/25,
     param:[
     {name:"Oct",def:80,max:100},
     {name:"Dry",def:100,max:100},
@@ -508,6 +537,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0070020c:{name:"Ba Pitch",group:"MOD",order:1004,install:0,ver:0x0110,title:"Pitch shifter for bass",
+    dspmax:1/5,dspmin:1/6,
     param:[
     {name:"Shift",def:0,max:25,disp:["-12","-11","-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","0","1","2","3","4","5","6","7","8","9","10","11","12","24"]},
     {name:"Tone",def:7,max:10},
@@ -516,6 +546,7 @@ var effectlist={
     {name:"Level",def:140,max:150},
   ]},
   0x00500010:{name:"ModDelay2",group:"DELAY",order:1005,install:0,ver:0x0110,title:"Modulation delay with depth adjust",
+    dspmax:1/6,dspmin:2/25,
     param:[
     {name:"Time",def:529,max:2014,disp:1},
     {name:"F.B",def:50,max:100},
@@ -526,6 +557,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00000204:{name:"St Bs GEQ",group:"FILTER",order:1006,install:0,ver:0x0120,title:"7 bands stereo GEQ for bass",
+    dspmax:1/5,dspmin:1/6,
     param:[
     {name:"50Hz",def:12,max:24,disp:-12},
     {name:"120Hz",def:12,max:24,disp:-12},
@@ -537,6 +569,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x006a0002:{name:"160 Comp",group:"COMP",order:1008,install:0,ver:0x0210,title:"dbx 160A style comp",
+    dspmax:1/6,dspmin:2/20,
     param:[
     {name:"THRSH",def:38,max:60,disp:-60},
     {name:"Ratio",def:30,max:90,disp:1,dispr:0.1},
@@ -545,6 +578,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x00740002:{name:"Limiter",group:"COMP",order:1010,install:0,ver:0x0210,title:"Limiter that suppresses signal peaks",
+    dspmax:1/6,dspmin:2/25,
     param:[
     {name:"THRSH",def:20,max:50},
     {name:"Ratio",def:3,max:9},
@@ -552,6 +586,7 @@ var effectlist={
     {name:"REL",def:2,max:9,disp:1},
   ]},
   0x00400102:{name:"DualComp",group:"COMP",order:1012,install:0,ver:0x0220,title:"Compressor with low/high separate frequency",
+    dspmax:1/6,dspmin:2/20,
     param:[
     {name:"Hi",def:24,max:50},
     {name:"Lo",def:15,max:50},
@@ -560,6 +595,7 @@ var effectlist={
     {name:"Tone",def:2,max:10},
   ]},
   0x00300004:{name:"Ba GEQ",group:"FILTER",order:1020,install:0,ver:0x0210,title:"7 bands GEQ for bass",
+    dspmax:1/6,dspmin:2/20,
     param:[
     {name:"50Hz",def:12,max:24,disp:-12},
     {name:"120Hz",def:12,max:24,disp:-12},
@@ -571,6 +607,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x00480004:{name:"Ba PEQ",group:"FILTER",order:1100,install:0,ver:0x0210,title:"2-band parametric equalizer for bass",
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Freq1",def:8,max:37,disp:[
       "20Hz","25Hz","32Hz","40Hz","50Hz","63Hz","70Hz","80Hz","100Hz","120Hz","140Hz","150Hz","160Hz",
@@ -589,6 +626,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x00500004:{name:"Splitter",group:"FILTER",order:1101,install:0,ver:0x0210,title:"Divide into 2bands and mix with ratio",
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Hi",def:19,max:50,disp:0,dispr:2},
     {name:"Lo",def:16,max:50,disp:0,dispr:2},
@@ -596,12 +634,14 @@ var effectlist={
     {name:"Level",def:95,max:150},
   ]},
   0x00580004:{name:"Bottom B",group:"FILTER",order:1102,install:0,ver:0x0210,title:"Emphasizes low/high frequencies",
+    dspmax:1/6,dspmin:2/20,
     param:[
     {name:"Bass",def:6,max:10},
     {name:"Trebl",def:7,max:10},
     {name:"Level",def:60,max:150},
   ]},
   0x40300004:{name:"BaAutoWah",group:"FILTER",order:1103,install:0,ver:0x0210,title:"Auto wah for bass",
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Sense",def:11,max:19,disp:["-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","1","2","3","4","5","6","7","8","9","10"]},
     {name:"Reso",def:8,max:10},
@@ -609,6 +649,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x00100104:{name:"Z Tron",group:"FILTER",order:1104,install:0,ver:0x0210,title:"Envelope Filter like Q-Tron in LP mode",
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Sense",def:12,max:19,disp:["-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","1","2","3","4","5","6","7","8","9","10"]},
     {name:"Reso",def:7,max:10},
@@ -616,6 +657,7 @@ var effectlist={
     {name:"Level",def:108,max:150},
   ]},
   0x002a0104:{name:"A-Filter",group:"FILTER",order:1105,install:0,ver:0x0210,title:"Resonance filter with a sharp envelope",
+    dspmax:1/6,dspmin:2/25,
     param:[
     {name:"Sense",def:7,max:9,disp:1},
     {name:"Peak",def:7,max:10},
@@ -624,6 +666,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x00340104:{name:"Ba Cry",group:"FILTER",order:1106,install:0,ver:0x0210,title:"Bass frequency talking modulator",
+    dspmax:1/6,dspmin:2/20,
     param:[
     {name:"Range",def:4,max:9,disp:1},
     {name:"Reso",def:8,max:10},
@@ -634,7 +677,7 @@ var effectlist={
 
 //MS-50G
   0x00100002:{name:"Comp",group:"COMP",order:100,install:0,ver:0x0201,title:"MXR DynaComp style comp",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Sense",def:6,max:10},
     {name:"Tone",def:6,max:10},
@@ -665,27 +708,27 @@ var effectlist={
     {name:"Level",def:50,max:150}
   ]},
   0x40000002:{name:"SlowATTCK",group:"COMP",order:104,install:0,ver:0x0211,title:"Violin like slow attack sounds",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Time",def:20,max:49,disp:1},
     {name:"Curve",def:10,max:10},
     {name:"Level",def:100,max:150}
   ]},
   0x40200002:{name:"ZNR",group:"COMP",order:105,install:0,ver:0x0111,title:"ZOOM's unique noise reduction",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"THRSH",def:9,max:24,disp:1},
     {name:"DETCT",def:1,max:1,disp:["GtrIn","EfxIn"]},
     {name:"Level",def:100,max:150}
   ]},
   0x40400002:{name:"NoiseGate",group:"COMP",order:106,install:0,ver:0x0222,title:"Cuts the sound during playing pauses",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"THRSH",def:9,max:24,disp:1},
     {name:"Level",def:100,max:150}
   ]},
   0x40600002:{name:"DirtyGate",group:"COMP",order:107,install:0,ver:0x0223,title:"Gate with vintage style way of closing",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"THRSH",def:9,max:24,disp:1},
     {name:"Level",def:100,max:150}
@@ -700,13 +743,13 @@ var effectlist={
     {name:"OUT",def:88,max:100}
   ]},
   0x00100004:{name:"LineSel",group:"FILTER",order:200,install:0,ver:0x0111,title:"Send directly to OUTPUT when OFF",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"EFX_L",def:100,max:150},
     {name:"OUT_L",def:100,max:150}
   ]},
   0x00200004:{name:"GraphicEQ",group:"FILTER",order:201,install:0,ver:0x0201,title:"6-band quealizer",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"160Hz",def:12,max:24,disp:-12},
     {name:"400Hz",def:12,max:24,disp:-12},
@@ -717,7 +760,7 @@ var effectlist={
     {name:"Level",def:100,max:150}
   ]},
   0x00400004:{name:"ParaEQ",group:"FILTER",order:202,install:0,ver:0x0201,title:"2-band parametric equalizer",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Freq1",def:8,max:30,
       disp:["20Hz","25Hz","32Hz","40Hz","50Hz","63Hz","80Hz","100Hz","125Hz","160Hz","200Hz","250Hz","320Hz","400Hz","500Hz","630Hz",
@@ -732,14 +775,14 @@ var effectlist={
     {name:"Level",def:100,max:150}
   ]},
   0x00600004:{name:"Exciter",group:"FILTER",order:203,install:0,ver:0x0212,title:"2-band phase exciter",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Bass",def:0,max:100},
     {name:"Trebl",def:0,max:100},
     {name:"Level",def:100,max:150}
   ]},
   0x40000004:{name:"CombFLTR",group:"FILTER",order:204,install:0,ver:0x0202,title:"Comb filter, that like fix modulated flanger",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Freq",def:24,max:49,disp:1},
     {name:"Reso",def:15,max:20,disp:-10},
@@ -748,21 +791,21 @@ var effectlist={
     {name:"Level",def:100,max:150}
   ]},
   0x40200004:{name:"AutoWah",group:"FILTER",order:205,install:0,ver:0x0201,title:"Wah accordance with picking intensity",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Sense",def:17,max:19,disp:["-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","1","2","3","4","5","6","7","8","9","10"]},
     {name:"Reso",def:8,max:10},
     {name:"Level",def:100,max:150}
   ]},
   0x40400004:{name:"Resonance",group:"FILTER",order:206,install:0,ver:0x0202,title:"Resonance filter according to picking intensisty",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Sense",def:14,max:19,disp:["-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","1","2","3","4","5","6","7","8","9","10"]},
     {name:"Reso",def:8,max:10},
     {name:"Level",def:100,max:150}
   ]},
   0x40600004:{name:"Cry",group:"FILTER",order:207,install:0,ver:0x0201,title:"Like the talking modulator",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Range",def:6,max:9,disp:1},
     {name:"Reso",def:8,max:10},
@@ -792,7 +835,7 @@ var effectlist={
     {name:"Level",def:100,max:150}
   ]},
   0x00400104:{name:"Step",group:"FILTER",order:210,install:0,ver:0x0201,title:"Special effect for sound stepping",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Depth",def:60,max:100},
     {name:"Rate",def:25,max:78},
@@ -1342,7 +1385,7 @@ var effectlist={
     {name:"CAB",def:336,max:gampcabmax,disp:gampcabdisp},
     {name:"OUT",def:0,max:4,disp:["LINE","COMBO FRONT","STACK FRONT","COMBO POWER AMP","STACK POWER AMP",]}]},
   0x0010000c:{name:"Tremolo",group:"MOD",order:500,install:0,ver:0x0211,title:"Volume varieing effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Depth",def:80,max:100},
     {name:"Rate",def:33,max:78},
@@ -1351,7 +1394,7 @@ var effectlist={
       "DWN 0","DWN 1","DWN 2","DWN 3","DWN 4","DWN 5","DWN 6","DWN 7","DWN 8","DWN 9",
       "TRI 0","TRI 1","TRI 2","TRI 3","TRI 4","TRI 5","TRI 6","TRI 7","TRI 8","TRI 9"]}]},
   0x0020000c:{name:"DuoTrem",group:"MOD",order:501,install:0,ver:0x0123,title:"Combines two tremolos",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"RateA",def:46,max:78},
     {name:"RateB",def:5,max:78},
@@ -1367,7 +1410,7 @@ var effectlist={
       "TRI 0","TRI 1","TRI 2","TRI 3","TRI 4","TRI 5","TRI 6","TRI 7","TRI 8","TRI 9"]},
   ]},
   0x0040000c:{name:"Slicer",group:"MOD",order:502,install:0,ver:0x0202,title:"Rhythmical sounds by slicing",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"PTTRN",def:0,max:19,disp:1},
     {name:"Speed",def:24,max:77,disp:1},
@@ -1376,14 +1419,14 @@ var effectlist={
     {name:"Level",def:130,max:150},
   ]},
   0x0060000c:{name:"Phaser",group:"MOD",order:503,install:0,ver:0x0111,title:"Phase varieing effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Rate",def:11,max:77,disp:1},
     {name:"Color",def:3,max:3,disp:["4 STG","8 STG","inv 4","inv 8"]},
     {name:"Level",def:100,max:150},
   ]},
   0x006a000c:{name:"DuoPhase",group:"MOD",order:504,install:0,ver:0x0221,title:"Combines 2 phasers",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"RateA",def:46,max:77,disp:1},
     {name:"RateB",def:5,max:51,disp:1},
@@ -1395,7 +1438,7 @@ var effectlist={
     {name:"DPT_B",def:62,max:99,disp:1},
   ]},
   0x0074000c:{name:"WarpPhase",group:"MOD",order:505,install:0,ver:0x0222,title:"Phaser with one way effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Speed",def:24,max:77,disp:1},
     {name:"Reso",def:7,max:10},
@@ -1403,7 +1446,7 @@ var effectlist={
     {name:"DRCTN",def:0,max:1,disp:["Go","Back"]},
   ]},
   0x4000000c:{name:"TheVibe",group:"MOD",order:506,install:0,ver:0x0121,title:"Unique undulations vibe",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Speed",def:25,max:50},
     {name:"Depth",def:60,max:100},
@@ -1413,7 +1456,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4060000c:{name:"Chorus",group:"MOD",order:507,install:0,ver:0x0101,title:"Mixing shifted pitch effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/12,
     param:[
     {name:"Depth",def:40,max:100},
     {name:"Rate",def:24,max:49,disp:1},
@@ -1422,7 +1465,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0000010c:{name:"Detune",group:"MOD",order:508,install:0,ver:0x0101,title:"Chorus without modulation by slightly pitch-shifted mix",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Cent",def:35,max:50,disp:-25},
     {name:"PreD",def:0,max:50},
@@ -1431,7 +1474,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0020010c:{name:"VintageCE",group:"MOD",order:509,install:0,ver:0x0122,title:"BOSS CE-1 modeling",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Comp",def:2,max:9},
     {name:"Rate",def:24,max:49,disp:1},
@@ -1439,7 +1482,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0040010c:{name:"StereoCho",group:"MOD",order:510,install:0,ver:0x0121,title:"Stereo chorus",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Depth",def:80,max:100},
     {name:"Rate",def:29,max:49,disp:1},
@@ -1448,7 +1491,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0060010c:{name:"Ensemble",group:"MOD",order:511,install:0,ver:0x0102,title:"Chorus with 3D movement",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Depth",def:40,max:100},
     {name:"Rate",def:29,max:49,disp:1},
@@ -1457,7 +1500,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4020010c:{name:"SuperCho",group:"MOD",order:512,install:0,ver:0x0121,title:"BOSS CH-1 SUPER CHORUS modeling",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"E.LVL",def:50,max:120},
     {name:"Rate",def:50,max:100},
@@ -1466,7 +1509,7 @@ var effectlist={
     {name:"Mode",def:0,max:1,disp:["MONO","STR"]},
   ]},
   0x4030010c:{name:"VinFLNGR",group:"MOD",order:513,install:0,ver:0x0222,title:"MXR M-117R like analog flanger",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Depth",def:47,max:100},
     {name:"Rate",def:7,max:78},
@@ -1476,7 +1519,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4040010c:{name:"Flanger",group:"MOD",order:514,install:0,ver:0x0101,title:"ADA flanger like jet sound",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Depth",def:47,max:100},
     {name:"Rate",def:7,max:78},
@@ -1486,7 +1529,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4060010c:{name:"DynaFLNGR",group:"MOD",order:515,install:0,ver:0x0222,title:"Flanger with effect changes according to input level",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Depth",def:30,max:100},
     {name:"Rate",def:38,max:78},
@@ -1495,7 +1538,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0000020c:{name:"Vibrato",group:"MOD",order:516,install:0,ver:0x0121,title:"Automatic vibrato",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Depth",def:40,max:100},
     {name:"Rate",def:30,max:78},
@@ -1504,7 +1547,7 @@ var effectlist={
     {name:"Level",def:120,max:150},
   ]},
   0x0020020c:{name:"Octave",group:"MOD",order:517,install:0,ver:0x0201,title:"Adding one/two octave below sound",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Oct1",def:80,max:100},
     {name:"Oct2",def:15,max:100},
@@ -1514,7 +1557,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0040020c:{name:"PitchSHFT",group:"MOD",order:518,install:0,ver:0x0111,title:"Pitch shift up or down",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Shift",def:19,max:25,disp:["-12","-11","-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","0","1","2","3","4","5","6","7","8","9","10","11","12","24"]},
     {name:"Tone",def:7,max:10},
@@ -1523,7 +1566,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0060020c:{name:"MonoPitch",group:"MOD",order:519,install:0,ver:0x0201,title:"Sound variance pitch shifter for monophonic",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Shift",def:0,max:25,disp:-12},
     {name:"Tone",def:6,max:10},
@@ -1532,7 +1575,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4000020c:{name:"HPS",group:"MOD",order:520,install:0,ver:0x0101,title:"Intelligent pitch shifter according to scale/key",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Scale",def:6,max:9,disp:["-6","-5","-4","-3","-m","m","3","4","5","6"]},
     {name:"Key",def:0,max:11,disp:["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]},
@@ -1541,7 +1584,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4020020c:{name:"BendCho",group:"MOD",order:521,install:0,ver:0x0202,title:"Pitch bending each input note",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Depth",def:40,max:100},
     {name:"Time",def:50,max:50},
@@ -1551,7 +1594,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4040020c:{name:"MojoRolle",group:"MOD",order:522,install:0,ver:0x0202,title:"Pitch modulation after picking",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Depth",def:37,max:100},
     {name:"Speed",def:57,max:128},
@@ -1560,7 +1603,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4060020c:{name:"RingMod",group:"MOD",order:523,install:0,ver:0x0222,title:"Metallic ringing sound",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Freq",def:27,max:49,disp:1},
     {name:"Tone",def:10,max:10},
@@ -1568,7 +1611,7 @@ var effectlist={
     {name:"Level",def:120,max:150},
   ]},
   0x0000030c:{name:"CE-Cho5",group:"MOD",order:524,install:0,ver:0x0123,title:"BOSS CE-5 chorus modeling",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"E.LVL",def:100,max:120},
     {name:"RATE",def:31,max:100},
@@ -1578,19 +1621,19 @@ var effectlist={
     {name:"MODE",def:0,max:1,disp:["MONO","STR"]},
   ]},
   0x0020030c:{name:"CloneCho",group:"MOD",order:525,install:0,ver:0x0123,title:"Electro-Harmonix SmallClone chorus modeling",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"DEPTH",def:1,max:1,disp:["1","2"]},
     {name:"RATE",def:23,max:100},
   ]},
   0x0040030c:{name:"StonePha",group:"MOD",order:526,install:0,ver:0x0223,title:"Electro-Harmonix SmallStone phaser modeling",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"COLOR",def:0,max:1,disp:["1","2"]},
     {name:"RATE",def:50,max:100},
   ]},
   0x0060030c:{name:"BF FLG 2",group:"MOD",order:527,install:0,ver:0x0223,title:"BOSS BF-2 Flanger modeling",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"MNL",def:100,max:100},
     {name:"DEPTH",def:80,max:100},
@@ -1611,7 +1654,7 @@ var effectlist={
     {name:"Tone",def:50,max:100},
   ]},
   0x4020030c:{name:"MirageCho",group:"MOD",order:529,install:0,ver:0x0103,title:"Chorus like mirage",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Depth",def:60,max:100},
     {name:"Rate",def:38,max:100},
@@ -1630,7 +1673,7 @@ var effectlist={
     {name:"DRY",def:1,max:1,disp:["OFF","ON"]},
   ]},
   0x4060030c:{name:"ANA234Cho",group:"MOD",order:531,install:0,ver:0x0123,title:"MXR M234 analog chorus modeling",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"LEVEL",def:70,max:100},
     {name:"RATE",def:60,max:100},
@@ -1649,7 +1692,7 @@ var effectlist={
     {name:"DRY",def:1,max:1,disp:["OFF","ON"]},
   ]},
   0x0020000e:{name:"BitCrush",group:"SFX",order:600,install:0,ver:0x0222,title:"Lo-Fi effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Bit",def:5,max:12,disp:4},
     {name:"SMPL",def:2,max:50},
@@ -1658,7 +1701,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0040000e:{name:"Bomber",group:"SFX",order:601,install:0,ver:0x0222,title:"Explosive sound effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"PTTRN",def:3,max:3,disp:["HndGn","Arm","Bomb","Thndr"]},
     {name:"Deay",def:49,max:99,disp:1},
@@ -1669,7 +1712,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x0060000e:{name:"MonoSynth",group:"SFX",order:602,install:0,ver:0x0202,title:"Monophonic guitar synth effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Synth",def:40,max:100},
     {name:"Dry",def:100,max:100},
@@ -1679,7 +1722,7 @@ var effectlist={
     {name:"Speed",def:0,max:100},
   ]},
   0x4000000e:{name:"Z-Organ",group:"SFX",order:603,install:0,ver:0x0222,title:"Organ sound effect",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Upper",def:70,max:100},
     {name:"Lower",def:80,max:100},
@@ -1689,7 +1732,7 @@ var effectlist={
     {name:"Level",def:100,max:150},
   ]},
   0x4020000e:{name:"AutoPan",group:"SFX",order:604,install:0,ver:0x0122,title:"Cyclic panning position movement",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Rate",def:5,max:78},
     {name:"Width",def:100,max:100,disp:-50},
@@ -1706,7 +1749,7 @@ var effectlist={
     {name:"Drive",def:20,max:100},
   ]},
   0x00100010:{name:"Delay",group:"DELAY",order:700,install:0,ver:0x0111,title:"Long delay upto 4000ms",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Time",def:559,max:4022,disp:1},
     {name:"F.B",def:30,max:100},
@@ -1717,7 +1760,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00200010:{name:"TapeEcho",group:"DELAY",order:701,install:0,ver:0x0121,title:"Tape echo simulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Time",def:559,max:2014,disp:1},
     {name:"F.B",def:64,max:100},
@@ -1727,7 +1770,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00400010:{name:"ModDelay",group:"DELAY",order:702,install:0,ver:0x0121,title:"Delay effect with modulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Time",def:499,max:2014,disp:1},
     {name:"F.B",def:50,max:100},
@@ -1737,7 +1780,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00600010:{name:"AnalogDly",group:"DELAY",order:703,install:0,ver:0x0121,title:"Analog delay simulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Time",def:359,max:4022,disp:1},
     {name:"F.B",def:28,max:100},
@@ -1748,7 +1791,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40000010:{name:"ReverseDL",group:"DELAY",order:704,install:0,ver:0x0121,title:"Reverse delay upto 2000ms",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Time",def:990,max:2005,disp:10},
     {name:"F.B",def:20,max:100},
@@ -1758,7 +1801,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40200010:{name:"MultiTapD",group:"DELAY",order:705,install:0,ver:0x0122,title:"Several delay sounds with different delay times",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Time",def:2999,max:3018,disp:1},
     {name:"PTTRN",def:1,max:7,disp:1},
@@ -1768,7 +1811,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40400010:{name:"DynaDelay",group:"DELAY",order:706,install:0,ver:0x0122,title:"Delay with dynamics adjusting according to input level",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Time",def:359,max:2014,disp:1},
     {name:"Sense",def:5,max:19,disp:["-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","1","2","3","4","5","6","7","8","9","10"]},
@@ -1778,7 +1821,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40600010:{name:"FilterDly",group:"DELAY",order:707,install:0,ver:0x0122,title:"Delay effect with filter",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Time",def:499,max:2014,disp:1},
     {name:"F.B",def:50,max:100},
@@ -1790,7 +1833,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00000110:{name:"PitchDly",group:"DELAY",order:708,install:0,ver:0x0122,title:"Delay effect with pitch-shifting",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Time",def:89,max:1999,disp:1},
     {name:"Pitch",def:21,max:30,disp:[
@@ -1805,7 +1848,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00200110:{name:"StereoDly",group:"DELAY",order:709,install:0,ver:0x0122,title:"Stereo delay with L/R separate delay times",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"TimeL",def:164,max:2014,disp:1},
     {name:"TimeR",def:504,max:2014,disp:1},
@@ -1818,7 +1861,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00400110:{name:"PhaseDly",group:"DELAY",order:710,install:0,ver:0x0122,title:"Delay effect with phaser",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Time",def:499,max:2014,disp:1},
     {name:"F.B",def:28,max:100},
@@ -1829,7 +1872,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00600110:{name:"TrgHldDly",group:"DELAY",order:711,install:0,ver:0x0102,title:"Delay effect with sample&hold by picking",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"Time",def:40,max:990,disp:10},
     {name:"Duty",def:75,max:75,disp:25},
@@ -1839,7 +1882,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40000110:{name:"StompDly",group:"DELAY",order:712,install:0,ver:0x0111,title:"Stomp style Self-Oscillable delay",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/9,dspmin:1/20,
     param:[
     {name:"E.LVL",def:30,max:120},
     {name:"F.B",def:20,max:100},
@@ -1850,6 +1893,7 @@ var effectlist={
     {name:"HiDMP",def:5,max:10},
   ]},
   0x40200110:{name:"TapeEcho3",group:"DELAY",order:713,install:0,ver:0x0123,title:"MAESTRO ECHOPLEX EP-3 tape echo modiling",
+    dspmax:1/5,dspmin:1/6,
     param:[
     {name:"F.B",def:20,max:100},
     {name:"MIX",def:50,max:100},
@@ -1859,6 +1903,7 @@ var effectlist={
     {name:"P-Amp",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40400110:{name:"DualDigiD",group:"DELAY",order:714,install:0,ver:0x0123,title:"Eventide TimeFactor DigitalDelay like cobination of 2 delays",
+    dspmax:1/4,dspmin:1/5,
     param:[
     {name:"TimeA",def:500,max:2005},
     {name:"TimeB",def:375,max:2005},
@@ -1883,6 +1928,7 @@ var effectlist={
     {name:"Sync",def:0,max:15,disp:["OFF","1/16","1/12","3/32","1/8","1/6","3/16","1/4","3/8","1/2","3/4","4/4","5/4","6/4","7/4","8/4"]},
   ]},
   0x00000210:{name:"DriveEcho",group:"DELAY",order:716,install:0,ver:0x0123,title:"LINE6 M9 TubeEcho modeling",
+    dspmax:3/5,dspmin:1/2,
     param:[
     {name:"DRIVE",def:39,max:100},
     {name:"MIX",def:80,max:100},
@@ -1894,6 +1940,7 @@ var effectlist={
     {name:"Mode",def:0,max:1,disp:["MONO","STR"]},
   ]},
   0x00200210:{name:"SlapBackD",group:"DELAY",order:717,install:0,ver:0x0123,title:"tc electonic FLASHBACK set for SLAP delay modeling",
+    dspmax:1/5,dspmin:1/6,
     param:[
     {name:"TIME",def:98,max:300,disp:1},
     {name:"SubDv",def:0,max:2,disp:["1/4","3/16","P-P"]},
@@ -1904,6 +1951,7 @@ var effectlist={
     {name:"Mode",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00400210:{name:"SmoothDly",group:"DELAY",order:718,install:0,ver:0x0123,title:"BOSS DD-20 smooth mode delay modeling",
+    dspmax:4/10,dspmin:1/3,
     param:[
     {name:"TIME",def:322,max:3014,disp:1},
     {name:"F.B",def:39,max:100},
@@ -1912,7 +1960,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00600210:{name:"LO-FI Dly",group:"DELAY",order:719,install:0,ver:0x0123,title:"Strymon TIMELINE LO-FI mode deley modeling",
-    dspmax:1/2,dspmin:1/3,
+    dspmax:1/2,dspmin:9/20,
     param:[
     {name:"TIME",def:248,max:1913,disp:2},
     {name:"F.B",def:25,max:100},
@@ -1925,6 +1973,7 @@ var effectlist={
     {name:"VINYL",def:0,max:18,disp:["OFF","D:1","D:2","D:3","D:4","D:5","D:6","D:7","D:8","D:9","S:1","S:2","S:3","S:4","S:5","S:6","S:7","S:8","S:9"]},
   ]},
   0x40000210:{name:"SlwAtkDly",group:"DELAY",order:720,install:0,ver:0x0123,title:"LINE6 M9 Auto-Volume Echo delay modeling",
+    dspmax:1/4,dspmin:1/5,
     param:[
     {name:"TIME",def:489,max:1914,disp:1},
     {name:"F.B",def:71,max:100},
@@ -1935,6 +1984,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40200210:{name:"TremDelay",group:"DELAY",order:721,install:0,ver:0x0123,title:"Strymon TIMELINE trem mode delay modeling",
+    dspmax:3/5,dspmin:1/2,
     param:[
     {name:"TIME",def:300,max:1855,disp:60},
     {name:"F.B",def:70,max:100},
@@ -1949,6 +1999,7 @@ var effectlist={
     {name:"GRIT",def:2,max:10},
   ]},
   0x40400210:{name:"FLTR PPD",group:"DELAY",order:722,install:0,ver:0x0123,title:"Eventide TimeFactor FilterPong delay modeling",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"TimeA",def:500,max:1915},
     {name:"TimeB",def:250,max:1915},
@@ -1974,7 +2025,7 @@ var effectlist={
     {name:"Level",def:100,max:200},
   ]},
   0x00000310:{name:"ICE Delay",group:"DELAY",order:724,install:0,ver:0x0123,title:"Strymon TIMELINE ICE mode pitch shifting delay modeling",
-    dspmax:1/2,dspmin:1/3,
+    dspmax:4/10,dspmin:1/3,
     param:[
     {name:"TIME",def:440,max:1255,disp:60},
     {name:"F.B",def:64,max:100},
@@ -1990,7 +2041,7 @@ var effectlist={
       "OFF","20","40","60","80","100","120","140","160","180","200","230","260","300","350","400","500","600","700","800","900"]},
   ]},
   0x00100012:{name:"HD Hall",group:"REVERB",order:800,install:0,ver:0x0111,title:"Dense hall reverb",
-    dspmax:1/2,dspmin:1/3,
+    dspmax:9/20,dspmin:1/3,
     param:[
     {name:"PreD",def:80,max:199,disp:1},
     {name:"Decay",def:45,max:100},
@@ -2011,7 +2062,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00200012:{name:"Hall",group:"REVERB",order:802,install:0,ver:0x0121,title:"Concert hall simulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Decay",def:9,max:29,disp:1},
     {name:"Tone",def:5,max:10},
@@ -2021,7 +2072,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00400012:{name:"Room",group:"REVERB",order:803,install:0,ver:0x0111,title:"A room simulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Decay",def:9,max:29,disp:1},
     {name:"Tone",def:8,max:10},
@@ -2031,7 +2082,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00600012:{name:"TiledRoom",group:"REVERB",order:804,install:0,ver:0x0122,title:"Tiled room simulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Decay",def:19,max:29,disp:1},
     {name:"Tone",def:4,max:10},
@@ -2041,7 +2092,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40000012:{name:"Spring",group:"REVERB",order:805,install:0,ver:0x0121,title:"Spring reverb simulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Decay",def:19,max:29,disp:1},
     {name:"Tone",def:8,max:10},
@@ -2051,7 +2102,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40200012:{name:"Arena",group:"REVERB",order:806,install:0,ver:0x0122,title:"Sports arena like large enclosure simulation",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Decay",def:14,max:29,disp:1},
     {name:"Tone",def:7,max:10},
@@ -2061,7 +2112,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40400012:{name:"EarlyRef",group:"REVERB",order:807,install:0,ver:0x0122,title:"Only the early reflections of reverb",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/6,dspmin:1/15,
     param:[
     {name:"Decay",def:14,max:29,disp:1},
     {name:"Shape",def:20,max:20,disp:-10},
@@ -2071,7 +2122,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40600012:{name:"Air",group:"REVERB",order:808,install:0,ver:0x0122,title:"A room ambience with spatial depth",
-    dspmax:1/6,dspmin:0,
+    dspmax:1/12,dspmin:0,
     param:[
     {name:"Size",def:19,max:99,disp:1},
     {name:"Tone",def:8,max:10},
@@ -2105,6 +2156,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00600112:{name:"SlapBack",group:"REVERB",order:811,install:0,ver:0x0113,title:"Reverb with repeating echo",
+    dspmax:1/4,dspmin:1/5,
     param:[
     {name:"Time",def:379,max:1010,disp:1},
     {name:"Decay",def:9,max:29,disp:1},
@@ -2116,7 +2168,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40000112:{name:"Spring63",group:"REVERB",order:812,install:0,ver:0x0123,title:"Fender Reverb ('63) spring reverb modeling",
-    dspmax:1/2,dspmin:1/3,
+    dspmax:4/10,dspmin:1/3,
     param:[
     {name:"DWELL",def:35,max:100},
     {name:"MIXER",def:51,max:100},
@@ -2124,6 +2176,7 @@ var effectlist={
     {name:"LEVEL",def:100,max:150},
   ]},
   0x40200112:{name:"Chamber",group:"REVERB",order:813,install:0,ver:0x0123,title:"Chamber room simulation",
+    dspmax:4/10,dspmin:1/3,
     param:[
     {name:"Decay",def:50,max:100},
     {name:"Tone",def:73,max:100},
@@ -2132,7 +2185,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40400112:{name:"LOFI Rev",group:"REVERB",order:814,install:0,ver:0x0123,title:"tc electronic HALL OF FAME lofi setting modeling",
-    dspmax:1/2,dspmin:1/3,
+    dspmax:9/20,dspmin:1/3,
     param:[
     {name:"DECAY",def:52,max:100},
     {name:"TONE",def:95,max:100},
@@ -2142,6 +2195,7 @@ var effectlist={
     {name:"Dry",def:1,max:1,disp:["OFF","ON"]},
   ]},
   0x40600112:{name:"Church",group:"REVERB",order:815,install:0,ver:0x0123,title:"Reverbrations of a church simulation",
+    dspmax:1/2,dspmin:1/3,
     param:[
     {name:"DECAY",def:49,max:100},
     {name:"PreD",def:96,max:200},
@@ -2171,6 +2225,7 @@ var effectlist={
     {name:"Dry",def:1,max:1,disp:["OFF","ON"]},
   ]},
   0x00400212:{name:"GateRev",group:"REVERB",order:818,install:0,ver:0x0123,title:"DigiTech RV-7(Lexicon) Gated setting modeling",
+    dspmax:4/10,dspmin:1/3,
     param:[
     {name:"Level",def:60,max:100},
     {name:"Tone",def:50,max:100},
@@ -2179,6 +2234,7 @@ var effectlist={
     {name:"Dry",def:1,max:1,disp:["OFF","ON"]},
   ]},
   0x00600212:{name:"ReverseRv",group:"REVERB",order:819,install:0,ver:0x0123,title:"DigiTech RV-7(Lexicon) Reverse setting modeling",
+    dspmax:1/3,dspmin:1/4,
     param:[
     {name:"Level",def:100,max:100},
     {name:"Tone",def:70,max:100},
@@ -2187,6 +2243,7 @@ var effectlist={
     {name:"Dry",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40000212:{name:"Echo",group:"REVERB",order:820,install:0,ver:0x0123,title:"Gorgeous echoes",
+    dspmax:4/10,dspmin:1/3,
     param:[
     {name:"DECAY",def:25,max:100},
     {name:"TIME",def:125,max:200},
@@ -2196,6 +2253,7 @@ var effectlist={
     {name:"Mode",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x40200212:{name:"TremoloRv",group:"REVERB",order:821,install:0,ver:0x0123,title:"EvenTide SPACE tremolo verb like reverb",
+    dspmax:1/2,dspmin:1/3,
     param:[
     {name:"Decay",def:50,max:100},
     {name:"PDLY",def:70,max:500},
@@ -2208,6 +2266,7 @@ var effectlist={
     {name:"High",def:100,max:200,disp:-100},
   ]},
   0x40400212:{name:"HolyFLERB",group:"REVERB",order:822,install:0,ver:0x0123,title:"Electro-Harmonix Holy Grail FLERB reverb/flanger modeling",
+    dspmax:1/2,dspmin:1/3,
     param:[
     {name:"RVRB",def:50,max:100},
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
@@ -2223,7 +2282,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00000312:{name:"ShimmerRv",group:"REVERB",order:824,install:0,ver:0x0103,title:"Strymon blueSky shimmer mode pitch-shifting delay/reverb modeling",
-    dspmax:1-2/5,dspmin:1/2,
+    dspmax:3/5,dspmin:1/2,
     param:[
     {name:"PreD",def:39,max:99,disp:1},
     {name:"DECAY",def:90,max:100},
@@ -2233,7 +2292,7 @@ var effectlist={
     {name:"Tail",def:0,max:1,disp:["OFF","ON"]},
   ]},
   0x00200312:{name:"ParticleR",group:"REVERB",order:825,install:0,ver:0x0103,title:"LINE6 M9 Particle Verb complex reverb modeling",
-    dspmax:1-2/5,dspmin:1/2,
+    dspmax:3/5,dspmin:1/2,
     param:[
     {name:"DWELL",def:40,max:100},
     {name:"GAIN",def:100,max:100},
@@ -2256,6 +2315,7 @@ var effectlist={
     {name:"High",def:82,max:200,disp:-100},
   ]},
   0x00600312:{name:"MangledSp",group:"REVERB",order:827,install:0,ver:0x0103,title:"Eventide SPACE MangledVerb like wild echoes",
+    dspmax:3/5,dspmin:1/2,
     param:[
     {name:"PDLY",def:80,max:500},
     {name:"Clip",def:50,max:100},
@@ -2268,6 +2328,7 @@ var effectlist={
     {name:"Level",def:85,max:200},
   ]},
   0x40000312:{name:"DualRev",group:"REVERB",order:828,install:0,ver:0x0103,title:"Eventide SPACE DualVerb like Combination of two reverbs",
+    dspmax:1/2,dspmin:1/3,
     param:[
     {name:"PDlyA",def:350,max:750},
     {name:"PDlyB",def:700,max:750},
@@ -2738,9 +2799,9 @@ function Init(){
                 SetEffect(currentpatch,i,GetEffect(currentpatch,i-1));
               SetEffect(currentpatch,d,e);
               SetCurrentEffect(d);
-//              TrimEffectMax();
               DispPatchName(currentpatch);
               midiif.SendCurrentPatch();
+              dirty=1;
             }
             else{
               var e=GetEffect(currentpatch,s);
@@ -2748,9 +2809,9 @@ function Init(){
                 SetEffect(currentpatch,i,GetEffect(currentpatch,i+1));
               SetEffect(currentpatch,d,e);
               SetCurrentEffect(d);
-//              TrimEffectMax();
               DispPatchName(currentpatch);
               midiif.SendCurrentPatch();
+              dirty=1;
             }
           }
           ev.preventDefault();
@@ -2787,6 +2848,7 @@ function Init(){
           SetParamVal(currentpatch,f-1,p+1,k.target.value);
         DispPatch();
         midiif.SendCurrentPatch();
+        dirty=1;
       }
       if(s)
         s.onchange=function(s){
@@ -2796,6 +2858,7 @@ function Init(){
           SetParamVal(currentpatch,f-1,p+1,s.target.value);
           DispPatch();
           midiif.SendCurrentPatch();
+          dirty=1;
         }
     }
   }
@@ -2894,6 +2957,7 @@ function Init(){
           EffectPanelCancel();
           midiif.SendCurrentPatch();
           midiif.RequestPatch();
+          dirty=1;
 
 //?
 //          midiif.SendCurrentPatchVerify(null,function(s){
@@ -3046,20 +3110,22 @@ function PopupEffectDelete(){
   var rc=tar.getBoundingClientRect();
   var panel=document.getElementById("confirmpanel");
   Confirm("Delete Effect Unit ?",function(ev){
-    for(var j=currenteffect;j<5;++j){
+    var n=(midiif.devid==0x5f)?4:6;
+    for(var j=currenteffect;j<n-1;++j){
       for(var i=0;i<11;++i){
         SetParamVal(currentpatch,j,i,GetParamVal(currentpatch,j+1,i));
       }
-      SetParamVal(currentpatch,5,0,1);
-      for(var i=1;i<10;++i)
-        SetParamVal(currentpatch,5,i,0);
-      SetCurrentEffect(currenteffect);
-      DispPatch();
-      DispPatchName(currentpatch);
-      midiif.SendCurrentPatch();
-      midiif.RequestPatch();
-      ev.target.parentNode.parentNode.style.display="none";
     }
+    SetParamVal(currentpatch,n-1,0,1);
+    for(var i=1;i<10;++i)
+      SetParamVal(currentpatch,n-1,i,0);
+    SetCurrentEffect(currenteffect);
+    DispPatch();
+    DispPatchName(currentpatch);
+    midiif.SendCurrentPatch();
+    midiif.RequestPatch();
+    ev.target.parentNode.parentNode.style.display="none";
+    dirty=1;
   },
   {x:(rc.left-20+window.pageXOffset),y:(rc.top+40+window.pageYOffset)});
 }
@@ -3068,8 +3134,6 @@ function PopupEffectReplace(){
   document.getElementById("effectpanelbase").style.display="block";
 }
 function PopupEffectInsert(){
-//  if(GetEffectId(currentpatch,5)!=0)
-//    return;
   if(patches[currentpatch].maxfx==6)
     return;
   for(var j=5;j>currenteffect;--j){
@@ -3080,11 +3144,11 @@ function PopupEffectInsert(){
   SetParamVal(currentpatch,currenteffect,0,1);
   for(var k=1;k<11;++k)
     SetParamVal(currentpatch,currenteffect,k,0);
-//  TrimEffectMax();
   DispPatch();
   DispPatchName(currentpatch);
   SetCurrentEffect(currenteffect);
   midiif.SendCurrentPatch();
+  dirty=1;
   PopupEffectCancel();
 }
 function PopupEffectUp(){
@@ -3094,6 +3158,7 @@ function PopupEffectUp(){
     SetEffect(currentpatch,currenteffect-1,e);
     DispPatchName(currentpatch);
     midiif.SendCurrentPatch();
+    dirty=1;
   }
   PopupEffectCancel();
 }
@@ -3104,6 +3169,7 @@ function PopupEffectDown(){
     SetEffect(currentpatch,currenteffect+1,e);
     DispPatchName(currentpatch);
     midiif.SendCurrentPatch();
+    dirty=1;
   }
   PopupEffectCancel();
 }
