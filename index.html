@@ -67,6 +67,7 @@ var patchkeymap=[
   "1","2","3","4","5","6","7","8","9","0"];
 var effectkeymap=["F1","F2","F3","F4","F5","F6"];
 var tunerkey="F9";
+var dirty=0;
 
 var emptypatch=[
   0xf0,0x52,0x00,0x58,0x28,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -2656,12 +2657,14 @@ function MidiIf(ma){
     }
     else{
       if(this.ready){
-//        if(++this.pcnt>=1500){
-//          this.pcnt=0;
-//          this.SendWait([0xf0,0x52,0x00,this.devid,0x29,0xf7],this.sysexhead+"28");
-//        }
-//        else
-          this.SendWait([0xf0,0x52,0x00,this.devid,0x33,0xf7],"c0");
+        if(dirty>0){
+          if(++dirty>40){
+            dirty=0;
+            if(autosave)
+              StorePatch(currentpatch);
+          }
+        }
+        this.SendWait([0xf0,0x52,0x00,this.devid,0x33,0xf7],"c0");
       }
     }
   };
