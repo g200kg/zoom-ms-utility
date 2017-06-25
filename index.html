@@ -2581,12 +2581,15 @@ function MidiIf(ma){
       this.midiout.send(d);
   };
   this.Send=function(d){
-//    console.log(this.que.length);
     if(this.que.length>2){
       var d2=this.que[this.que.length-1];
-      if(d[0]==0xf0 && d[4]==0x28 && d2[0]==0xf0 && d2[4]==0x28){
-        this.que.pop();
-//        console.log(d,d2);
+      if(d[0]==0xf0 && d2[0]==0xf0){
+        if(d[4]==0x28 && d2[4]==0x28){
+          this.que.pop();
+        }
+        else if(d[4]==0x31 && d2[4]==0x31 && d[5]==d2[5] && d[6]==d2[6]){
+          this.que.pop();
+        }
       }
     }
     this.que.push(d);
@@ -2594,6 +2597,10 @@ function MidiIf(ma){
   this.RequestPatch=function(){
     this.Send([0xf0,0x52,0x00,this.devid,0x29,0xf7]);
 //    this.SendWait([0xf0,0x52,0x00,this.devid,0x29,0xf7],this.sysexhead+"28",null);
+  };
+  this.SendParamChange=function(f,p,v){
+    var cmd=[0xf0,0x52,0x00,this.devid,0x31,f,p,v&0x7f,(v>>7)&0x7f,0xf7];
+    this.Send(cmd);
   };
   this.SendCurrentPatch=function(){
     this.Send(patches[currentpatch].MakeBin(this.devid));
@@ -2862,8 +2869,17 @@ function Init(){
         else
           SetParamVal(currentpatch,f-1,p+1,k.target.value);
         DispPatch();
-        midiif.SendCurrentPatch();
-        dirty=1;
+
+        if(f<=3 && f-1==currenteffect){
+//          console.log("paramchange")
+          midiif.SendParamChange(f-1,p+1,patches[currentpatch].GetParamVal(f-1,p+1));
+        }
+        else{
+//          console.log("currentpat")
+          midiif.SendCurrentPatch();
+          currenteffect=f-1;
+          dirty=1;
+        }
       }
       if(s)
         s.onchange=function(s){
