@@ -2581,6 +2581,14 @@ function MidiIf(ma){
       this.midiout.send(d);
   };
   this.Send=function(d){
+//    console.log(this.que.length);
+    if(this.que.length>2){
+      var d2=this.que[this.que.length-1];
+      if(d[0]==0xf0 && d[4]==0x28 && d2[0]==0xf0 && d2[4]==0x28){
+        this.que.pop();
+//        console.log(d,d2);
+      }
+    }
     this.que.push(d);
   };
   this.RequestPatch=function(){
@@ -2589,10 +2597,6 @@ function MidiIf(ma){
   };
   this.SendCurrentPatch=function(){
     this.Send(patches[currentpatch].MakeBin(this.devid));
-  };
-  this.SenPatch=function(p){
-    if(typeof(p)=="undefined")
-      p=currentpatch;
   };
   this.SendCurrentPatchVerify=function(success,fail){
     var o=[];
