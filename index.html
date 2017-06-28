@@ -2605,7 +2605,7 @@ function MidiIf(ma){
   this.SendCurrentPatch=function(){
     this.Send(patches[currentpatch].MakeBin(this.devid));
   };
-  this.SendCurrentPatchVerify=function(success,fail){
+  this.SendCurrentPatchVerify=function(callback){
     var o=[];
     var len=(midiif.devid==0x5f)?4:6;
     for(var i=0;i<len;++i){
@@ -2623,14 +2623,12 @@ function MidiIf(ma){
               el.classList.add("notinstall");
               if(effectlist[o[j]].install==0)
                 effectlist[o[j]].install=-1;
-              s+="[ "+effectlist[o[j]].name+"]";
+              s+="["+effectlist[o[j]].name+"]";
             }
           }
         }
-        if(success&&s.length==0)
-          success(s);
-        if(fail&&s.length>0)
-          fail(s);
+        if(callback)
+          callback(s.length?s:null);
       })
     }.bind(this),200);
   };
@@ -3548,12 +3546,15 @@ apatch.prototype.GetBits=(dat,bits)=>{
   for(var i=0;i<bits.length;++i){
     var b0=bits[i];
     if(b0[0]<len && b0[2]!=="NZ"){
-      var v=dat[b0[0]]&b0[1];
-      if(b0[2]>=0)
-        v<<=b0[2];
-      else
-        v>>=-b0[2];
-      val|=v;
+      var r=b0[0];
+      if(r<len){
+        var v=dat[b0[0]]&b0[1];
+        if(b0[2]>=0)
+          v<<=b0[2];
+        else
+          v>>=-b0[2];
+        val|=v;
+      }
     }
   }
   return val;
@@ -3771,6 +3772,8 @@ function DispPatch(patch){
   for(n=0;n<efmax;++n){
     var id=patches[patch].GetEffectId(n);
     var ef=effectlist[id];
+    if(!ef)
+      id=0,ef=effectlist[0];
     var b=dspgraph.childNodes[n];
 //    b.style.height=(ef.dspmax+ef.dspmin)*50+"%";
     b.style.height=(1/ef.dsp)*100+"%";
@@ -4169,8 +4172,11 @@ function ImportPatch(){
                       DispPatchName(currentpatch);
                       DispPatch(currentpatch);
                       SelectPatch(currentpatch);
-                      SendPatch(currentpatch);
-                      midiif.RequestPatch();
+                      midiif.SendCurrentPatchVerify(function(s){
+                        if(s)
+                          AlertMsg("Following effect(s) are not exist<br/>"+s);
+                        console.log(s);
+                      });
                       if(autosave)
                         StorePatch(currentpatch);
                       document.getElementById("patchenum").style.display="none";
@@ -4182,8 +4188,11 @@ function ImportPatch(){
                     DispPatchName(currentpatch);
                     DispPatch(currentpatch);
                     SelectPatch(currentpatch);
-                    SendPatch(currentpatch);
-                    midiif.RequestPatch();
+                    midiif.SendCurrentPatchVerify(function(s){
+                      if(s)
+                        AlertMsg("Following effect(s) are not exist<br/>"+s);
+                      console.log(s);
+                    });
                     if(autosave)
                       StorePatch(currentpatch);
                     document.getElementById("patchenum").style.display="none";
@@ -4207,7 +4216,11 @@ function ImportPatch(){
             DispPatchName(p);
             DispPatch(p);
             SelectPatch(p);
-            midiif.SendCurrentPatchVerify(null,null);
+            midiif.SendCurrentPatchVerify(function(s){
+              if(s)
+                AlertMsg("Following effect(s) are not exist<br/>"+s);
+              console.log(s);
+            });
             if(autosave)
               StorePatch(p);
             ev.target.parentNode.parentNode.style.display="none";
@@ -4223,7 +4236,11 @@ function ImportPatch(){
       DispPatchName(p);
       DispPatch(p);
       SelectPatch(p);
-      SendPatch(p);
+      midiif.SendCurrentPatchVerify(function(s){
+        if(s)
+          AlertMsg("Following effect(s) are not exist<br/>"+s);
+        console.log(s);
+      });
       if(autosave)
         StorePatch(p);
     }
