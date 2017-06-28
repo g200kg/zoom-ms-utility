@@ -3950,6 +3950,7 @@ function InstallChecker(){
       setTimeout(function(){
         midiif.Send(this.porg.MakeBin(midiif.devid));
         patches[49].CopyFrom(this.porg);
+        DispPatchName(currentpatch);
         DispPatch();
         SelectPatch(currentpatch);
         document.getElementById("waitbase").style.display="none";
@@ -5285,15 +5286,20 @@ webaudio-switch{
                 <li>By context menu - ExportToFile/ImportFromFile, each patch can be backup/restore to local file</li>
                 <li>By context menu - SavePatchToDevice, force each patch to be stored to device's memory</li>
                 <li>If you want to choose export directory when 'ExportToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
+                <li>If you want to exchange patch data with BBS etc, 'Show Patch as text' and 'Import Patch from text' in the context menu are useful</li>
+                <li>'Show Patch as text' displays a patch expressed in text (hex string), it can be used for copying, saving, posting to BBS etc</li>
+                <li>'Import Patch from text' will load patches by entering the text displayed in 'Show Patch as text'</li>
+                <li>'Import from text' also support the format of MS-50G patch page in 'http://guitarpatches.com'. Copy entire text by (Ctrl-A / Ctrl-C) in patch page, and paste to Patch editor's input field</li>
               </ul>
             </li>
             <li>Effects<br/>
               <ul>
+                <li>In the bottom row, 6 effects (4 in 60 B) in use are displayed</li>
                 <li>Click effect name to switch effect/bypass</li>
+                <li>Effects are draggable to another position to change order</li>
                 <li>From right-click or number-button context menu, each effect can be add/move/del</li>
                 <li>Each parameter can be edit by drag(coarse)/shift-drag(fine)</li>
                 <li>Mouse wheel and Shift+wheel are also available to value edit</li>
-                <li>Effects are draggable to another position to change order</li>
               </ul>
             </li>
             <li>Bank<br/>
@@ -5301,6 +5307,12 @@ webaudio-switch{
                 <li>by Export Bank/Import Bank buttons, all 50 patches can be save/load as zipped one file.</li>
                 <li>bank file is a .zip file that contains 50 patch files. It can be edit as normal .zip file if you need.</li>
                 <li>When a bank file is selected when one patch file loading, a list in the bank file is displayed, and one patch can be selected from among them.</li>
+              </ul>
+            </li>
+            <li>本体での操作<br/>
+              <ul>
+                <li>パッチエディタと本体での操作を併用する事もできます。本体でのパッチの選択やパラメータ調整などもパッチエディタに反映されます。</li>
+                <li>パッチエディタの画面を見ながら本体のノブでパラメータの調整を行うという使い方も可能です</li>
               </ul>
             </li>
             <li>AutoSave<br/>
@@ -5353,15 +5365,20 @@ webaudio-switch{
                 <li>コンテキストメニューの Export To File / Import From File はパッチをローカルファイルに保存/読込を行います</li>
                 <li>コンテキストメニューの Save Patch To Device はパッチを本体のメモリに名前を付けて保存します</li>
                 <li>ExportToFile で保存されるフォルダを毎回選択するには Chrome のダウンロードの詳細設定を変更してください</li>
+                <li>BBS等でパッチデータを交換したい場合はコンテキストメニューの Show Patch as text と Import Patch from text が便利です。</li>
+                <li>Show Patch as text は、パッチをテキスト(16進文字列)で表現したものを表示しますので、コピーして保存、BBS等への投稿に使用してください。</li>
+                <li>Import from text は、入力欄に Show Patch as text で表示されたテキストを入力する事でパッチをロードできます。</li>
+                <li>また Import from text は http://guitarpatches.com の MS-50G 用のパッチのページをそのままコピー (Ctrl-A / Ctrl-C) したものを貼り付ける事もできます。</li>
               </ul>
             </li>
             <li>エフェクト<br/>
               <ul>
+                <li>下段には6個(60Bでは4個)の使用中のエフェクトが表示されます</li>
                 <li>エフェクト名をクリックすると、エフェクトのオン/オフが切り替わります</li>
+                <li>エフェクト名をドラッグする事で順番を入れ替える事ができます</li>
                 <li>エフェクト名を右クリックまたはエフェクト番号のボタンを押すとコンテキストメニューが表示され、エフェクトの追加や削除、移動ができます</li>
                 <li>エフェクトの各パラメータの調整はドラッグ(微調整はShift + ドラッグ)で行います。</li>
                 <li>また、マウスホイールの操作でパラメータ調整を行う事もできます。微調整は (Shift + マウスホイール)で行います</li>
-                <li>エフェクト名をドラッグする事で順番を入れ替える事ができます</li>
               </ul>
             </li>
             <li>バンク<br/>
@@ -5369,6 +5386,12 @@ webaudio-switch{
                 <li>Export Bank/ Import Bankのボタンで50個のパッチをまとめてファイルへの保存/読込ができます</li>
                 <li>バンクファイルはパッチファイルを.zipにまとめたものです。zipファイルの中身として入っているパッチファイルを入れ替える等の編集をしても構いません</li>
                 <li>1つのパッチファイルのインポート時にバンクファイルを選択した場合はバンクファイル内の一覧が表示され、その中から選択する事ができます</li>
+              </ul>
+            </li>
+            <li>本体での操作<br/>
+              <ul>
+                <li>パッチエディタと本体での操作を併用する事もできます。本体でのパッチの選択やパラメータ調整などもパッチエディタに反映されます。</li>
+                <li>パッチエディタの画面を見ながら本体のノブでパラメータの調整を行うという使い方も可能です</li>
               </ul>
             </li>
             <li>オートセーブ<br/>
