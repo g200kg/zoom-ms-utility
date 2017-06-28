@@ -2742,6 +2742,7 @@ function MakeName(b){
 }
 function MakeBin(s,len){
   var bin=[];
+  s=s.replace(/[\x00-\x20\x7f-\x9f]/g, '');
   for(var j=0;j<s.length&&j<len*2;j+=2)
     bin.push(parseInt(s.substr(j,2),16));
   return bin;
@@ -4233,6 +4234,7 @@ function ImportText(){
     if(h>=0){
       var str=str.substr(h);
       var data=MakeBin(str,146);
+      console.log(data);
       var len=0;
       if(data[145]==0xf7) len=146;
       if(data[104]==0xf7) {
