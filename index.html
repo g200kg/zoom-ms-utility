@@ -4135,7 +4135,7 @@ function ShowPatch(){
   var n=patches[p].name;
   var fname=n.replace(/\s+$/,"").replace(/ /g,"_");
   var d=MakeStr(patches[p].MakeBin(midiif.devid));
-  AlertMsg("Show Patch As Text <br/><textarea disabled style='width:300px;height:100px'>"+d+"</textarea>");
+  AlertMsg("Show Patch As Text <br/><textarea disabled style='width:360px;height:100px'>"+d+"</textarea>");
 }
 function ExportPatch(){
   var p=currentpatch;
@@ -4223,7 +4223,7 @@ function ImportPatch(){
 function ImportText(){
   var tar=document.getElementById((currentpatch+1)+"nam");
   var panel=document.getElementById("textareabase");
-  document.getElementById("textareamsg").innerHTML="*TENTATIVE* : Load from Text : Copy/Pate here the guitarpatches.com's zoom MS-50G patch page texts.";
+  document.getElementById("textareamsg").innerHTML="Load from Text : Pate here the Text from 'Show Patch as text' or guitarpatches.com's zoom MS-50G patch page texts.";
   document.getElementById("textareatext").value="";
   var rc=tar.getBoundingClientRect();
   panel.style.display="block";
@@ -4466,7 +4466,7 @@ img{
   bottom:0;
   left:0;
   right:0;
-  width:300px;
+  width:380px;
   height:150px;
   margin:auto;
   padding:10px;
@@ -4483,7 +4483,7 @@ img{
 }
 #alertmsg{
   display: table-cell;
-  width: 350px;
+  width: 360px;
   height: 100px;
   text-align: center;
 }
