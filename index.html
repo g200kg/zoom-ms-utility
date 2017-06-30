@@ -3569,7 +3569,7 @@ apatch.prototype.ReadBin=function(dat){
       name+=String.fromCharCode(c);
   }
   this.name=name.replace(/ +$/,"");
-  var flen=(len>146)?6:4;
+  var flen=(len>=146)?6:4;
   for(var f=0;f<6;++f){
     for(var p=0;p<11;++p){
       if(f>=flen)
