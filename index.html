@@ -2349,7 +2349,16 @@ var effectlist={
     {name:"ToneB",def:70,max:200,disp:-100},
   ]},
 }
-
+function dumpeff(){
+  console.log("name,group,ms50g,ms60b,ms70cdr,dsp(%),description")
+  for(i in effectlist){
+    var ef=effectlist[i];
+    var v50=ef.ver&0xf;
+    var v60=(ef.ver>>4)&0xf;
+    var v70=(ef.ver>>8)&0xf;
+    console.log("\""+ef.name+"\","+ef.group+","+((v50>0)?v50:"")+","+((v60>0)?v60:"")+","+((v70>0)?v70:"")+","+(100/ef.dsp).toFixed(1)+","+ef.title);
+  }
+}
 function MidiIf(ma){
   this.midiaccess=ma;
   this.midiout=null;
@@ -2648,7 +2657,7 @@ function MidiIf(ma){
         id=parseInt(cookies[i].split("=")[1]);
       }
     }
-    if(id!=instanceid){
+    if(id!=0&&id!=instanceid){
       AlertMsg("Another Patch Editor is launched.<br/> This instance is no more effective. <br/>Reload?",function(){
         window.location.href=url;
       });
@@ -3058,7 +3067,8 @@ function Init(){
               v=Math.max(v-=p1,k.min);
               break;
             }
-            k.setValue(v,true);
+            if(k.setValue)
+              k.setValue(v,true);
           }
         }
       }
@@ -3864,8 +3874,10 @@ function DispPatch(patch){
             ek.tab=null;
             ek.defvalue=ef.param[p].def;
             es.defvalue=ef.param[p].def;
-            ek.setValue(v);
-            es.setValue(v);
+            if(ek.setValue)
+              ek.setValue(v);
+            if(es.setValue)
+              es.setValue(v);
           }
         }
         else{
