@@ -32,7 +32,8 @@ This tool will not work if you just open the local html file by Chrome because o
   Make a shortcut of Chrome, like
   `"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"  --allow-file-access-from-files file:///C:/Users/xxxx/zoom-ms-utility/index.html`  
   Or on Mac, use Automator shell script, like  
-  `Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files /Users/xxxx/zoom-ms-utility/index.html`
+  `Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files /Users/xxxx/zoom-ms-utility/index.html`  
+  Note that this method will not work if the Chrome instance is already exist. You should close all Chrome window before launch.
 
 ## Info
 If you are interested in MS-50G/70CDR MIDI function, check `midimessage.md`
