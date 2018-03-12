@@ -2702,7 +2702,7 @@ function MidiIf(ma){
     for(var o=outputIterator.next(); !o.done; o=outputIterator.next()) {
         midioutputs[i]=o.value;
         var op=new Option(o.value.name);
-        if(o.value.name=="ZOOM MS Series")
+        if(o.value.name.startsWith("ZOOM MS Series"))
           op.selected=true;
         else
           op.disabled=true;
@@ -2711,7 +2711,7 @@ function MidiIf(ma){
     }
     var inputIterator=this.midiaccess.inputs.values();
     for(var ip=inputIterator.next(); !ip.done; ip=inputIterator.next()){
-      if(ip.value.name==="ZOOM MS Series" && this.midiinport==null){
+      if(ip.value.name.startsWith("ZOOM MS Series") && this.midiinport==null){
         this.midiinport=ip.value;
         this.recvhander=this.recv.bind(this);
         this.midiinport.onmidimessage=this.recvhander;
@@ -2722,7 +2722,7 @@ function MidiIf(ma){
     var idx=document.getElementById("midiport").selectedIndex;
     if(idx>=0 && midioutputs.length>0){
       this.midiout=midioutputs[idx];
-      if(this.midiout.name!="ZOOM MS Series")
+      if (!this.midiout.name.startsWith("ZOOM MS Series"))
         this.midiout=null;
     }
   };
