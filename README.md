@@ -10,7 +10,7 @@ This is still a very tentative version for the confirmation of MIDI related func
 * Press accept if 'MIDI device' dialog is displayed
 * Select MidiPort to 'ZOOM MS Series'
 
-[Zoom MS Utility Page](https://g200kg.github.io/zoom-ms-utility/)
+Online Path Editor: [Zoom MS Utility Page](https://nilsof.github.io/zoom-ms-utility/)
 
 ## To Use this tool in offline
 
