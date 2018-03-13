@@ -1,16 +1,16 @@
 # zoom-ms-utility
-Online Zoom MS-50G/MS-70CDR multi stomp patch editor.
+Online Zoom MS-50G/MS-60B/MS-70CDR multi stomp patch editor.
 
-This is a patch utility for ZOOM MS-50G/70CDR MultiStomp guitar pedal.  
+This is a patch utility for the ZOOM MS - 50G / 60B / 70 CDR MultiStomp guitar pedal which runs on the chrome browser.  
 This is still a very tentative version for the confirmation of MIDI related function.
 
 ## Usage
-* Connect PC/Mac to MS-50G/70CDR via USB
-* Launch this page. You should use latest Chrome
+* Connect PC/Mac to MS-50G/60B/70CDR via USB
+* Launch this page. You should use latest ***Chrome***
 * Press accept if 'MIDI device' dialog is displayed
 * Select MidiPort to 'ZOOM MS Series'
 
-Online Patch Editor: [Zoom MS Utility Page](https://nilsof.github.io/zoom-ms-utility/)
+Online Patch Editor: [Zoom MS Utility Page](https://g200kg.github.io/zoom-ms-utility/)
 
 ## To Use this tool in offline
 
