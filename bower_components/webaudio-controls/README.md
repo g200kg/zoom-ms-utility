@@ -1,10 +1,9 @@
 # webaudio-controls
-**WebAudioControls** is GUI parts library for Web application using [Polymer] WebComponents.  
+**WebAudioControls** is GUI parts Custom Elements library for Web application using WebComponents.  
 Especially suitable for audio-applications like VST plugins.  
 
-Polymer 1.4 compatible
 
-**WebAudioControls** is consist of following components  
+**webaudio-controls** is consist of following components  
 
 Component | Description
 ---|---
@@ -16,22 +15,32 @@ webaudio-keyboard | Mouse/Touch playable keyboard. multi-touch support.
 
 * Also available 'webaudio-pianoroll' at : [https://github.com/g200kg/webaudio-pianoroll/](https://github.com/g200kg/webaudio-pianoroll/)
 
-Chrome / Firefox / Safari / Opera / IE compatible  
+#### Difference from old version
+There are some difference from old [Polymer 1.4] version.
+* Current **webaudio-controls** uses the Custom Elements V1 API directly. In Chrome / Safari / Firefox (59 and later) it works without polyfill. Please install webcomponentsjs on Firefox (58 or less), Edge etc Custom Elements non-compatible browsers.  
+
+* Event firing. Knobs/Sliders fires 'input' event instead of 'change' during drag. This is same behavior as input type=range tags.
+
+* Value post conversion function `conv` attribute is available. It will help for implement, for example, exponential curve parameters. Also Tooltip and Valuetip is integrated. It is now acceptable C-like formatting string for current value display.  
+
+Chrome / Firefox / Safari / Opera compatible  
 iOS and Android touch devices compatible  
 
-[Live Demo sample1 (with external image-files)](https://rawgithub.com/g200kg/webaudio-controls/master/sample1.html)  
-[Live Demo sample2 (with code example)](https://rawgithub.com/g200kg/webaudio-controls/master/sample2.html)  
-[Live Demo sample3 (Knob/Slider/Switch/Param/Keyboard default style)](https://rawgithub.com/g200kg/webaudio-controls/master/sample3.html)  
-[Live Demo sample4 (webaudio-keyboard to webMIDIAPI)](https://rawgithub.com/g200kg/webaudio-controls/master/sample4.html)  
- (need Mac+ChromeCanary+flagEnabled+MIDIdevice or Win+JazzPlugin or Mac+JazzPlugin+MidiDevice)  
+[Live Demo (with external image-files)](https://g200kg.github.io/webaudio-controls/2.0/sample1.html)  
+[Live Demo (with code example)](https://g200kg.github.io/webaudio-controls/2.0/sample2.html)  
+[Live Demo (Knob/Slider/Switch/Param/Keyboard default style)](https://g200kg.github.io/webaudio-controls/2.0/sample3.html)  
+[Live Demo (Various Knob Images)](https://g200kg.github.io/webaudio-controls/2.0/knobsamples.html)  
+[Live Demo (Multi-Touch Fader)](https://g200kg.github.io/webaudio-controls/2.0/multifader.html)  
+[Live Demo (webaudio-keyboard to Web MIDI API)](https://g200kg.github.io/webaudio-controls/2.0/sample4.html)  
+ (need Web MIDI API support)  
 [Renoid : Practical application using webaudio-controls](http://www.g200kg.com/renoid/)  
-[webaudio-controls Resize Test](https://rawgithub.com/g200kg/webaudio-controls/master/resizetest.html)  
+[webaudio-controls Resize Test](https://g200kg.github.io/webaudio-controls/2.0/resizetest.html)  
 
 Using with external image-files.  
-[![](img/demo.png)](https://rawgithub.com/g200kg/webaudio-controls/master/sample1.html)  
+[![](img/demo.png)](https://g200kg.github.io/webaudio-controls/2.0/sample1.html)  
 
 Default style with no external image-files.  
-[![](img/sample3.png)](https://rawgithub.com/g200kg/webaudio-controls/master/sample3.html)  
+[![](img/sample3.png)](https://g200kg.github.io/webaudio-controls/2.0/sample3.html)  
 
 ## To Operate  
 Following user actions are supported.
@@ -50,26 +59,28 @@ Operation | Component | Description
 ---
 ## How to use
 
-- Install  
- * Use command `bower install --save Polymer/polymer`, if you use bower. Or download zipped file and deploy appropriately.
- * webaudio-controls also can be installed with : `bower install --save g200kg/webaudio-controls`  
+* Install  
+  * The main file is `webaudio-controls.js`. If you want to support non-WebComponents ready browsers, webcomponents.js is also needed.
+  * Use command `bower install --save g200kg/webaudio-controls`, if you use bower. Or download zipped file and deploy appropriately.
+  * If you want to load webaudio-controls.js directly from this GitHub page, installation is not necessary.
 
 
-- load webcomponents.js and polymer
-  * &lt;script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"&gt;&lt;/script&gt;<br/>
-  &lt;link rel="import" href="bower_components/polymer/polymer.html"&gt;
+* [for WebComponents polyfill] load webcomponents.js  
+  * &lt;script src="bower_components/webcomponentsjs/webcomponents-lite.js"&gt;&lt;/script&gt;
 
 
 - load webaudio-contols  
-  * &lt;link rel="import" href="bower_components/webaudio-controls/webaudio-controls.html" &gt;
+  * &lt;script src="bower_components/webaudio-controls/webaudio-controls.js"&gt;&lt;/script&gt;
+  * Or, if you want to load webaudio-controls.js directly from this GitHub page as CDN: <br/>
+&lt;script src="https://g200kg.github.io/webaudio-controls/webaudio-controls.js" &gt;&lt;/script&gt;
 
 
-- insert **webaudio-knob/slider/switch/param/keyboard** elements. for example...
- * &lt;webaudio-knob src="img/LittlePhatty.png" sprites="100" min="0" max="100"&gt;&lt;/webaudio-knob&gt;  
- * &lt;webaudio-slider src="img/hsliderbody.png"&gt;&lt;/webaudio-slider&gt;  
- * &lt;webaudio-switch src="img/switch_toggle.png" width="32" height="32"&gt;&lt;/webaudio-switch&gt;  
- * &lt;webaudio-param src="" link="knob-1"&gt;&lt;/webaudio-param&gt;  
- * &lt;webaudio-keyboard keys="25" &gt;&lt;/webaudio-keyboard&gt;  
+* insert **webaudio-knob/slider/switch/param/keyboard** elements. for example...
+  * &lt;webaudio-knob src="img/LittlePhatty.png" sprites="100" min="0" max="100"&gt;&lt;/webaudio-knob&gt;  
+  * &lt;webaudio-slider src="img/hsliderbody.png"&gt;&lt;/webaudio-slider&gt;  
+  * &lt;webaudio-switch src="img/switch_toggle.png" width="32" height="32"&gt;&lt;/webaudio-switch&gt;  
+  * &lt;webaudio-param src="" link="knob-1"&gt;&lt;/webaudio-param&gt;  
+  * &lt;webaudio-keyboard keys="25" &gt;&lt;/webaudio-keyboard&gt;  
 
 ---
 ## Attributes
@@ -78,32 +89,32 @@ Operation | Component | Description
 
 Attribute  | Options      | Default          | Description
 ---        | ---                  | ---                 | ---
-**src** | string | Internal embedded resource is used if not specified | url of the knob image. (single frame or vertical stitched)
+**src** | string | null | url of the knob image, Single frame or vertical stitched. Internal embedded resource is used if not specified.
 **value** | float | `0` | The current value. Also used as initial value if specified
 **defvalue** | float | Initial 'value' is used if not specified | The default value that will be used when ctrl+click
 **min** | float | `0` | Minimum value of the knob
 **max** | float | `100` | Maximum value of the knob
 **step** | float | `1` | Value step of the control. The 'value' is always rounded to multiple of 'step'
-**log** | int | `0` | If 1, knob scale is logalithmic. In this mode, `step` is ignored.
-**units** | string | `null` | specified units (e.g. Hz) is added to valuetip
-**width** | int | `64` | Knob display width in px
-**height** | int | `64` | Knob display height in px
-**diameter** | int | `64` | Knob display diameter in px. This attribute can be used instead of width / height if the display image is square
-**sprites** | int | `0` | if `0`, the `src` image should be single frame image that indicate middle position. the image will be rotated -135deg to +135deg. if `sprirites` is not `0`, the `src` image should be stitched multi-framed image. `sprites` specify the max frame number in the stitched knob image. Note that this is (number of frames) - 1
+**width** | int | `0` | Knob width in px. diameter value is used if this value is `0`.
+**height** | int | `0` | Knob height in px. diameter value is used if this value is `0`.
+**diameter** | int | `64` | Knob diameter in px. This attribute can be used instead of width / height if the display image is square.
+**sprites** | int | `0` | if `0`, the `src` image should be single frame image that indicate middle position. the image will be rotated -135deg to +135deg. If `sprirites` is not `0`, the `src` image should be vertically stitched multi-framed image. `sprites` specify the max frame number in the stitched knob image. Note that this is (number of frames) - 1
 **sensitivity** | float | `1` | Pointing device sensitivity. min-max range correspond to (128 / `sensitivity`) px
 **valuetip** | `0`,`1` | `1` | Enable the overlaid value-tip display.
-**tooltip** | string | `null` | Tooltip text that will be shown when mouse hover a while
+**tooltip** | string | `null` | Tooltip text that will be shown when mouse hover a while. If the text include a C-printf style value formatter like `%8.2f`, it will be replaced by current value. This formatter should be `%[n][.][m]{d,f,x,X,s}`. Here the 'n' is total columns, 'm' is after the decimal point columns. If the `conv` function is specified, the converted value `convValue` is used for display.
+**conv** | string | `null` | Value conversion function. If this function is specified, the function is called with current `value` as argument and be stored as `convValue`. That will be used as tooltip display. For example, `conv="(x)=>{return Math.pow(10,x)*20}"` is specified, for range of value between 0 and 3, the range of convValue corresponds to 20 to 20000.
 **enable** | `0`,`1` | `1` | Enable control with the pointing device.
 **colors** | string | "#e00;#000;#000" | Semicolon separated 3 colors for 'indicator', 'body' and 'highlight'. These colors are used in default knob (when `src` is not provided).
-**midilearn** | string | null | If `true`, MIDI learn function with right-click menu is enabled.
-**midicc** | string | null | Assign MIDI control change to this knob. with format `ch.cn`, here the `ch` is channel (1-16, ignore channel if 0) and `cn` is control number (0-119).
+**outline** | `0`,`1` | `1` | Border display when focused.
+**midilearn** | `0`,`1` | `0` | If `1`, MIDI learn function with right-click menu is enabled.
+**midicc** | string | null | Assign MIDI control change to this knob, with format `ch.cn`, here the `ch` is channel (1-16, ignore channel if 0) and `cn` is control number (0-119).
 
 ### webaudio-slider
 
 Attribute  | Options      | Default          | Description
 ---        | ---                  | ---                 | ---
-**src** | string | Internal embedded resource is used if not specified | url of the slider background image
-**knobsrc** | string | Internal embedded resouce is used if not specified | url of the slider knob part image
+**src** | string | null | url of the slider background image. Solid background color if not specified.
+**knobsrc** | string | null | url of the slider knob part image. Internal embedded resouce is used if not specified
 **value** | float | `0` | The current value. Also used as initial value if specified
 **defvalue** | float | Initial 'value' is used if not specified | The default value that will be used when ctrl+click
 **min** | float | `0` | Minimum value of the slider
@@ -117,10 +128,12 @@ Attribute  | Options      | Default          | Description
 **direction** | `"vert"`,`"horz"` | `"vert"` | Slider direction. vertical or horizontal
 **sensitivity** | float | `1` | Pointing device sensitivity. min-max range correspond to (128 / 'sensitivity') px
 **valuetip** | `0`,`1` | `1` | Enable the overlaid value-tip display.
-**tooltip** | string | `null` | Tooltip text that will be shown when mouse hover a while
+**tooltip** | string | `null` | Tooltip text that will be shown when mouse hover a while. If the text include a C-printf style value formatter like `%8.2f`, it will be replaced by current value. This formatter should be `%[n][.][m]{d,f,x,X,s}`. Here the 'n' is total columns, 'm' is after the decimal point columns. If the `conv` function is specified, the converted value `convValue` is used for display.
+**conv** | string | `null` | Value conversion function. If this function is specified, the function is called with current `value` as argument and be stored as `convValue`. That will be used as tooltip display. For example, `conv="(x)=>{return Math.pow(10,x)*20}"` is specified, for range of value between 0 and 3, the range of convValue corresponds to 20 to 20000.
 **enable** | `0`, `1` | `1` | Enable control with the pointing device.
 **colors** | string | "#e00;#000;#fff" | Semicolon separated 3 colors for 'knob', 'background' and 'highlight'. These colors are used in default knob (when `src` or `knobsrc` is not provided).
-**midilearn** | string | null | If `true`, MIDI learn function with right-click menu is enabled.
+**outline** | `0`,`1` | `1` | Border display when focused.
+**midilearn** | `0`,`1` | `0` | If `1`, MIDI learn function with right-click menu is enabled.
 **midicc** | string | null | Assign MIDI control change to this slider. with format `ch.cn`, here the `ch` is channel (1-16, ignore channel if 0) and `cn` is control number (0-119).
 
 
@@ -139,6 +152,7 @@ Attribute  | Options      | Default          | Description
 **tooltip** | string | `null` | Tooltip text that will be shown when mouse hover a while
 **enable** | `0`,`1` | `1` | Enable control with the pointing device.
 **colors** | string | "#e00;#000;#fff" | Semicolon separated 3 colors for 'knob', 'background' and 'highlight'. These colors are used in default switch (when `src` is not provided).
+**outline** | `0`,`1` | `1` | Border display when focused.
 **midilearn** | string | null | If `true`, MIDI learn function with right-click menu is enabled.
 **midicc** | string | null | Assign MIDI control change to this switch. with format `ch.cn`, here the `ch` is channel (1-16, ignore channel if 0) and `cn` is control number (0-119).
 
@@ -152,6 +166,7 @@ Attribute  | Options      | Default          | Description
 **height** | int | `16` | Parameter display height in px
 **fontsize** | int | `9` | Font-size of the parameter display
 **colors** | string | `"#e00;#000"` | Semicolon separated 2 colors for text and background. background color is used when `src` is not defined.
+**outline** | `0`,`1` | `1` | Border display when focused.
 **link** | string | `null` | Specify the linked webaudio-knob/slider/switch by Id
 
 ### webaudio-keyboard
@@ -164,6 +179,7 @@ Attribute  | Options      | Default          | Description
 **min** | int | `0` | Lowest Key number. Each key is numbered incrementally from this number. If the "min" is not `0` and the modulo 12 is not zero, the keyboard is started from corresponding position (not-C). Note that the specified key should be a 'white-key'.
 **keys** | int | `25` | Number of keys. `25` means 25 keys keyboard.
 **colors** | string | '#222; #eee;#ccc; #333;#000; #e88;#c44; #c33;#800' | semicolon separated 9 keyboard colors. 'border; whitekey-grad-from;whitekey-grad-to; blackkey-grad-from;blackkey-grad-to; active-whitekey-grad-from;active-whitekey-grad-to; active-blackkey-grad-from;active-blackkey-grad-to'. Each key surface can has garadient left to right with 'from' and 'to'.
+**outline** | `0`,`1` | `1` | Border display when focused.
 **enable** | `0`,`1` | `1` | Enable control with the pointing device.
 
 ---
@@ -180,9 +196,16 @@ If the `fire` parameter is `undefined` or `false`, this function will not fire `
 
 ---
 ## Events
+
+### 'input'  
+`webaudio-knob` | `webaudio-slider`  
+**description**: 'input' event is fired when knob / slider value changes while dragging.
+
 ### 'change'  
 `webaudio-knob` | `webaudio-slider` | `webaudio-switch` | `webaudio-keyboard`  
-**description**: 'change' event is emitted everytime value changes by user action or setValue() function with fire flag is `true`. In the event handler of `webaudio-knob`,`webaudio-slider` or `webaudio-switch`, current value can be get with referring `event.target.value`.  
+**description**: 'change' event is fired when value changes is decided. It means mouse button release for knobs and sliders, or switch / keyboard state changes.
+ Also issued when setValue() function call with fire flag is nonzero.
+In the event handler of `webaudio-knob`,`webaudio-slider` or `webaudio-switch`, current value can be get with referring `event.target.value`.  
 
 ```
 var knobs = document.getElementsByTagName('webaudio-knob');
@@ -206,11 +229,48 @@ keyboard.addEventListener('change', function(e) {
 });
 ```
 
-**Note**: The addEventListener() function is recommended for event handler setup instead of 'onchange=' attribute. 'onchange=' attribute seems not work on Safari.
-
 ### 'click'  
 `webaudio-switch (kick)`  
 **description**: 'click' event is emitted if the 'kick' type webaudio-switch has clicked.
+
+---
+## WebAudioControlsOptions
+By setting the global object, WebAudioControlsOptions, you can specify default values such as the knob size or colors etc when attribute setting on each tag is omitted.
+This declaration should be prior to the webaduio-controls.js loading.
+```
+<script>
+WebAudioControlsOptions={
+  useMidi:1,
+  knobDiameter:80,
+  switchWidth:40,
+  switchHeight:20,
+};
+</script>
+<script src="webaudio-controls.js"></script>
+```
+The items that can be set are as follows
+
+name   | default | description
+------------|---------|----------------
+useMidi     |0        | enable control from midi devices
+midilearn   |0        | enable midilearn function for each knobs/sliders/switches
+outline     |1        | border display when focused
+knobWidth   |0        | width for knobs
+knobHeight  |0        | height for knobs
+knobDiameter|64       | diameter for knobs
+knobSrc     |null     | knob image source
+knobSprites |0        | knob image number of frames
+knobColors  |"#e00;#000;#000"| color setting for knobs
+sliderWidth |24       | width for sliders
+sliderHeight|128      | height for sliders
+sliderColors|"#e00;#000;#fcc"| color setting for sliders
+switchWidth |0        | width for switches
+switchHeight|0        | height for switches
+switchDiameter|24     | diameter for switches
+switchColors|"#e00;#000;#fcc"| color setting for switches
+paramWidth  |32       | width for param
+paramHeight |16       | height for param
+paramColors |"#fff;#000"| color setting for param
 
 ---
 ## Creating knob images
@@ -244,13 +304,15 @@ Here is a brief instruction  to export knob-image from KnobGallery
 ---
 ## MIDI support: knobs, sliders and switches have midilearn/midicc support built-in
 
-Added a midilearn menu to knobs, sliders and switches by @micbuffa and @CellouBalde.
+To enable MIDI related functions, add the following line before the &lt;link&gt; tag that loads `webaudio-controls.html`  
 
-<b>Midilearn right click menu</b>: add a <code>midilearn=true</code> attribute to the <code>&lt;webaudio-knob&gt;</code>,  <code>&lt;webaudio-slider&gt;</code> and  <code>&lt;webaudio-switch&gt;</code> elements. Then right click on the element in the GUI, a midi learn menu should appear. Then, operate one of your midi controller and it should start actionning the webaudiocontrol widget in the HTML page. You can associate more than one controller to each widget. You can hot plug/unplug midi devices, they will be detected.
+`<script>WebAudioControlsOptions={useMidi:1}</script>`
 
-![Midi Learn Menu](http://i.imgur.com/h0ZiXyp.jpg)
+<b>Midilearn right click menu</b>: add a <code>midilearn=1</code> attribute to the <code>&lt;webaudio-knob&gt;</code>,  <code>&lt;webaudio-slider&gt;</code> and  <code>&lt;webaudio-switch&gt;</code> elements. Then right click on the element in the GUI, a midi learn menu should appear. Then, operate one of your midi controller and it should start actionning the webaudio-controls widget in the HTML page. <!--You can associate more than one controller to each widget. -->You can hot plug/unplug midi devices, they will be detected.
 
-<b>Declarative association between a midi controller and a GUI webaudiocontrol</b>: There is also an HTML <code>midicc="channel.cc#"</code> attribute that works like this:  <code>midicc="3.2"</code> means "listen to a cc event on channel 3, cc number 2". If you don't know the channel/cc number of your controller: 1) add a <code>midilearn=true</code> attribute so that a right click on the GUI widget will display the midilearn menu, 2) select "learn" in the menu, 3) operate your knob/slider/switch, normally the midi controller and the GUI object are in sync. 4) look at the devtool console, there is a message indicating the channel and cc number, for example "channel 0, cc 28". Then if you add the attribute midicc="0.28" to the HTML of your knob/slider/switch, the midi mapping between your GUI webaudiocontrol and your midi controller will be automatic. Follow the links at the end of this section and look at the HTML source code to see some examples.
+![Midi Learn Menu](img/midilearn.png)
+
+<b>Declarative association between a midi controller and a GUI webaudiocontrol</b>: There is also an HTML <code>midicc="channel.cc#"</code> attribute that works like this:  <code>midicc="3.2"</code> means "listen to a cc event on channel 3, cc number 2". If you don't know the channel/cc number of your controller: 1) add a <code>midilearn=1</code> attribute so that a right click on the GUI widget will display the midilearn menu, 2) select "learn" in the menu, 3) operate your knob/slider/switch, normally the midi controller and the GUI object are in sync. 4) look at the devtool console, there is a message indicating the channel and cc number, for example "channel 0, cc 28". Then if you add the attribute midicc="0.28" to the HTML of your knob/slider/switch, the midi mapping between your GUI webaudiocontrol and your midi controller will be automatic. Follow the links at the end of this section and look at the HTML source code to see some examples.
 
 Example: associate a knob with a controller on channel 7, cc number 7:
 
@@ -287,10 +349,10 @@ WebAudio-Controls is developped based on:
 - [WebAudio-Switch](http://aikelab.net/switch/) by [Keisuke Ai](http://d.hatena.ne.jp/aike/)  
 Integrated and enhanced by [g200kg](http://www.g200kg.com/)
 
-Copyright (c) 2013 Eiji Kitamura / Ryoya KAWAI / Keisuke Ai / g200kg (Tatsuya Shinyagaito)  
+Copyright (c) 2013 Eiji Kitamura / Ryoya KAWAI / Keisuke Ai / g200kg /  @micbuffa / @CellouBalde  
 Licensed under the Apache License, Version 2.0
 
 ---
+
 Knob/Switch images in samples are from [Knob Gallery](http://www.g200kg.com/en/webknobman/gallery.php)  
-[switch_toggle.knob](http://www.g200kg.com/en/webknobman/gallery.php?m=p&p=58) by [az](http://bji.yukihotaru.com/) (c) 2011 [CC-BY](http://creativecommons.org/licenses/by/3.0/)
----
+[switch_toggle.knob](http://www.g200kg.com/en/webknobman/gallery.php?m=p&p=58) by [az](http://bji.yukihotaru.com/) (c) 2011 [CC-BY](http://creativecommons.org/licenses/by/3.0/)  

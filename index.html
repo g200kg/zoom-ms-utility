@@ -5,10 +5,9 @@
 <title>Zoom MS-50G / 60B / 70CDR Patch Editor</title>
 <link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-<script src="bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
-<link rel="import" href="bower_components/polymer/polymer.html">
+<script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 <script>UseWebAudioControlsMidi=0</script>
-<link rel="import" href="bower_components/webaudio-controls/webaudio-controls.html" >
+<script src="bower_components/webaudio-controls/webaudio-controls.js"></script>
 <script src="./bower_components/jszip/dist/jszip.min.js"></script>
 <script>
 //
@@ -2866,7 +2865,7 @@ function Init(){
         ev.preventDefault();
       };
       k.valuetip=0;
-      k.onchange = function(k){
+      k.oninput = function(k){
         var f=parseInt(k.target.id[1]);
         var p=parseInt(k.target.id[3]);
         SetCurrentEffect(f-1);
@@ -2890,7 +2889,7 @@ function Init(){
         }
       }
       if(s)
-        s.onchange=function(s){
+        s.oninput=function(s){
           var f=parseInt(s.target.id[1]);
           var p=parseInt(s.target.id[3]);
           SetCurrentEffect(f-1);
@@ -4699,12 +4698,6 @@ img{
   cursor:default;
   background:url(./images/bg-grad.png);
 }
-#effects td div{
-}
-#effects td div{
-}
-#effects td div div{
-}
 #effects td div div input{
   display:none;
   background:#446;
@@ -5001,7 +4994,7 @@ webaudio-switch{
     <div id="mainmenu">
       <ul>
         <li>MidiPort : <select id="midiport" onchange="SelectPort()"></select></li>
-        <li><div style="display:inline-block:width:160px">Device : <span id="device"></span></div><div>Firmware : <span id="firmver"></span></div></li>
+        <li><div style="display:inline-block;width:160px">Device : <span id="device"></span></div><div>Firmware : <span id="firmver"></span></div></li>
         <li><hr/></li>
         <li><button class="menubtn" id="scanbtn" onclick="Scan()" title="Re-Scan all patches on the device">Scan Patches</button> <button class="menubtn" id="tunerbtn" onclick="Tuner()" title="Toggle Tuner-Mode">Tuner</button></li>
         <li><button class="menubtn" id="instchbtn" onclick="InstallCheck()" title="List the installed effects">Install Check</button> <button class="menubtn" id="autosavebtn" onclick="AutoSave()" title="Save the changes in the browser automatically">AutoSave</button></li>
@@ -5258,7 +5251,7 @@ webaudio-switch{
   <div id="splashbase" class="modalbase">
     <div id="splashpanel">
       <h1>Zoom MS-50G / MS-60B / MS-70CDR Patch Editor</h1>
-      <img src="./images/g200kg160x80.png" style="margin:0px 10px"/> <img src="./images/50g.png" style="width:45px;margin 0px 10px"/> <img src="./images/60b.png" style="width:45px;margin:0px 10px"/> <img src="./images/70cdr.png" style="width:45px;margin 0px 10px"/><br/>
+      <img src="./images/g200kg160x80.png" style="margin:0px 10px"/> <img src="./images/50g.png" style="width:45px;margin:0px 10px"/> <img src="./images/60b.png" style="width:45px;margin:0px 10px"/> <img src="./images/70cdr.png" style="width:45px;margin:0px 10px"/><br/>
       <p>This is a browser based ZOOM MS-50G / 60B / 70CDR patch editor<br/>
       Launch this page with latest Chrome after connect ZOOM MS-50G / 60B / 70CDR via USB.</p>
       <p>これはブラウザで動作する ZOOM MS-50G / 60B / 70CDR 用のパッチエディタです<br/>
