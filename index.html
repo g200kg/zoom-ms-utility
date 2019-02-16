@@ -2775,7 +2775,12 @@ function Init(){
   }
   navigator.requestMIDIAccess({sysex:true}).then(
       function(ma){midiif=new MidiIf(ma);},
-      function(e){AlertMsg("requestMIDIAccess Error");},
+      function(e){
+        AlertMsg("requestMIDIAccess Error.<br/><br/><img src='./images/mididisableicon.png' align='left' style='margin:5px'/>"
+        + "If an icon of keyboard with 'x' mark is displayed at the right end of the address bar, "
+        + "click the icon, clear setting, reload and allow 'use MIDI device'."
+        );
+      },
     );
   for(i=0;i<50;++i)
     patches[i]=new apatch();
