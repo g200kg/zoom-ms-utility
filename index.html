@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <title>Zoom MS-50G / 60B / 70CDR Patch Editor</title>
-<link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+<link rel="icon" href="./images/icon.png" />
+<!--<link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">-->
+<!--<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">-->
 <script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
 <script>UseWebAudioControlsMidi=0</script>
 <script src="bower_components/webaudio-controls/webaudio-controls.js"></script>
@@ -2757,6 +2758,9 @@ function MakeBin(s,len){
 }
 function Init(){
   var i;
+  document.getElementById("g200kglogo").addEventListener("click",()=>{OpenUrl("https://www.g200kg.com")});
+  document.getElementById("github").addEventListener("click",()=>{OpenUrl("https://github.com/g200kg/zoom-ms-utility")});
+  document.getElementById("github2").addEventListener("click",()=>{OpenUrl("https://github.com/g200kg/zoom-ms-utility")});
   if(!navigator.requestMIDIAccess){
     AlertMsg("This browser does not support Web MIDI API. Please use latest Chrome.");
     return;
@@ -2894,7 +2898,7 @@ function Init(){
         }
       }
       if(s)
-        s.oninput=function(s){
+        s.onchange=function(s){
           var f=parseInt(s.target.id[1]);
           var p=parseInt(s.target.id[3]);
           SetCurrentEffect(f-1);
@@ -4240,7 +4244,7 @@ function ImportPatch(){
 function ImportText(){
   var tar=document.getElementById((currentpatch+1)+"nam");
   var panel=document.getElementById("textareabase");
-  document.getElementById("textareamsg").innerHTML="Load from Text : Pate here the Text from 'Show Patch as text' or guitarpatches.com's zoom MS-50G patch page texts.";
+  document.getElementById("textareamsg").innerHTML="Load from Text : Paste here the Text from 'Show Patch as text' or guitarpatches.com's zoom MS-50G patch page texts.";
   document.getElementById("textareatext").value="";
   var rc=tar.getBoundingClientRect();
   panel.style.display="block";
@@ -4337,18 +4341,21 @@ function ImportText(){
     document.getElementById("textareabase").style.display="none";
   };
 }
+function OpenUrl(url){
+    window.open(url);
+}
 function ShowDoc(x) {
-	var divs=document.getElementsByTagName("div");
-	var t="doc_"+x;
-	for(var i=0;i<divs.length;++i) {
-		if(divs[i].className==="doc_ja")
-			divs[i].style.display=(x==="ja")?"block":"none";
-		if(divs[i].className=="doc_en")
-			divs[i].style.display=(x==="ja")?"none":"block";
-	}
+  var divs=document.getElementsByTagName("div");
+  var t="doc_"+x;
+  for(var i=0;i<divs.length;++i) {
+    if(divs[i].className==="doc_ja")
+      divs[i].style.display=(x==="ja")?"block":"none";
+    if(divs[i].className=="doc_en")
+      divs[i].style.display=(x==="ja")?"none":"block";
+  }
 }
 function GetLang() {
-	return (navigator.language || navigator.browserLanguage).substring(0, 2);
+  return (navigator.language || navigator.browserLanguage).substring(0, 2);
 }
 window.addEventListener("load",Init);
 
@@ -4386,7 +4393,7 @@ body{
   text-align: left;
 }
 h1{
-  font-family: 'Audiowide', cursive;
+  font-family: 'AudioWide',sans-serif;
   font-size:22px;
   margin:10px 0px 0px 0px;
 }
@@ -4400,8 +4407,27 @@ h1{
   width:1100px;
   height:70px;
 }
-#header img{
+#g200kglogo{
   height:60px;
+  position:absolute;
+  top:5px;
+  left:5px;
+  cursor:pointer;
+}
+#title{
+  position:absolute;
+  top:0px;
+  left:135px;
+}
+#subtitle{
+  position:absolute;
+  top:45px;
+  left:135px;
+}
+#version{
+  position:absolute;
+  top:20px;
+  left:340px;
 }
 #header .info{
   position: absolute;
@@ -4868,24 +4894,24 @@ webaudio-switch{
 }
 .efitem .mk50{
   position:absolute;
-  left:4px;
+  left:1px;
   bottom:0;
-  height:9px;
-  width:19px;
+  height:13px;
+  width:25px;
 }
 .efitem .mk60{
   position:absolute;
-  left:24px;
+  left:27px;
   bottom:0;
-  height:9px;
-  width:19px;
+  height:14px;
+  width:25px;
 }
 .efitem .mk70{
   position:absolute;
-  left:42px;
+  left:53px;
   bottom:0;
-  height:9px;
-  width:19px;
+  height:14px;
+  width:25px;
 }
 .efitem .dspbar{
   position:absolute;
@@ -4986,14 +5012,17 @@ webaudio-switch{
   background:linear-gradient(#ccf,#b8b8e8);
   box-shadow:1px 1px 1px 1px rgba(0,0,0,0.4);
 }
+
 </style>
 </head>
 <body>
   <div id="base">
     <div id="header">
-      <a href="http://www.g200kg.com/" target="_blank"><img src="./images/g200kg160x80.png" style="float:left;margin:4px 11px"/></a>
-      <h1>Zoom MS Series Patch Editor</h1>
-      Patch utility for ZOOM MS-50G / 60B / 70CDR MultiStomp guitar/bass pedal<div class="info">Source code is available at GitHub : <a href="https://github.com/g200kg/zoom-ms-utility" target="_blank">https://github.com/g200kg/zoom-ms-utility</a></div>
+      <img src="./images/g200kg160x80.png" id="g200kglogo"/>
+      <img src="./images/title.png" id="title"/>
+      <div id="version" style="font-size:12px;vertical-align:top">v1.0.1</div>
+      <div id="subtitle">Patch editor for ZOOM MS-50G / 60B / 70CDR MultiStomp guitar/bass pedal</div>
+      <div class="info">Source code is available at GitHub : <div id="github" style="text-decoration:underline;cursor:pointer">https://github.com/g200kg/zoom-ms-utility</div></div>
     </div>
     <br/>
     <div id="mainmenu">
@@ -5249,13 +5278,14 @@ webaudio-switch{
       </div>
       <button onclick="EffectPanelCancel()" style="width:120px;height:30px;margin:5px">Cancel</button>
       <button onclick="inst.Start()" style="width:120px;height:30px;margin:5px">Install Check</button>
-      <input type="checkbox" onchange="inst.ShowAll(this.checked)" style="width:12px"/><span style="font-size:12px">Show All MS series effects</span>
+      <input type="checkbox" onchange="inst.ShowAll(this.checked)" style="width:12px" id="showall"/><label for="showall" style="font-size:12px">Show All MS series effects</label>
     </div>
   </div>
 
   <div id="splashbase" class="modalbase">
     <div id="splashpanel">
-      <h1>Zoom MS-50G / MS-60B / MS-70CDR Patch Editor</h1>
+      <h1>Zoom MS Utility MS-50G / MS-60B / MS-70CDR</h1>
+      <br/>
       <img src="./images/g200kg160x80.png" style="margin:0px 10px"/> <img src="./images/50g.png" style="width:45px;margin:0px 10px"/> <img src="./images/60b.png" style="width:45px;margin:0px 10px"/> <img src="./images/70cdr.png" style="width:45px;margin:0px 10px"/><br/>
       <p>This is a browser based ZOOM MS-50G / 60B / 70CDR patch editor<br/>
       Launch this page with latest Chrome after connect ZOOM MS-50G / 60B / 70CDR via USB.</p>
@@ -5263,9 +5293,7 @@ webaudio-switch{
         ZOOM MS-50G / 60B / 70CDR を USB で接続した後、このページを起動してください。</p>
       <hr style="clear:both"/>
       <p style="font-size:12px">
-        This is still very tentative version for the confirmation of MIDI related fucntion.<br/>
-        If you are interested in MS-50G / 60B / 70CDR MIDI related function, check GitHub repository<br/>
-        <a href="https://github.com/g200kg/zoom-ms-utility">GitHub repository</a>
+        <div id="github2" style="text-decoration:underline;cursor:pointer">GitHub repository</DIV>
       </p>
       <button onclick="document.getElementById('splashbase').style.display='none';Scan()" style="width:150px;height:40px" title="Start Patch Editor">START</button>
       <button onclick="Usage()" style="width:150px;height:40px" title="How to use this patch editor">How To Use</button>
@@ -5281,30 +5309,31 @@ webaudio-switch{
           <ul>
             <li>Launch<br/>
               <ul>
-                <li>Connect PC/Mac to MS-50G / 60B / 70CDR via USB</li>
-                <li>Launch this page. You should use Latest Chrome. On Windows, unplugging the USB while running may cause freeze (this will be fixed on Chrome 60). Once close all Chrome window if you have MidiPort detection problem.</li>
-                <li>Press accept if 'MIDI device' permission dialog is displayed  (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
-                <li>After splash screen, all patches and effects with parameters are displayed</li>
+                <li>Connect PC/Mac to MS-50G / 60B / 70CDR via USB.</li>
+                <li>Launch this page. You should use Latest Chrome. Once close all Chrome window if you have MidiPort detection problem.</li>
+                <li>Press accept if 'MIDI device' permission dialog is displayed. (press keyboard icon on right edge of address bar and retry if you make a mistake)</li>
+                <li>After splash screen, all patches and effects with parameters are displayed.</li>
               </ul>
             </li>
             <li>Patches<br/>
               <ul>
-                <li>Click patch name to select</li>
+                <li>Click patch name to select.</li>
                 <li>Right-click (ctrl+click for Mac) or patch number button will show Context-menu.</li>
-                <li>From context-menu, Copy/Paste/Rename/etc patches</li>
-                <li>Patches are draggable to another position for overwrite/exchange</li>
-                <li>By context menu - ExportToFile/ImportFromFile, each patch can be backup/restore to local file</li>
-                <li>By context menu - SavePatchToDevice, force each patch to be stored to device's memory</li>
-                <li>If you want to choose export directory when 'ExportToFile', I recommend change Chrome setting of setting-detail-download confirm folder</li>
-                <li>If you want to exchange patch data with BBS etc, 'Show Patch as text' and 'Import Patch from text' in the context menu are useful</li>
-                <li>'Show Patch as text' displays a patch expressed in text (hex string), it can be used for copying, saving, posting to BBS etc</li>
-                <li>'Import Patch from text' will load patches by entering the text displayed in 'Show Patch as text'</li>
-                <li>'Import from text' also support the format of MS-50G patch page in 'http://guitarpatches.com'. Copy entire text by (Ctrl-A / Ctrl-C) in patch page, and paste to Patch editor's input field</li>
+                <li>From context-menu, You can do Copy/Paste/Rename/etc patches.</li>
+                <li>Patches are draggable to another position for overwrite/exchange.</li>
+                <li>By context menu - ExportToFile/ImportFromFile, each patch can be backup/restore to local file.</li>
+                <li>By context menu - SavePatchToDevice, force each patch to be stored to device's memory.</li>
+                <li>The default folder for exporting patches (as well as banks) is determined by the browser specification.
+                  I recommend to set to "Ask where to save each file before downloading" in Chrome settings-advanced-downloads.</li>
+                <li>If you want to exchange patch data with BBS etc, 'Show Patch as text' and 'Import Patch from text' in the context menu are useful.</li>
+                <li>'Show Patch as text' displays a patch expressed in text (hex string), it can be used for copying, saving, posting to BBS etc.</li>
+                <li>'Import Patch from text' will load patches by entering the text displayed in 'Show Patch as text'.</li>
+                <li>'Import Patch from text' also support the format of MS-50G patch page in 'http://guitarpatches.com'. Copy entire text by (Ctrl-A / Ctrl-C) in patch page, and paste to Patch editor's input field</li>
               </ul>
             </li>
             <li>Effects<br/>
               <ul>
-                <li>In the bottom row, 6 effects (4 in 60 B) in use are displayed</li>
+                <li>In the bottom row, 6 effects (4 in 60B) in use are displayed</li>
                 <li>Click effect name to switch effect/bypass</li>
                 <li>Effects are draggable to another position to change order</li>
                 <li>From right-click or number-button context menu, each effect can be add/move/del</li>
@@ -5319,19 +5348,19 @@ webaudio-switch{
                 <li>When a bank file is selected when one patch file loading, a list in the bank file is displayed, and one patch can be selected from among them.</li>
               </ul>
             </li>
-            <li>本体での操作<br/>
+            <li>Operation on the device<br/>
               <ul>
-                <li>パッチエディタと本体での操作を併用する事もできます。本体でのパッチの選択やパラメータ調整などもパッチエディタに反映されます。</li>
-                <li>パッチエディタの画面を見ながら本体のノブでパラメータの調整を行うという使い方も可能です</li>
+                <li>You can use both the patch editor and the operation on the device. The patch selection and parameter adjustment on the device are also reflected in the patch editor.</li>
+                <li>It is also convenient to adjust parameters with the physical knob on the device while looking at the patch editor screen.</li>
               </ul>
             </li>
             <li>AutoSave<br/>
               <ul>
                 <li>Autosave mode is defaultly ON. But this is not automatically linked to device's "AUTOSAVE" mode. It is recommended to set according to device's "AUTOSAVE" mode.</li>
-                <li>In "AutoSave On" mode, patch replacement etc on the browser will be automatically stored to the device's memory</li>
+                <li>In "AutoSave On" mode, patch replacement etc on the browser will be automatically stored to the device's memory.</li>
                 <li>If AutoSave is Off, patch replacement etc in the browser is not stored to device's memory until pressing the Save all patches button or Context-menu - SavePatchToDevice for each patch.</li>
                 <li>Note that device's "AUTOSAVE" mode is independent to this behavior. A patch may be stored to memory by operation of device itself.</li>
-                <li>"Save all patches" button will force all 50 patches to be stored to device's memory</li>
+                <li>"Save all patches" button will force all 50 patches to be stored to device's memory.</li>
               </ul>
             </li>
             <li>DSP consumption<br/>
@@ -5367,7 +5396,7 @@ webaudio-switch{
             <li>起動<br/>
               <ul>
                 <li>PC または Mac と MS-50G / 60B / 70CDR を USB で接続します</li>
-                <li>最新版の Chrome を使用してこのページを起動します。Windows では動作中に USB ケーブルを抜くとフリーズする事があります(Chrome60で修正される模様です)。MIDIポートの検出関係で問題がある場合には一度 Chrome の全てのウィンドウを閉じてください</li>
+                <li>最新版の Chrome を使用してこのページを起動します。MIDIポートの検出関係で問題がある場合には一度 Chrome の全てのウィンドウを閉じてください</li>
                 <li>"MIDIデバイス" のアクセスに関するダイアログが出た場合は、許可してください。(やり直す場合はアドレスバーの右端にあるキーボードのアイコンをクリックします)</li>
                 <li>スプラッシュスクリーンの後、パッチの一覧とエフェクトパラメータが表示されます。</li>
               </ul>

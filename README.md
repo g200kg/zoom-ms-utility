@@ -35,5 +35,8 @@ This tool will not work if you just open the local html file by Chrome because o
   `Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome --allow-file-access-from-files /Users/xxxx/zoom-ms-utility/index.html`  
   Note that this method will not work if the Chrome instance is already exist. You should close all Chrome window before launch.
 
+## History
+* v1.0.1 Fix behavior when click a switch
+
 ## Info
 If you are interested in MS-50G/70CDR MIDI function, check `midimessage.md`
