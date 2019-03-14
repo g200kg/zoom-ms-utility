@@ -4244,7 +4244,7 @@ function ImportPatch(){
 function ImportText(){
   var tar=document.getElementById((currentpatch+1)+"nam");
   var panel=document.getElementById("textareabase");
-  document.getElementById("textareamsg").innerHTML="Load from Text : Paste here the Text from 'Show Patch as text' or guitarpatches.com's zoom MS-50G patch page texts.";
+  document.getElementById("textareamsg").innerHTML="Load from Text : Paste here the Text from 'Show Patch as text'<br/> or guitarpatches.com's zoom MS-50G patch page texts.";
   document.getElementById("textareatext").value="";
   var rc=tar.getBoundingClientRect();
   panel.style.display="block";
@@ -4582,7 +4582,7 @@ img{
   border-radius: 3px;
   box-shadow: 2px 2px 3px 3px rgba(0,0,0,0.4);
   width:800px;
-  height:150px;
+  height:200px;
   padding:10px;
   margin:auto;
   left:0;
@@ -4593,6 +4593,7 @@ img{
 #textareapanel textarea{
   width:700px;
   height:100px;
+  resize:none;
 }
 #textareapanel button{
   width:70px;
