@@ -549,7 +549,7 @@ var effectlist={
   0x00500010:{name:"ModDelay2",group:"DELAY",order:1005,install:0,ver:0x0110,title:"Modulation delay with depth adjust",
     dsp:7.5506,dspmax:1/6,dspmin:2/25,
     param:[
-    {name:"Time",def:529,max:2014,disp:1},
+    {name:"Time",def:529,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:50,max:100},
     {name:"Mix",def:45,max:100},
     {name:"Rate",def:16,max:49,disp:1},
@@ -1752,7 +1752,7 @@ var effectlist={
   0x00100010:{name:"Delay",group:"DELAY",order:700,install:0,ver:0x0111,title:"Long delay upto 4000ms",
     dsp:14.2628,dspmax:1/12,dspmin:1/20,
     param:[
-    {name:"Time",def:559,max:4022,disp:1},
+    {name:"Time",def:559,max:4022,disp:{type:"Time",min:1,max:4001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8","&#x1D15F; x9","&#x1D15F; x10","&#x1D15F; x11","&#x1D15F; x12","&#x1D15F; x13","&#x1D15F; x14","&#x1D15F; x15","&#x1D15F; x16"]}},
     {name:"F.B",def:30,max:100},
     {name:"Mix",def:70,max:100},
     {name:"HiDMP",def:10,max:10},
@@ -1763,7 +1763,7 @@ var effectlist={
   0x00200010:{name:"TapeEcho",group:"DELAY",order:701,install:0,ver:0x0121,title:"Tape echo simulation",
     dsp:12.4737,dspmax:1/10,dspmin:1/20,
     param:[
-    {name:"Time",def:559,max:2014,disp:1},
+    {name:"Time",def:559,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:64,max:100},
     {name:"Mix",def:56,max:100},
     {name:"HiDMP",def:5,max:10},
@@ -1773,7 +1773,7 @@ var effectlist={
   0x00400010:{name:"ModDelay",group:"DELAY",order:702,install:0,ver:0x0121,title:"Delay effect with modulation",
     dsp:12.4737,dspmax:1/10,dspmin:1/20,
     param:[
-    {name:"Time",def:499,max:2014,disp:1},
+    {name:"Time",def:499,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:50,max:100},
     {name:"Mix",def:62,max:100},
     {name:"Rate",def:20,max:49,disp:1},
@@ -1783,7 +1783,7 @@ var effectlist={
   0x00600010:{name:"AnalogDly",group:"DELAY",order:703,install:0,ver:0x0121,title:"Analog delay simulation",
     dsp:14.2628,dspmax:1/12,dspmin:1/20,
     param:[
-    {name:"Time",def:359,max:4022,disp:1},
+    {name:"Time",def:359,max:4022,disp:{type:"Time",min:1,max:4001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8","&#x1D15F; x9","&#x1D15F; x10","&#x1D15F; x11","&#x1D15F; x12","&#x1D15F; x13","&#x1D15F; x14","&#x1D15F; x15","&#x1D15F; x16"]}},
     {name:"F.B",def:28,max:100},
     {name:"Mix",def:40,max:100},
     {name:"HiDMP",def:8,max:10},
@@ -1794,7 +1794,7 @@ var effectlist={
   0x40000010:{name:"ReverseDL",group:"DELAY",order:704,install:0,ver:0x0121,title:"Reverse delay upto 2000ms",
     dsp:14.2628,dspmax:1/12,dspmin:1/20,
     param:[
-    {name:"Time",def:990,max:2005,disp:10},
+    {name:"Time",def:990,max:2005,disp:{type:"Time",min:10,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:20,max:100},
     {name:"Bal",def:50,max:100},
     {name:"HiDMP",def:8,max:10},
@@ -1804,7 +1804,7 @@ var effectlist={
   0x40200010:{name:"MultiTapD",group:"DELAY",order:705,install:0,ver:0x0122,title:"Several delay sounds with different delay times",
     dsp:10.7911,dspmax:1/10,dspmin:1/15,
     param:[
-    {name:"Time",def:2999,max:3018,disp:1},
+    {name:"Time",def:2999,max:3018,disp:{type:"Time",min:1,max:3001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8","&#x1D15F; x9","&#x1D15F; x10","&#x1D15F; x11","&#x1D15F; x12"]}},
     {name:"PTTRN",def:1,max:7,disp:1},
     {name:"Mix",def:20,max:100},
     {name:"Tone",def:10,max:10},
@@ -1814,7 +1814,7 @@ var effectlist={
   0x40400010:{name:"DynaDelay",group:"DELAY",order:706,install:0,ver:0x0122,title:"Delay with dynamics adjusting according to input level",
     dsp:10.7911,dspmax:1/10,dspmin:1/15,
     param:[
-    {name:"Time",def:359,max:2014,disp:1},
+    {name:"Time",def:359,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"Sense",def:5,max:19,disp:["-10","-9","-8","-7","-6","-5","-4","-3","-2","-1","1","2","3","4","5","6","7","8","9","10"]},
     {name:"Mix",def:80,max:100},
     {name:"F.B",def:30,max:100},
@@ -1824,7 +1824,7 @@ var effectlist={
   0x40600010:{name:"FilterDly",group:"DELAY",order:707,install:0,ver:0x0122,title:"Delay effect with filter",
     dsp:10.7911,dspmax:1/10,dspmin:1/15,
     param:[
-    {name:"Time",def:499,max:2014,disp:1},
+    {name:"Time",def:499,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:50,max:100},
     {name:"Mix",def:90,max:100},
     {name:"Rate",def:6,max:49,disp:1},
@@ -1851,8 +1851,8 @@ var effectlist={
   0x00200110:{name:"StereoDly",group:"DELAY",order:709,install:0,ver:0x0122,title:"Stereo delay with L/R separate delay times",
     dsp:10.7911,dspmax:1/10,dspmin:1/15,
     param:[
-    {name:"TimeL",def:164,max:2014,disp:1},
-    {name:"TimeR",def:504,max:2014,disp:1},
+    {name:"TimeL",def:164,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
+    {name:"TimeR",def:504,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"Mix",def:100,max:100},
     {name:"LchFB",def:55,max:100},
     {name:"RchFB",def:37,max:100},
@@ -1864,7 +1864,7 @@ var effectlist={
   0x00400110:{name:"PhaseDly",group:"DELAY",order:710,install:0,ver:0x0122,title:"Delay effect with phaser",
     dsp:8.0000,dspmax:1/6,dspmin:16/100,
     param:[
-    {name:"Time",def:499,max:2014,disp:1},
+    {name:"Time",def:499,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:28,max:100},
     {name:"Mix",def:57,max:100},
     {name:"Rate",def:49,max:49,disp:1},
@@ -1906,8 +1906,9 @@ var effectlist={
   0x40400110:{name:"DualDigiD",group:"DELAY",order:714,install:0,ver:0x0123,title:"Eventide TimeFactor DigitalDelay like cobination of 2 delays",
     dsp:4.4444,dspmax:1/4,dspmin:22/100,
     param:[
-    {name:"TimeA",def:500,max:2005},
-    {name:"TimeB",def:375,max:2005},
+//    {name:"TimeA",def:500,max:2005},
+    {name:"TimeA",def:500,max:2005,disp:{type:"Time",min:0,max:1991,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
+    {name:"TimeB",def:375,max:2005,disp:{type:"Time",min:0,max:1991,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"FdbkA",def:50,max:110},
     {name:"FdbkB",def:50,max:110},
     {name:"Depth",def:0,max:101},
@@ -1933,7 +1934,7 @@ var effectlist={
     param:[
     {name:"DRIVE",def:39,max:100},
     {name:"MIX",def:80,max:100},
-    {name:"TIME",def:355,max:1985,disp:20},
+    {name:"TIME",def:355,max:1985,disp:{type:"Time",min:20,max:1991,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:70,max:100},
     {name:"WOW",def:25,max:100},
     {name:"DRV",def:0,max:1,disp:["DRIV","THRU"]},
@@ -1943,8 +1944,8 @@ var effectlist={
   0x00200210:{name:"SlapBackD",group:"DELAY",order:717,install:0,ver:0x0123,title:"tc electonic FLASHBACK set for SLAP delay modeling",
     dsp:5.4545,dspmax:23/125,dspmin:18/100,  //0.184 - 0.18
     param:[
-    {name:"TIME",def:98,max:300,disp:1},
-    {name:"SubDv",def:0,max:2,disp:["1/4","3/16","P-P"]},
+    {name:"TIME",def:98,max:300,disp:{type:"Time",min:1,max:301,list:["Sync"]}},
+    {name:"SubDv",def:0,max:2,disp:["&#x1D15F;","&#x1D160;.","P-P"]},
     {name:"F.B",def:29,max:100},
     {name:"FxLVL",def:40,max:100},
     {name:"DRY",def:1,max:1,disp:["OFF","ON"]},
@@ -1954,7 +1955,7 @@ var effectlist={
   0x00400210:{name:"SmoothDly",group:"DELAY",order:718,install:0,ver:0x0123,title:"BOSS DD-20 smooth mode delay modeling",
     dsp:2.8111,dspmax:4/10,dspmin:1/3,
     param:[
-    {name:"TIME",def:322,max:3014,disp:1},
+    {name:"TIME",def:322,max:3014,disp:{type:"Time",min:1,max:3001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:39,max:100},
     {name:"E.LVL",def:49,max:100},
     {name:"TONE",def:83,max:100},
@@ -1963,7 +1964,7 @@ var effectlist={
   0x00600210:{name:"LO-FI Dly",group:"DELAY",order:719,install:0,ver:0x0123,title:"Strymon TIMELINE LO-FI mode deley modeling",
     dsp:2.2588,dspmax:1/2,dspmin:9/20,
     param:[
-    {name:"TIME",def:248,max:1913,disp:2},
+    {name:"TIME",def:248,max:1913,disp:{type:"Time",min:2,max:1901,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:25,max:100},
     {name:"MIX",def:50,max:100},
     {name:"SMPL",def:5,max:14,disp:["1/128","1/64","1/32","1/24","1/12","1/10","1/9","1/8","1/7","1/6","1/5","1/4","1/3","1/2","1/1"]},
@@ -1976,7 +1977,7 @@ var effectlist={
   0x40000210:{name:"SlwAtkDly",group:"DELAY",order:720,install:0,ver:0x0123,title:"LINE6 M9 Auto-Volume Echo delay modeling",
     dsp:4.3243,dspmax:1/4,dspmin:22/100,
     param:[
-    {name:"TIME",def:489,max:1914,disp:1},
+    {name:"TIME",def:489,max:1914,disp:{type:"Time",min:1,max:1901,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:71,max:100},
     {name:"MIX",def:64,max:100},
     {name:"DEPTH",def:77,max:100},
@@ -1987,7 +1988,7 @@ var effectlist={
   0x40200210:{name:"TremDelay",group:"DELAY",order:721,install:0,ver:0x0123,title:"Strymon TIMELINE trem mode delay modeling",
     dsp:1.9173,dspmax:3/5,dspmin:1/2,
     param:[
-    {name:"TIME",def:300,max:1855,disp:60},
+    {name:"TIME",def:300,max:1855,disp:{type:"Time",min:60,max:1901,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:70,max:100},
     {name:"MIX",def:60,max:100},
     {name:"LFO",def:0,max:4,disp:["TRI","SQR","SIN","RAMP","SAW"]},
@@ -2002,8 +2003,8 @@ var effectlist={
   0x40400210:{name:"FLTR PPD",group:"DELAY",order:722,install:0,ver:0x0123,title:"Eventide TimeFactor FilterPong delay modeling",
     dsp:3.4286,dspmax:1/3,dspmin:1/4,
     param:[
-    {name:"TimeA",def:500,max:1915},
-    {name:"TimeB",def:250,max:1915},
+    {name:"TimeA",def:500,max:1915,disp:{type:"Time",min:0,max:1901,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
+    {name:"TimeB",def:250,max:1915,disp:{type:"Time",min:0,max:1901,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"Mix",def:50,max:100},
     {name:"DlyMx",def:25,max:100},
     {name:"Fdbk",def:75,max:110},
@@ -2015,7 +2016,7 @@ var effectlist={
   0x40600210:{name:"A-Pan DLY",group:"DELAY",order:723,install:0,ver:0x0123,title:"Combination of autopan and delay",
     dsp:5.8065,dspmax:924/5400,dspmin:1/6,//0.17111 - 0.1666
     param:[
-    {name:"Time",def:222,max:2014,disp:1},
+    {name:"Time",def:222,max:2014,disp:{type:"Time",min:1,max:2001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:87,max:100},
     {name:"Mix",def:53,max:100},
     {name:"Rate",def:26,max:52,disp:-2},
@@ -2028,7 +2029,7 @@ var effectlist={
   0x00000310:{name:"ICE Delay",group:"DELAY",order:724,install:0,ver:0x0123,title:"Strymon TIMELINE ICE mode pitch shifting delay modeling",
     dsp:2.9268,dspmax:4/10,dspmin:1/3,
     param:[
-    {name:"TIME",def:440,max:1255,disp:60},
+    {name:"TIME",def:440,max:1255,disp:{type:"Time",min:60,max:1301,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4","&#x1D15F; x5","&#x1D15F; x6","&#x1D15F; x7","&#x1D15F; x8"]}},
     {name:"F.B",def:64,max:100},
     {name:"MIX",def:60,max:100},
     {name:"INTVL",def:23,max:30,disp:[
@@ -2159,7 +2160,7 @@ var effectlist={
   0x00600112:{name:"SlapBack",group:"REVERB",order:811,install:0,ver:0x0113,title:"Reverb with repeating echo",
     dsp:4.6142,dspmax:1108/4800,dspmin:1/5,
     param:[
-    {name:"Time",def:379,max:1010,disp:1},
+    {name:"Time",def:379,max:1010,disp:{type:"Time",min:1,max:1001,list:["&#x1D161;","&#x1D15F; 3","&#x1D161;.","&#x1D160;","&#x1D15E; 3","&#x1D160;.","&#x1D15F;","&#x1D15F;.","&#x1D15F; x2","&#x1D15F; x3","&#x1D15F; x4"]}},
     {name:"Decay",def:9,max:29,disp:1},
     {name:"Mix",def:48,max:100},
     {name:"F.B",def:43,max:100},
@@ -2862,6 +2863,7 @@ function Init(){
       var c="f"+(i+1)+"p"+(j+1);
       var k=document.getElementById(c+"k");
       var s=document.getElementById(c+"s");
+      var v=document.getElementById(c+"v");
       p.onclick=p.oncontextmenu=function(ev){
         var id=ev.target.id;
         if(id[0]!="f")
@@ -2887,17 +2889,15 @@ function Init(){
         DispPatch();
 
         if(f<=3 && f-1==currenteffect){
-//          console.log("paramchange")
           midiif.SendParamChange(f-1,p+1,patches[currentpatch].GetParamVal(f-1,p+1));
         }
         else{
-//          console.log("currentpat")
           midiif.SendCurrentPatch();
           currenteffect=f-1;
           dirty=1;
         }
-      }
-      if(s)
+      };
+      if(s){
         s.onchange=function(s){
           var f=parseInt(s.target.id[1]);
           var p=parseInt(s.target.id[3]);
@@ -2907,6 +2907,17 @@ function Init(){
           midiif.SendCurrentPatch();
           dirty=1;
         }
+      }
+
+      v.ondblclick=function(ev){
+        var f=parseInt(ev.target.id[1]);
+        var p=parseInt(ev.target.id[3]);
+        var id=patches[currentpatch].GetEffectId(f-1);
+        var ef=effectlist[id];
+        var par=ef.param[p-1];
+        PopupEdit(f,p,par);
+      }
+
     }
   }
   for(i=0;i<50;++i){
@@ -3032,14 +3043,24 @@ function Init(){
     PopupEffectCancel();
     PopupPatchCancel();
     PopupPatchCancel2();
+    document.getElementById("popupeditpanel").style.display="none";
   });
   document.addEventListener("keydown",function(ev){
     if(ready){
       var p;
       if(document.getElementById("inputbase").style.display=="block"
         || document.getElementById("confirmbase").style.display=="block"
-        || document.getElementById("textareabase").style.display=="block")
+        || document.getElementById("textareabase").style.display=="block"
+        || document.getElementById("popupeditpanel").style.display=="block"
+        ){
+        if(ev.key=="Escape"){
+          document.getElementById("inputbase").style.display="none";
+          document.getElementById("confirmbase").style.display="none";
+          document.getElementById("textareabase").style.display="none";
+          document.getElementById("popupeditpanel").style.display="none";
+        }
         return;
+      }
       if(ev.ctrlKey||ev.altKey)
         return;
       if(ev.key=="ArrowUp"||ev.key=="ArrowDown"||ev.key=="PageUp"||ev.key=="PageDown"){
@@ -3054,19 +3075,15 @@ function Init(){
             switch(ev.key){
             case "ArrowUp":
               if(ev.shiftKey)
-                v=Math.min(v+=1,k.max);
-              else if(ev.ctrlKey)
                 v=Math.min(v+=p1,k.max);
               else
-                v=Math.min(v+=p2,k.max);
+                v=Math.min(v+=1,k.max);
               break;
             case "ArrowDown":
               if(ev.shiftKey)
-                v=Math.max(v-=1,k.min);
-              else if(ev.ctrlKey)
-                v=Math.min(v-=p1,k.min);
+                v=Math.max(v-=p1,k.min);
               else
-                v=Math.max(v-=p2,k.min);
+                v=Math.max(v-=1,k.min);
               break;
             case "PageUp":
               v=Math.min(v+=p1,k.max);
@@ -3321,6 +3338,113 @@ function PopupPatchDelete(){
   {x:(rc.left-55+window.pageXOffset), y:(rc.top+24+window.pageYOffset)},
   );
   PopupPatchCancel2();
+}
+function PopupEdit(f,p,par){
+  var tar=document.getElementById("f"+f+"p"+p+"v");
+  var rc=tar.getBoundingClientRect();
+  var offs;
+  var panel=document.getElementById("popupeditpanel");
+  var top=(377+(f-1)*42);
+  var left=190+(p-1)*96;
+  if(f>=5) top-=115;
+  panel.onclick=(ev)=>{
+    ev.stopPropagation();
+  }
+  switch(typeof(par.disp)){
+  case "object": 
+    if(typeof(par.disp.min)=="undefined"){
+      var s=`<div style='height:${par.disp.length*20}px'>`;
+      for(let i=0;i<par.disp.length;++i){
+        s+=`<button>${par.disp[i]}</button><br/>`;
+      }
+      s+="</div>";
+      panel.innerHTML=s;
+      panel.style.left=left+"px";
+      panel.style.top=top+"px";
+      panel.style.display="block";
+      for(let i=0;i<par.disp.length;++i){
+        var e=panel.childNodes[0].childNodes[i*2];
+        e.onclick=()=>{
+          SetParamVal(currentpatch,f-1,p+1,i);
+          DispPatch(currentpatch);
+          panel.style.display="none";
+        };
+      }
+    }
+    else{
+      var s=`<div style='height:${par.disp.list.length*20}px'><div>Range : ${par.disp.min} .. ${par.disp.max-1}</div><input value="${GetParamVal(currentpatch,f-1,p+1)+par.disp.min}" style="margin-bottom:4px"/><br/>`;
+      for(let i=0;i<par.disp.list.length;++i){
+        s+=`<button>${par.disp.list[i]}</button><br/>`;
+      }
+      s+="</div>";
+      panel.innerHTML=s;
+      panel.style.left=left+"px";
+      panel.style.top=top+"px";
+      panel.style.display="block";
+      for(let i=0;i<par.disp.list.length;++i){
+        var e=panel.childNodes[0].childNodes[(i+1)*2+1];
+        e.onclick=()=>{
+          console.log(par.disp.max+i)
+          SetParamVal(currentpatch,f-1,p+1,par.disp.max+i-par.disp.min);
+          DispPatch(currentpatch);
+          panel.style.display="none";
+        };
+      }
+      var input=panel.childNodes[0].childNodes[1];
+      input.focus();
+      input.selectionStart=input.selectionEnd=100;
+      input.onkeydown=(ev)=>{
+        console.log(ev.key);
+        switch(ev.key){
+        case "Enter":
+          var val=input.value;
+          if(val<par.disp.min) val=par.disp.min;
+          if(val>=par.max+par.disp.min) val=par.max+par.disp.min;
+          val-=par.disp.min;
+          if(isNaN(val)) val=0;
+          SetParamVal(currentpatch,f-1,p+1,val);
+          panel.style.display="none";
+          DispPatch(currentpatch);
+          break;
+        case "Escape":
+          panel.style.display="none";
+          break;
+        }
+      }
+    }
+    return;
+  case "undefined": offs=0; break;
+  case "number": offs=par.disp; break;
+  }
+  panel.innerHTML=`<div>Range : ${offs} .. ${offs+par.max}</div><input value="${GetParamVal(currentpatch,f-1,p+1)+offs}"/>`;
+  panel.style.top=top+"px";
+  panel.style.left=left+"px";
+  panel.style.display="block";
+  PopupPatchCancel2();
+  var input=panel.childNodes[1];
+  input.focus();
+  input.selectionStart=input.selectionEnd=100;
+  input.onkeydown=(ev)=>{
+    console.log(ev.key);
+    switch(ev.key){
+    case "Enter":
+      var val=input.value;
+      if(val<offs) val=offs;
+      if(val>=par.max+offs) val=par.max+offs;
+      val-=offs;
+      if(isNaN(val)) val=0;
+      SetParamVal(currentpatch,f-1,p+1,val);
+      panel.style.display="none";
+      DispPatch(currentpatch);
+      break;
+    case "Escape":
+      panel.style.display="none";
+      break;
+    }
+  }
+  input.onblur=()=>{
+    panel.style.display="none";
+  };
 }
 function PopupPatchRename(){
   document.getElementById("inputtext").value="";
@@ -3858,19 +3982,28 @@ function DispPatch(patch){
             var dr=ef.param[p].dispr;
             if(dr>0){
               if(dr<1){
-                ev.value=(v*dr+ds).toFixed(1);
+                ev.innerHTML=(v*dr+ds).toFixed(1);
               }
               else
-                ev.value=v*dr+ds;
+                ev.innerHTML=v*dr+ds;
             }
             else
-              ev.value=v+ds;
+              ev.innerHTML=v+ds;
             break;
           case "object":
-            ev.value=ds[v];
+            if(ds.type=="Time"){
+              const t=v+ds.min;
+              if(t>=ds.max){
+                ev.innerHTML=ds.list[t-ds.max];
+              }
+              else
+                ev.innerHTML=t;
+            }
+            else
+              ev.innerHTML=ds[v];
             break;
           default:
-            ev.value=v;
+            ev.innerHTML=v;
           }
           if(typeof(ef.param[p].max)=="object"){
               ek.max=ef.param[p].max.length-1;
@@ -4368,6 +4501,7 @@ body{
 }
 #base{
   position:absolute;
+  user-select:none;
   top:0px;
   bottom:0px;
   left:0px;
@@ -4455,6 +4589,7 @@ h1{
   margin:0;
   padding:0;
   box-shadow: 2px 2px 3px 3px rgba(0,0,0,0.4);
+  user-select: none;
 }
 .popup>li{
   background:#cce;
@@ -4493,7 +4628,19 @@ img{
 .menubtn[disabled]{
   color:#aaa;
 }
-
+#popupeditpanel{
+  position:absolute;
+  top:0;
+  left:0;
+  width:160px;
+  height:50px;
+  padding:10px;
+  overflow-y:auto;
+}
+#popupeditpanel button {
+  width:140px;
+  height:20px;
+}
 .modalbase{
   position:absolute;
   display:none;
@@ -4730,15 +4877,15 @@ img{
   cursor:default;
   background:url(./images/bg-grad.png);
 }
-#effects td div div input{
+#effects td div div .param{
   display:none;
   background:#446;
   color:#ffd;
   width:55px;
-  height:12px;
+  height:20px;
   margin:2px 0px 0px 0px;
   text-align: center;
-  font-size:11px;
+  font-size:13px;
   font-weight:normal;
   border-radius:3px;
 }
@@ -5117,77 +5264,77 @@ webaudio-switch{
     <table id="effects">
       <tr>
         <th><button class="fnum" id="fnum1">1</button></th><td id="fnam1" class="fnam"><img id="fimg1" class="fimg"/><img id="full1" class="fimg"/><div id="ftxt1" class="ftxt"></div></td>
-        <td><div class="pcell pfocus" id="f1p1"><webaudio-knob id="f1p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p1v" disabled/></div><div id="f1p1l"></div></div></div></td>
-        <td><div class="pcell" id="f1p2"><webaudio-knob id="f1p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p2v" disabled/></div><div id="f1p2l"></div></div></div></td>
-        <td><div class="pcell" id="f1p3"><webaudio-knob id="f1p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p3v" disabled/></div><div id="f1p3l"></div></div></div></td>
-        <td><div class="pcell" id="f1p4"><webaudio-knob id="f1p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p4v" disabled/></div><div id="f1p4l"></div></div></div></td>
-        <td><div class="pcell" id="f1p5"><webaudio-knob id="f1p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p5v" disabled/></div><div id="f1p5l"></div></div></div></td>
-        <td><div class="pcell" id="f1p6"><webaudio-knob id="f1p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p6v" disabled/></div><div id="f1p6l"></div></div></div></td>
-        <td><div class="pcell" id="f1p7"><webaudio-knob id="f1p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p7v" disabled/></div><div id="f1p7l"></div></div></div></td>
-        <td><div class="pcell" id="f1p8"><webaudio-knob id="f1p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p8v" disabled/></div><div id="f1p8l"></div></div></div></td>
-        <td><div class="pcell" id="f1p9"><webaudio-knob id="f1p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f1p9v" disabled/></div><div id="f1p9l"></div></div></div></td>
+        <td><div class="pcell pfocus" id="f1p1"><webaudio-knob id="f1p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p1v" class="param"></div><div id="f1p1l"></div></div></div></td>
+        <td><div class="pcell" id="f1p2"><webaudio-knob id="f1p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p2v" class="param"></div><div id="f1p2l"></div></div></div></td>
+        <td><div class="pcell" id="f1p3"><webaudio-knob id="f1p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p3v" class="param"></div><div id="f1p3l"></div></div></div></td>
+        <td><div class="pcell" id="f1p4"><webaudio-knob id="f1p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p4v" class="param"></div><div id="f1p4l"></div></div></div></td>
+        <td><div class="pcell" id="f1p5"><webaudio-knob id="f1p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p5v" class="param"></div><div id="f1p5l"></div></div></div></td>
+        <td><div class="pcell" id="f1p6"><webaudio-knob id="f1p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p6v" class="param"></div><div id="f1p6l"></div></div></div></td>
+        <td><div class="pcell" id="f1p7"><webaudio-knob id="f1p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p7v" class="param"></div><div id="f1p7l"></div></div></div></td>
+        <td><div class="pcell" id="f1p8"><webaudio-knob id="f1p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p8v" class="param"></div><div id="f1p8l"></div></div></div></td>
+        <td><div class="pcell" id="f1p9"><webaudio-knob id="f1p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f1p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f1p9v" class="param"></div><div id="f1p9l"></div></div></div></td>
       </tr>
       <tr>
         <th><button class="fnum" id="fnum2">2</button></th><td id="fnam2" class="fnam"><img id="fimg2" class="fimg"/><img id="full2" class="fimg"/><div id="ftxt2" class="ftxt"></div></td>
-        <td><div class="pcell" id="f2p1"><webaudio-knob id="f2p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p1v" disabled/></div><div id="f2p1l"></div></div></div></td>
-        <td><div class="pcell" id="f2p2"><webaudio-knob id="f2p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p2v" disabled/></div><div id="f2p2l"></div></div></div></td>
-        <td><div class="pcell" id="f2p3"><webaudio-knob id="f2p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p3v" disabled/></div><div id="f2p3l"></div></div></div></td>
-        <td><div class="pcell" id="f2p4"><webaudio-knob id="f2p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p4v" disabled/></div><div id="f2p4l"></div></div></div></td>
-        <td><div class="pcell" id="f2p5"><webaudio-knob id="f2p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p5v" disabled/></div><div id="f2p5l"></div></div></div></td>
-        <td><div class="pcell" id="f2p6"><webaudio-knob id="f2p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p6v" disabled/></div><div id="f2p6l"></div></div></div></td>
-        <td><div class="pcell" id="f2p7"><webaudio-knob id="f2p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p7v" disabled/></div><div id="f2p7l"></div></div></div></td>
-        <td><div class="pcell" id="f2p8"><webaudio-knob id="f2p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p8v" disabled/></div><div id="f2p8l"></div></div></div></td>
-        <td><div class="pcell" id="f2p9"><webaudio-knob id="f2p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f2p9v" disabled/></div><div id="f2p9l"></div></div></div></td>
+        <td><div class="pcell" id="f2p1"><webaudio-knob id="f2p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p1v" class="param"></div><div id="f2p1l"></div></div></div></td>
+        <td><div class="pcell" id="f2p2"><webaudio-knob id="f2p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p2v" class="param"></div><div id="f2p2l"></div></div></div></td>
+        <td><div class="pcell" id="f2p3"><webaudio-knob id="f2p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p3v" class="param"></div><div id="f2p3l"></div></div></div></td>
+        <td><div class="pcell" id="f2p4"><webaudio-knob id="f2p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p4v" class="param"></div><div id="f2p4l"></div></div></div></td>
+        <td><div class="pcell" id="f2p5"><webaudio-knob id="f2p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p5v" class="param"></div><div id="f2p5l"></div></div></div></td>        <td><div class="pcell" id="f2p6"><webaudio-knob id="f2p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p6v" class="param"></div><div id="f2p6l"></div></div></div></td>
+        <td><div class="pcell" id="f2p7"><webaudio-knob id="f2p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p7v" class="param"></div><div id="f2p7l"></div></div></div></td>
+        <td><div class="pcell" id="f2p8"><webaudio-knob id="f2p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p8v" class="param"></div><div id="f2p8l"></div></div></div></td>
+        <td><div class="pcell" id="f2p9"><webaudio-knob id="f2p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f2p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f2p9v" class="param"></div><div id="f2p9l"></div></div></div></td>
       </tr>
       <tr>
         <th><button class="fnum" id="fnum3">3</button></th><td id="fnam3" class="fnam"><img id="fimg3" class="fimg"/><img id="full3" class="fimg"/><div id="ftxt3" class="ftxt"></div></td>
-        <td><div class="pcell" id="f3p1"><webaudio-knob id="f3p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p1v" disabled/></div><div id="f3p1l"></div></div></div></td>
-        <td><div class="pcell" id="f3p2"><webaudio-knob id="f3p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p2v" disabled/></div><div id="f3p2l"></div></div></div></td>
-        <td><div class="pcell" id="f3p3"><webaudio-knob id="f3p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p3v" disabled/></div><div id="f3p3l"></div></div></div></td>
-        <td><div class="pcell" id="f3p4"><webaudio-knob id="f3p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p4v" disabled/></div><div id="f3p4l"></div></div></div></td>
-        <td><div class="pcell" id="f3p5"><webaudio-knob id="f3p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p5v" disabled/></div><div id="f3p5l"></div></div></div></td>
-        <td><div class="pcell" id="f3p6"><webaudio-knob id="f3p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p6v" disabled/></div><div id="f3p6l"></div></div></div></td>
-        <td><div class="pcell" id="f3p7"><webaudio-knob id="f3p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p7v" disabled/></div><div id="f3p7l"></div></div></div></td>
-        <td><div class="pcell" id="f3p8"><webaudio-knob id="f3p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p8v" disabled/></div><div id="f3p8l"></div></div></div></td>
-        <td><div class="pcell" id="f3p9"><webaudio-knob id="f3p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f3p9v" disabled/></div><div id="f3p9l"></div></div></div></td>
+        <td><div class="pcell" id="f3p1"><webaudio-knob id="f3p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p1v" class="param"><input id="f3p1v" disabled/></div><div id="f3p1l"></div></div></div></td>
+        <td><div class="pcell" id="f3p2"><webaudio-knob id="f3p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p2v" class="param"></div><div id="f3p2l"></div></div></div></td>
+        <td><div class="pcell" id="f3p3"><webaudio-knob id="f3p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p3v" class="param"></div><div id="f3p3l"></div></div></div></td>
+        <td><div class="pcell" id="f3p4"><webaudio-knob id="f3p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p4v" class="param"></div><div id="f3p4l"></div></div></div></td>
+        <td><div class="pcell" id="f3p5"><webaudio-knob id="f3p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p5v" class="param"></div><div id="f3p5l"></div></div></div></td>
+        <td><div class="pcell" id="f3p6"><webaudio-knob id="f3p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p6v" class="param"></div><div id="f3p6l"></div></div></div></td>
+        <td><div class="pcell" id="f3p7"><webaudio-knob id="f3p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p7v" class="param"></div><div id="f3p7l"></div></div></div></td>
+        <td><div class="pcell" id="f3p8"><webaudio-knob id="f3p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p8v" class="param"></div><div id="f3p8l"></div></div></div></td>
+        <td><div class="pcell" id="f3p9"><webaudio-knob id="f3p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f3p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f3p9v" class="param"></div><div id="f3p9l"></div></div></div></td>
       </tr>
       <tr>
         <th><button class="fnum" id="fnum4">4</button></th><td id="fnam4" class="fnam"><img id="fimg4" class="fimg"/><img id="full4" class="fimg"/><div id="ftxt4" class="ftxt"></div></td>
-        <td><div class="pcell" id="f4p1"><webaudio-knob id="f4p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p1v" disabled/></div><div id="f4p1l"></div></div></div></td>
-        <td><div class="pcell" id="f4p2"><webaudio-knob id="f4p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p2v" disabled/></div><div id="f4p2l"></div></div></div></td>
-        <td><div class="pcell" id="f4p3"><webaudio-knob id="f4p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p3v" disabled/></div><div id="f4p3l"></div></div></div></td>
-        <td><div class="pcell" id="f4p4"><webaudio-knob id="f4p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p4v" disabled/></div><div id="f4p4l"></div></div></div></td>
-        <td><div class="pcell" id="f4p5"><webaudio-knob id="f4p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p5v" disabled/></div><div id="f4p5l"></div></div></div></td>
-        <td><div class="pcell" id="f4p6"><webaudio-knob id="f4p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p6v" disabled/></div><div id="f4p6l"></div></div></div></td>
-        <td><div class="pcell" id="f4p7"><webaudio-knob id="f4p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p7v" disabled/></div><div id="f4p7l"></div></div></div></td>
-        <td><div class="pcell" id="f4p8"><webaudio-knob id="f4p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p8v" disabled/></div><div id="f4p8l"></div></div></div></td>
-        <td><div class="pcell" id="f4p9"><webaudio-knob id="f4p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f4p9v" disabled/></div><div id="f4p9l"></div></div></div></td>
+        <td><div class="pcell" id="f4p1"><webaudio-knob id="f4p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p1v" class="param"></div><div id="f4p1l"></div></div></div></td>
+        <td><div class="pcell" id="f4p2"><webaudio-knob id="f4p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p2v" class="param"></div><div id="f4p2l"></div></div></div></td>
+        <td><div class="pcell" id="f4p3"><webaudio-knob id="f4p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p3v" class="param"></div><div id="f4p3l"></div></div></div></td>
+        <td><div class="pcell" id="f4p4"><webaudio-knob id="f4p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p4v" class="param"></div><div id="f4p4l"></div></div></div></td>
+        <td><div class="pcell" id="f4p5"><webaudio-knob id="f4p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p5v" class="param"></div><div id="f4p5l"></div></div></div></td>
+        <td><div class="pcell" id="f4p6"><webaudio-knob id="f4p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p6v" class="param"></div><div id="f4p6l"></div></div></div></td>
+        <td><div class="pcell" id="f4p7"><webaudio-knob id="f4p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p7v" class="param"></div><div id="f4p7l"></div></div></div></td>
+        <td><div class="pcell" id="f4p8"><webaudio-knob id="f4p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p8v" class="param"></div><div id="f4p8l"></div></div></div></td>
+        <td><div class="pcell" id="f4p9"><webaudio-knob id="f4p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f4p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f4p9v" class="param"></div><div id="f4p9l"></div></div></div></td>
       </tr>
       <tr>
         <th><button class="fnum" id="fnum5">5</button></th><td id="fnam5" class="fnam"><img id="fimg5" class="fimg"/><img id="full5" class="fimg"/><div id="ftxt5" class="ftxt"></div></td>
-        <td><div class="pcell" id="f5p1"><webaudio-knob id="f5p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p1v" disabled/></div><div id="f5p1l"></div></div></div></td>
-        <td><div class="pcell" id="f5p2"><webaudio-knob id="f5p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p2v" disabled/></div><div id="f5p2l"></div></div></div></td>
-        <td><div class="pcell" id="f5p3"><webaudio-knob id="f5p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p3v" disabled/></div><div id="f5p3l"></div></div></div></td>
-        <td><div class="pcell" id="f5p4"><webaudio-knob id="f5p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p4v" disabled/></div><div id="f5p4l"></div></div></div></td>
-        <td><div class="pcell" id="f5p5"><webaudio-knob id="f5p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p5v" disabled/></div><div id="f5p5l"></div></div></div></td>
-        <td><div class="pcell" id="f5p6"><webaudio-knob id="f5p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p6v" disabled/></div><div id="f5p6l"></div></div></div></td>
-        <td><div class="pcell" id="f5p7"><webaudio-knob id="f5p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p7v" disabled/></div><div id="f5p7l"></div></div></div></td>
-        <td><div class="pcell" id="f5p8"><webaudio-knob id="f5p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p8v" disabled/></div><div id="f5p8l"></div></div></div></td>
-        <td><div class="pcell" id="f5p9"><webaudio-knob id="f5p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f5p9v" disabled/></div><div id="f5p9l"></div></div></div></td>
+        <td><div class="pcell" id="f5p1"><webaudio-knob id="f5p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p1v" class="param"></div><div id="f5p1l"></div></div></div></td>
+        <td><div class="pcell" id="f5p2"><webaudio-knob id="f5p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p2v" class="param"></div><div id="f5p2l"></div></div></div></td>
+        <td><div class="pcell" id="f5p3"><webaudio-knob id="f5p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p3v" class="param"></div><div id="f5p3l"></div></div></div></td>
+        <td><div class="pcell" id="f5p4"><webaudio-knob id="f5p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p4v" class="param"></div><div id="f5p4l"></div></div></div></td>
+        <td><div class="pcell" id="f5p5"><webaudio-knob id="f5p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p5v" class="param"></div><div id="f5p5l"></div></div></div></td>
+        <td><div class="pcell" id="f5p6"><webaudio-knob id="f5p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p6v" class="param"></div><div id="f5p6l"></div></div></div></td>
+        <td><div class="pcell" id="f5p7"><webaudio-knob id="f5p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p7v" class="param"></div><div id="f5p7l"></div></div></div></td>
+        <td><div class="pcell" id="f5p8"><webaudio-knob id="f5p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p8v" class="param"></div><div id="f5p8l"></div></div></div></td>
+        <td><div class="pcell" id="f5p9"><webaudio-knob id="f5p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f5p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f5p9v" class="param"></div><div id="f5p9l"></div></div></div></td>
       </tr>
       <tr>
         <th><button class="fnum" id="fnum6">6</button></th><td id="fnam6" class="fnam"><img id="fimg6" class="fimg"/><img id="full6" class="fimg"/><div id="ftxt6" class="ftxt"></div></td>
-        <td><div class="pcell" id="f6p1"><webaudio-knob id="f6p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p1v" disabled/></div><div id="f6p1l"></div></div></div></td>
-        <td><div class="pcell" id="f6p2"><webaudio-knob id="f6p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p2v" disabled/></div><div id="f6p2l"></div></div></div></td>
-        <td><div class="pcell" id="f6p3"><webaudio-knob id="f6p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p3v" disabled/></div><div id="f6p3l"></div></div></div></td>
-        <td><div class="pcell" id="f6p4"><webaudio-knob id="f6p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p4v" disabled/></div><div id="f6p4l"></div></div></div></td>
-        <td><div class="pcell" id="f6p5"><webaudio-knob id="f6p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p5v" disabled/></div><div id="f6p5l"></div></div></div></td>
-        <td><div class="pcell" id="f6p6"><webaudio-knob id="f6p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p6v" disabled/></div><div id="f6p6l"></div></div></div></td>
-        <td><div class="pcell" id="f6p7"><webaudio-knob id="f6p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p7v" disabled/></div><div id="f6p7l"></div></div></div></td>
-        <td><div class="pcell" id="f6p8"><webaudio-knob id="f6p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p8v" disabled/></div><div id="f6p8l"></div></div></div></td>
-        <td><div class="pcell" id="f6p9"><webaudio-knob id="f6p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div><input id="f6p9v" disabled/></div><div id="f6p9l"></div></div></div></td>
+        <td><div class="pcell" id="f6p1"><webaudio-knob id="f6p1k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p1s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p1v" class="param"></div><div id="f6p1l"></div></div></div></td>
+        <td><div class="pcell" id="f6p2"><webaudio-knob id="f6p2k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p2s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p2v" class="param"></div><div id="f6p2l"></div></div></div></td>
+        <td><div class="pcell" id="f6p3"><webaudio-knob id="f6p3k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p3s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p3v" class="param"></div><div id="f6p3l"></div></div></div></td>
+        <td><div class="pcell" id="f6p4"><webaudio-knob id="f6p4k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p4s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p4v" class="param"></div><div id="f6p4l"></div></div></div></td>
+        <td><div class="pcell" id="f6p5"><webaudio-knob id="f6p5k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p5s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p5v" class="param"></div><div id="f6p5l"></div></div></div></td>
+        <td><div class="pcell" id="f6p6"><webaudio-knob id="f6p6k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p6s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p6v" class="param"></div><div id="f6p6l"></div></div></div></td>
+        <td><div class="pcell" id="f6p7"><webaudio-knob id="f6p7k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p7s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p7v" class="param"></div><div id="f6p7l"></div></div></div></td>
+        <td><div class="pcell" id="f6p8"><webaudio-knob id="f6p8k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p8s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p8v" class="param"></div><div id="f6p8l"></div></div></div></td>
+        <td><div class="pcell" id="f6p9"><webaudio-knob id="f6p9k" diameter="32" src="./images/ms50gknob.png" sprites="100"></webaudio-knob><webaudio-switch id="f6p9s" src="./images/switch.png" width="32" height="32"></webaudio-switch><div><div id="f6p9v" class="param"></div><div id="f6p9l"></div></div></div></td>
       </tr>
     </table>
+    <div id="popupeditpanel" class="popup"></div>
   </div>
 
   <ul id="popuppatch" class="popup">
@@ -5306,6 +5453,12 @@ webaudio-switch{
       <button onclick="ShowDoc('en')" style="width:80px">English</button> | <button onclick="ShowDoc('ja')" style="width:80px">Japanese</button>
       <div id="usagescr">
         <div class="doc_en">
+          <h3>What's new v1.0.1</h3>
+          <ul>
+            <li>Fix the switch behavior when clicking</li>
+            <li>The parameter display is now the same as the device display when the DELAY's Time is tempo sync</li>
+            <li>By double-clicking the parameter value display, numerical values edit from the keyboard is enabled</li>
+          </ul>
           <h3>Usage</h3>
           <ul>
             <li>Launch<br/>
@@ -5339,7 +5492,9 @@ webaudio-switch{
                 <li>Effects are draggable to another position to change order</li>
                 <li>From right-click or number-button context menu, each effect can be add/move/del</li>
                 <li>Each parameter can be edit by drag(coarse)/shift-drag(fine)</li>
+                <li>Keyboard Up/Down to increase/decrease(fine), PageUp/PageDown(Shift+PageUp/Shift+PageDown) to increase/decrease(coarse) the value</li>
                 <li>Mouse wheel and Shift+wheel are also available to value edit</li>
+                <li>Also, numerical edit from the keyboard by double-clicking the displayed value</li>
               </ul>
             </li>
             <li>Bank<br/>
@@ -5392,6 +5547,12 @@ webaudio-switch{
           </ul>
         </div>
         <div class="doc_ja">
+          <h3>What's new v1.0.1</h3>
+          <ul>
+            <li>スイッチをクリックした時の挙動を修正しました</li>
+            <li>ディレイのTimeがテンポシンクになっている場合のパラメータ表示をデバイスの表示に合わせました</li>
+            <li>パラメータ値表示をダブルクリックする事で、キーボードからの数値編集ができるようになりました。</li>
+          </ul>
           <h3>使い方</h3>
           <ul>
             <li>起動<br/>
@@ -5423,8 +5584,10 @@ webaudio-switch{
                 <li>エフェクト名をクリックすると、エフェクトのオン/オフが切り替わります</li>
                 <li>エフェクト名をドラッグする事で順番を入れ替える事ができます</li>
                 <li>エフェクト名を右クリックまたはエフェクト番号のボタンを押すとコンテキストメニューが表示され、エフェクトの追加や削除、移動ができます</li>
-                <li>エフェクトの各パラメータの調整はドラッグ(微調整はShift + ドラッグ)で行います。</li>
+                <li>エフェクトの各パラメータの調整はドラッグ(微調整はShift + ドラッグ)で行います</li>
+                <li>またはキーボードの上/下で値の増減、PageUp/PageDown(Shift+上/下) で値のおおまかな増減ができます</li>
                 <li>また、マウスホイールの操作でパラメータ調整を行う事もできます。微調整は (Shift + マウスホイール)で行います</li>
+                <li>更に、表示されている値をダブルクリックする事でキーボードからの数値入力を行う事もできます</li>
               </ul>
             </li>
             <li>バンク<br/>
@@ -5516,6 +5679,5 @@ webaudio-switch{
       <button id="alertok">Ok</button>
     </div>
   </div>
-
 </body>
 </html>
