@@ -3447,7 +3447,7 @@ function PopupEdit(f,p,par){
   };
 }
 function PopupPatchRename(){
-  document.getElementById("inputtext").value="";
+  document.getElementById("inputtext").value=patches[currentpatch].name;
   var tar=document.getElementById((currentpatch+1)+"nam");
   document.getElementById("inputmsg").innerHTML="Rename Patch";
   var rc=tar.getBoundingClientRect();
@@ -3455,6 +3455,7 @@ function PopupPatchRename(){
   var panel=document.getElementById("inputpanel");
   panel.style.left=(rc.left-80+window.pageXOffset)+"px";
   panel.style.top=(rc.top+20+window.pageYOffset)+"px";
+  document.getElementById("inputtext").focus();
   PopupPatchCancel2();
   document.getElementById("inputok").onclick=function(ev){
     var i;
