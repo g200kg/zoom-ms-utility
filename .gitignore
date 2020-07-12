@@ -50,3 +50,7 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# Node
+node_modules
+package-lock.json
