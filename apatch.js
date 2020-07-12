@@ -235,7 +235,7 @@ apatch.prototype.ReadBin=function(dat){
   this.curfx=this.GetCurFxBit(dat);
   this.dspstate=dat[(len>=146)?129:88]&0x3f;
 };
-apatch.prototype.MakeBin=function(id){
+apatch.prototype.MakeBin=function(id,effectlistlocal){
   var i,r,flen;
   if(id==0x5f){
     r=this.empty105.slice(0);
@@ -258,7 +258,7 @@ apatch.prototype.MakeBin=function(id){
     for(var p=0;p<11;++p){
       this.SetBits(r,this.bits[f][p],this.fx[f][p]);
     }
-    var ef=effectlist[this.fx[f][1]];
+    var ef=(effectlistlocal || effectlist)[this.fx[f][1]];
     if(ef && ef.group=="AMP"){
       if((ef.ver&0xf0)==0x20){
         r[this.v2byte[f]]=0x20;
