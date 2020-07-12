@@ -1,0 +1,34 @@
+{
+  "name": "zoom-ms-utility",
+  "version": "1.0.1",
+  "description": "Online Zoom MS-50G/MS-60B/MS-70CDR multi stomp patch editor.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo none yet"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/g200kg/zoom-ms-utility.git"
+  },
+  "keywords": [
+    "zoom",
+    "MS-50G",
+    "MS-60B",
+    "MS-70CDR",
+    "multi",
+    "stomp",
+    "editor",
+    "utility",
+    "midi"
+  ],
+  "author": "@g200kg",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/g200kg/zoom-ms-utility/issues"
+  },
+  "homepage": "https://github.com/g200kg/zoom-ms-utility#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
