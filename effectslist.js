@@ -1,3 +1,7 @@
+var bampcabmax=[];
+var bampcabdisp=[];
+var gampcabmax=[];
+var gampcabdisp=[];
 var effectlist={
   0x00000000:{name:"THRU",group:"THRU",order:1,install:1,ver:0x0101,
     dsp:10000,dspmax:0,dspmin:0,
