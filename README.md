@@ -12,7 +12,18 @@ This is still a very tentative version for the confirmation of MIDI related func
 
 Online Patch Editor: [Zoom MS Utility Page](https://g200kg.github.io/zoom-ms-utility/)
 
-## To Use this tool in offline
+## To Use this tool in offline mode
+
+### Via Node.js (Recommended)
+
+Standard Node.js workflow, clone this repo and run:
+```bash
+npm install
+npm start
+```
+As per the output, open a Browser and visit (http://localhost:3000)[http://localhost:3000]
+
+### Via Other local web servers
 
 This tool will not work if you just open the local html file by Chrome because of file access security limitation. There are several ways to use this tool in an offline environment.
 
