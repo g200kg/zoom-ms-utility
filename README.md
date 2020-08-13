@@ -1,20 +1,39 @@
 # zoom-ms-utility
-Online Zoom MS-50G/MS-60B/MS-70CDR multi stomp patch editor.
+Zoom MS-50G/MS-60B/MS-70CDR multi stomp patch editor.
 
-This is a patch utility for the ZOOM MS - 50G / 60B / 70 CDR MultiStomp guitar pedal which runs on the chrome browser.  
+This is a patch utility for the ZOOM MS - 50G / 60B / 70 CDR MultiStomp guitar pedal.  
 This is still a very tentative version for the confirmation of MIDI related function.
+
+* in v1.0.2, standalone executables for Win / Mac are available. 
+
+## Install
+* **Online version** :  
+The application starts just by accessing it with **Chrome**, so installation is not required.
+
+* **Stand-alone version** :  
+1. Download whole repository(`zoom-ms-utility-master.zip`) from https://github.com/g200kg/zoom-ms-utility by [Code]-[Download ZIP].
+2. Unzip `zoom-ms-utility-master.zip`.
+3. Place the necessary files into your appropriate folder.  
+
+  **Windows (x64) version** :  
+  > necessary files are in the `dist/zoom-ms-utility-1.0.2-win-x64`  
+  > startup executable is `ZoomMSUtility.exe` in the folder.
+
+  **Mac (x64) version** : 
+  > necessary files are in the `dist/zoom-ms-utility-1.0.2-mac-x64`  
+  > Starts with `ZoomMSUtility.app` in the folder.  
 
 ## Usage
 * Connect PC/Mac to MS-50G/60B/70CDR via USB
-* Launch this page. You should use latest ***Chrome***
+* Launch this app. You should use latest ***Chrome*** for Online version
 * Press accept if 'MIDI device' dialog is displayed
 * Select MidiPort to 'ZOOM MS Series'
 
-Online Patch Editor: [Zoom MS Utility Page](https://g200kg.github.io/zoom-ms-utility/)
 
-## To Use this tool in offline mode
+## Offline mode
+Though the standalone version is recommended for offline use, the following is for use via Node.js or another local server.
 
-### Via Node.js (Recommended)
+### Via Node.js
 
 Standard Node.js workflow, clone this repo and run:
 ```bash
@@ -47,6 +66,7 @@ This tool will not work if you just open the local html file by Chrome because o
   Note that this method will not work if the Chrome instance is already exist. You should close all Chrome window before launch.
 
 ## History
+* v1.0.2 add standalone version
 * v1.0.1 Fix behavior when click a switch
 
 ## Info

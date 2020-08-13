@@ -1,5 +1,5 @@
 # bower
-#bower_components/
+bower_components/
 
 # Windows image file caches
 Thumbs.db
@@ -54,3 +54,8 @@ Temporary Items
 # Node
 node_modules
 package-lock.json
+
+# dist
+dist/zoom-ms-utility-1.0.2-mac-x64
+dist/zoom-ms-utility-1.0.2-win-x64
+

@@ -1,11 +1,20 @@
 {
   "name": "zoom-ms-utility",
-  "version": "1.0.1",
-  "description": "Online Zoom MS-50G/MS-60B/MS-70CDR multi stomp patch editor.",
-  "main": "index.js",
+  "version": "1.0.2",
+  "description": "Zoom MS-50G/MS-60B/MS-70CDR multi stomp patch editor.",
+  "main": "index.html",
+  "window": {
+    "width": 1200,
+    "height": 640,
+    "resizable": false
+  },
   "scripts": {
-    "start": "node index.js",
-    "test": "echo none yet"
+    "start": "node js/index.js",
+    "test": "echo none yet",
+    "dist:build": "build --tasks win-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
+    "dist:zip": "bestzip dist/zoom-ms-utility-1.0.2-win-x64.zip dist/zoom-ms-utility-1.0.2-win-x64/* && bestzip dist/zoom-ms-utility-1.0.2-mac-x64.zip dist/zoom-ms-utility-1.0.2-mac-x64/*",
+    "dist": "npm run dist:build && npm run dist:zip",
+    "nwstart": "run --x64 --mirror https://dl.nwjs.io/ ."
   },
   "repository": {
     "type": "git",
@@ -30,5 +39,25 @@
   "homepage": "https://github.com/g200kg/zoom-ms-utility#readme",
   "dependencies": {
     "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "bestzip": "^2.1.6",
+    "nwjs-builder-phoenix": "^1.15.0"
+  },
+  "build": {
+    "nwVersion": "0.47.2",
+    "nwFlavor": "normal",
+    "packed": true,
+    "win": {
+      "productName": "ZoomMSUtility",
+      "companyName": "g200kg",
+      "copyright": "g200kg",
+      "icon": "./images/icon.ico"
+    },
+    "mac": {
+      "displayName": "ZoomMSUtility",
+      "copyright": "g200kg",
+      "icon": "./images/icon.icns"
+    }
   }
 }

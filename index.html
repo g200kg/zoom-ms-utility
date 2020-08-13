@@ -6,10 +6,10 @@
 <link rel="icon" href="./images/icon.png" />
 <!--<link href="https://fonts.googleapis.com/css?family=Audiowide" rel="stylesheet">-->
 <!--<link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">-->
-<script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>
+<!--<script src="bower_components/webcomponentsjs/webcomponents-lite.js"></script>-->
 <script>UseWebAudioControlsMidi=0</script>
-<script src="bower_components/webaudio-controls/webaudio-controls.js"></script>
-<script src="./bower_components/jszip/dist/jszip.min.js"></script>
+<script src="./js/webaudio-controls.js"></script>
+<script src="./js/jszip.min.js"></script>
 <script>
 //
 // Zoom MS-50G / 60B / 70CDR
@@ -43,7 +43,7 @@
 //  ??? :                 [0xf0,0x52,0x00,0x58,0x60,0xf7]
 //
 
-</script><script src="apatch.js"></script><script>
+</script><script src="./js/apatch.js"></script><script>
 
 var midiif=null;
 var midioutputs=[];
@@ -102,7 +102,7 @@ var gampcab=[
     disp:["FD COMBO 2x12","DLX-R 1x12","FD VIBRO 2x10","US BLUES 4x10","VX COMBO 2x12","VX JMI 2x12","BG CRUNCH 1x12","MATCH 30 2x12","CAR DRIVE 1x12","TW ROCK 1x12","TONE CITY 4x12","HW STACK 4x12","TANGERINE 4x12","B-BRKR 2x12","MS CRUNCH 4x12","MS 1959 4x12","MS DRIVE 4x12","BGN DRIVE 4x12","BG DRIVE 4x12","DZ DRIVE 4x12","ALIEN 4x12","REVO-1 4x12","OFF"],
   }
 ];
-</script><script src="effectslist.js"></script><script>
+</script><script src="./js/effectslist.js"></script><script>
 
 function dumpeff(){
   console.log("name,group,ms50g,ms60b,ms70cdr,dsp(%),description")
@@ -513,6 +513,13 @@ function MakeBin(s,len){
 }
 function Init(){
   var i;
+  if(typeof(nw)!="undefined"){
+    var nwgui= require("nw.gui");
+    nwgui.Window.get().on('new-win-policy', function(frame, url, policy) {
+      policy.ignore();
+      nwgui.Shell.openExternal(url);
+    });
+  }
   document.getElementById("g200kglogo").addEventListener("click",()=>{OpenUrl("https://www.g200kg.com")});
   document.getElementById("github").addEventListener("click",()=>{OpenUrl("https://github.com/g200kg/zoom-ms-utility")});
   document.getElementById("github2").addEventListener("click",()=>{OpenUrl("https://github.com/g200kg/zoom-ms-utility")});
@@ -1089,7 +1096,7 @@ function PopupPatchDelete(){
       StorePatch(currentpatch);
     ev.target.parentNode.parentNode.style.display="none";
   },
-  {x:(rc.left-55+window.pageXOffset), y:(rc.top+24+window.pageYOffset)},
+  {x:(rc.left-100+window.pageXOffset), y:(rc.top+24+window.pageYOffset)},
   );
   PopupPatchCancel2();
 }
@@ -1207,7 +1214,7 @@ function PopupPatchRename(){
   var rc=tar.getBoundingClientRect();
   document.getElementById("inputbase").style.display="block";
   var panel=document.getElementById("inputpanel");
-  panel.style.left=(rc.left-80+window.pageXOffset)+"px";
+  panel.style.left=(rc.left-120+window.pageXOffset)+"px";
   panel.style.top=(rc.top+20+window.pageYOffset)+"px";
   document.getElementById("inputtext").focus();
   PopupPatchCancel2();
@@ -1929,7 +1936,7 @@ function ImportText(){
   };
 }
 function OpenUrl(url){
-    window.open(url);
+  window.open(url);
 }
 function ShowDoc(x) {
   var divs=document.getElementsByTagName("div");
@@ -2622,7 +2629,7 @@ webaudio-switch{
     <div id="header">
       <img src="./images/g200kg160x80.png" id="g200kglogo"/>
       <img src="./images/title.png" id="title"/>
-      <div id="version" style="font-size:12px;vertical-align:top">v1.0.1</div>
+      <div id="version" style="font-size:12px;vertical-align:top">v1.0.2</div>
       <div id="subtitle">Patch editor for ZOOM MS-50G / 60B / 70CDR MultiStomp guitar/bass pedal</div>
       <div class="info">Source code is available at GitHub : <div id="github" style="text-decoration:underline;cursor:pointer">https://github.com/g200kg/zoom-ms-utility</div></div>
     </div>
@@ -2907,7 +2914,11 @@ webaudio-switch{
       <button onclick="ShowDoc('en')" style="width:80px">English</button> | <button onclick="ShowDoc('ja')" style="width:80px">Japanese</button>
       <div id="usagescr">
         <div class="doc_en">
-          <h3>What's new v1.0.1</h3>
+          <h3>What's new v1.0.2</h3>
+          <ul>
+            <li>Added stand-alone version</li>
+          </ul>
+          <h3>v1.0.1</h3>
           <ul>
             <li>Fix the switch behavior when clicking</li>
             <li>The parameter display is now the same as the device display when the DELAY's Time is tempo sync</li>
@@ -2992,16 +3003,25 @@ webaudio-switch{
                 <li>Keybeard 'F9' is assigned to Tuner mode On/Off.</li>
               </ul>
             </li>
-            <li>Usage in offline environment<br/>
+            <li>Usage in online / offline environment<br/>
               <ul>
-                <li>If you want to use with no Internet connection, place the file on the local server and connect with http:// .</li>
-                <li>It does not work properly with file:/// which simply opens a local file in the browser.</li>
+                <li>Online version : <a href="https://g200kg.github.io/zoom-ms-utility/" target="_blank">https://g200kg.github.io/zoom-ms-utility/</a></li>
+                <li>Standalone version : Offline executables are available in the repository <a href="https://github.com/g200kg/zoom-ms-utility" target="_blank">zoom-ms-utility</a>,
+                  <ul>
+                    <li>Windows (x64) : dist/zoom-ms-utility-1.0.2-win-x64</li>
+                    <li>Mac (x64) : dist/zoom-ms-utility-1.0.2-mac-x64</li>
+                  </ul>
+                </li>
               </ul>
             </li>
-          </ul>
+        </ul>
         </div>
         <div class="doc_ja">
-          <h3>What's new v1.0.1</h3>
+          <h3>What's new v1.0.2</h3>
+          <ul>
+            <li>スタンドアローンバージョンを追加しました</li>
+          </ul>
+          <h3>v1.0.1</h3>
           <ul>
             <li>スイッチをクリックした時の挙動を修正しました</li>
             <li>ディレイのTimeがテンポシンクになっている場合のパラメータ表示をデバイスの表示に合わせました</li>
@@ -3085,10 +3105,15 @@ webaudio-switch{
                 <li>キーボードの'F9'はチューナーのオン/オフを切り替えます</li>
               </ul>
             </li>
-            <li>オフラインでの使用<br/>
+            <li>オンライン / オフラインでの使用<br/>
               <ul>
-                <li>インターネット接続が無い状態で使用する場合はローカルサーバーにファイルを配置し、http://で接続してください</li>
-                <li>ブラウザで単にローカルファイルを開く file:/// では正常に動作しません</li>
+                <li>オンライン版 : <a href="https://g200kg.github.io/zoom-ms-utility/" target="_blank">https://g200kg.github.io/zoom-ms-utility/</a></li>
+                <li>スタンドアローン版 : オフライン環境で動作する実行ファイルが、リポジトリ <a href="https://github.com/g200kg/zoom-ms-utility" target="_blank">zoom-ms-utility</a> にあります。
+                  <ul>
+                    <li>Windows (x64) : dist/zoom-ms-utility-1.0.2-win-x64</li>
+                    <li>Mac (x64) : dist/zoom-ms-utility-1.0.2-mac-x64</li>
+                  </ul>
+                </li>
               </ul>
             </li>
           </ul>
