@@ -11,16 +11,13 @@ This is still a very tentative version for the confirmation of MIDI related func
 The application starts just by accessing it with **Chrome**, so installation is not required.
 
 * **Stand-alone version** :  
-1. Download whole repository(`zoom-ms-utility-master.zip`) from https://github.com/g200kg/zoom-ms-utility by [Code]-[Download ZIP].
-2. Unzip `zoom-ms-utility-master.zip`.
-3. Place the necessary files into your appropriate folder.  
+1. Download zip file (`zoom-ms-utility-XXX-XXX.zip`) from [https://github.com/g200kg/zoom-ms-utility/tree/master/dist](https://github.com/g200kg/zoom-ms-utility/tree/master/dist)
+2. Unzip and place to your appropriate folder.
 
   **Windows (x64) version** :  
-  > necessary files are in the `dist/zoom-ms-utility-1.0.2-win-x64`  
   > startup executable is `ZoomMSUtility.exe` in the folder.
 
   **Mac (x64) version** : 
-  > necessary files are in the `dist/zoom-ms-utility-1.0.2-mac-x64`  
   > Starts with `ZoomMSUtility.app` in the folder.  
 
 ## Usage
@@ -29,9 +26,13 @@ The application starts just by accessing it with **Chrome**, so installation is 
 * Press accept if 'MIDI device' dialog is displayed
 * Select MidiPort to 'ZOOM MS Series'
 
+## TECH NOTE : For build standalone packages
+* The standalone versions are packaged using `NW.JS`
+* Git LFS required due to large file size
+* Create ZIP-files for distribution with `npm run dist`.
 
 ## Offline mode
-Though the standalone version is recommended for offline use, the following is for use via Node.js or another local server.
+Though the standalone version is available for offline use, the following is for use via Node.js or another local server.
 
 ### Via Node.js
 
