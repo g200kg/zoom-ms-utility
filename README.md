@@ -18,6 +18,7 @@ The application starts just by accessing it with **Chrome**, so installation is 
   > startup executable is `ZoomMSUtility.exe` in the folder.
 
   **Mac (x64) version** : 
+  > You should manage `GateKeeper` by yourself.
   > Starts with `ZoomMSUtility.app` in the folder.  
 
 ## Usage
@@ -32,7 +33,8 @@ The application starts just by accessing it with **Chrome**, so installation is 
 * Create ZIP-files for distribution with `npm run dist`.
 
 ## Offline mode
-Though the standalone version is available for offline use, the following is for use via Node.js or another local server.
+For windows, the standalone version is recommended for offline use.
+On mac, you need to manage GateKeeper yourself to launch the standalone version. Or build it yourself or use the following offline modes.
 
 ### Via Node.js
 
