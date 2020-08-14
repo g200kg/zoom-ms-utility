@@ -11,14 +11,14 @@ This is still a very tentative version for the confirmation of MIDI related func
 The application starts just by accessing it with **Chrome**, so installation is not required.
 
 * **Stand-alone version** :  
-1. Download zip file (`zoom-ms-utility-XXX-XXX.zip`) from [https://github.com/g200kg/zoom-ms-utility/tree/master/dist](https://github.com/g200kg/zoom-ms-utility/tree/master/dist)
-2. Unzip and place to your appropriate folder.
 
-  **Windows (x64) version** :  
+  **Windows (x64)** :  
+  > Download and Unzip [zoom-ms-utility-1.0.2-win-x64.zip](https://www.g200kg.com/software/zoom-ms-utility/zoom-ms-utility-1.0.2-win-x64.zip)  
   > startup executable is `ZoomMSUtility.exe` in the folder.
 
-  **Mac (x64) version** : 
-  > You should manage `GateKeeper` by yourself.
+  **Mac (x64)** : 
+  > **You should manage `GateKeeper` by yourself**.  
+  > Download and Unzip [zoom-ms-utility-1.0.2-mac-x64.zip](https://www.g200kg.com/software/zoom-ms-utility/zoom-ms-utility-1.0.2-mac-x64.zip)  
   > Starts with `ZoomMSUtility.app` in the folder.  
 
 ## Usage
@@ -29,8 +29,7 @@ The application starts just by accessing it with **Chrome**, so installation is 
 
 ## TECH NOTE : For build standalone packages
 * The standalone versions are packaged using `NW.JS`
-* Git LFS required due to large file size
-* Create ZIP-files for distribution with `npm run dist`.
+* Create dist-files with `npm run dist`.
 
 ## Offline mode
 For windows, the standalone version is recommended for offline use.

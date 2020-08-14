@@ -56,6 +56,4 @@ node_modules
 package-lock.json
 
 # dist
-dist/zoom-ms-utility-1.0.2-mac-x64
-dist/zoom-ms-utility-1.0.2-win-x64
-
+dist/
