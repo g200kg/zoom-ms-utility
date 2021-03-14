@@ -28,8 +28,9 @@ The application starts just by accessing it with **Chrome**, so installation is 
 * Select MidiPort to 'ZOOM MS Series'
 
 ## TECH NOTE : For build standalone packages
-* The standalone versions are packaged using `NW.JS`
+* The standalone versions are packaged using [`NW.js`](https://nwjs.io/)
 * Create dist-files with `npm run dist`.
+* Start the built NW.js app with `npm run nwstart`.
 
 ## Offline mode
 For windows, the standalone version is recommended for offline use.
@@ -42,7 +43,7 @@ Standard Node.js workflow, clone this repo and run:
 npm install
 npm start
 ```
-As per the output, open a Browser and visit (http://localhost:3000)[http://localhost:3000]
+As per the output, open a Browser and visit [http://localhost:3000](http://localhost:3000)
 
 ### Via Other local web servers
 

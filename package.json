@@ -11,8 +11,8 @@
   "scripts": {
     "start": "node js/index.js",
     "test": "echo none yet",
-    "dist": "build --tasks win-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
-    "nwstart": "run --x64 --mirror https://dl.nwjs.io/ ."
+    "dist": "npx build --tasks win-x64,mac-x64 --mirror https://dl.nwjs.io/ .",
+    "nwstart": "npx run --x64 --mirror https://dl.nwjs.io/ ."
   },
   "repository": {
     "type": "git",
