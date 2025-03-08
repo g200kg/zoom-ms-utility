@@ -3,6 +3,10 @@ Zoom MS-50G/MS-60B/MS-70CDR multi stomp patch editor.
 
 This is an updated GUI Web Version only for the original repo: https://github.com/g200kg/zoom-ms-utility
 
+### Available online
+The tool is available online without any installation, open the following link in Chrome (or other Web MIDI supported browser)
+https://radinsky.github.io/zoom-ms-utility/
+
 ### Usage
 Just open index.html in your (Chrome) browser
 
