@@ -7,7 +7,7 @@ This is an updated GUI Web Version only for the original repo: https://github.co
 The tool is available online without any installation, open the following link in Chrome (or other Web MIDI supported browser)
 https://radinsky.github.io/zoom-ms-utility/
 
-### Usage
+### Usage (offline)
 Just open index.html in your (Chrome) browser
 
 ### Via Other local web servers
